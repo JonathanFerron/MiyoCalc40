@@ -1,11 +1,10 @@
 # MiyoCalc40
  RPN calculator
 
-This is a project for a trough-hole only RPN calculator with a flexible configuration. The idea is for it to be minimalist, meant as a complement to other tools that the user would typically have on hand (computer, formula cheat sheet, etc.) rather than as a replacement, and made with easy to solder through-hole components.
+This is a project for a trough-hole only RPN calculator with a flexible configuration. The idea is for it to be minimalist, meant as a complement to other tools that the 
+user would typically have on hand (computer, formula cheat sheet, etc.) rather than as a replacement, and made with easy to solder through-hole components.
 
-Shield: [![CC BY 4.0][cc-by-shield]][cc-by]
-
-The MiyoCalc40 PCB work is licensed under a
+The MiyoCalc40 _PCB work_ is licensed under a
 [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License][cc-by-nc-sa].
 
 [![CC BY-NC-SA 4.0][cc-by-nc-sa-image]][cc-by-nc-sa]
