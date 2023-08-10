@@ -1,0 +1,7 @@
+(sym_lib_table
+  (lib (name "MiyoCalcSymbolLibrary")(type "KiCad")(uri "${KIPRJMOD}/../lib_sch/MiyoCalcSymbolLibrary.kicad_sym")(options "")(descr ""))
+  (lib (name "Device_AKL")(type "KiCad")(uri "${KICAD6_3RD_PARTY}/symbols/com_github_dawidcislo_alternate-kicad-library/Device_AKL.kicad_sym")(options "")(descr ""))
+  (lib (name "Diode_AKL")(type "KiCad")(uri "${KICAD6_3RD_PARTY}/symbols/com_github_dawidcislo_alternate-kicad-library/Diode_AKL.kicad_sym")(options "")(descr ""))
+  (lib (name "Diode_Schottky_AKL")(type "KiCad")(uri "${KICAD6_3RD_PARTY}/symbols/com_github_dawidcislo_alternate-kicad-library/Diode_Schottky_AKL.kicad_sym")(options "")(descr ""))
+  (lib (name "Diode_Zener_AKL")(type "KiCad")(uri "${KICAD6_3RD_PARTY}/symbols/com_github_dawidcislo_alternate-kicad-library/Diode_Zener_AKL.kicad_sym")(options "")(descr ""))
+)
