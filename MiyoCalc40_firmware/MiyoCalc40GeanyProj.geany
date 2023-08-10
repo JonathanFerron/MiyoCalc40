@@ -34,7 +34,7 @@ FILE_NAME_1=0;C++;0;EUTF-8;0;1;0;C%3A%5CUsers%5CJonathan%5CAppData%5CLocal%5CArd
 FILE_NAME_2=34707;C++;0;EUTF-8;0;1;0;C%3A%5CUsers%5CJonathan%5CAppData%5CLocal%5CArduino15%5Cpackages%5CDxCore%5Chardware%5Cmegaavr%5C1.5.6%5Ccores%5Cdxcore%5CArduino.h;0;2
 FILE_NAME_3=131542;C++;0;EUTF-8;0;1;0;C%3A%5CUsers%5CJonathan%5CAppData%5CLocal%5CArduino15%5Cpackages%5CDxCore%5Ctools%5Cavr-gcc%5C7.3.0-atmel3.6.1-azduino6%5Cavr%5Cinclude%5Cavr%5Cioavr128da28.h;0;2
 FILE_NAME_4=0;Markdown;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cresources%5CKicad%20how%20to.md;0;2
-FILE_NAME_5=389;Markdown;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5Creadme.md;0;2
+FILE_NAME_5=659;Markdown;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cresources%5Cmarkdown-cheat-sheet.md;0;2
 
 [prjorg]
 source_patterns=*.c;*.C;*.cpp;*.cxx;*.c++;*.cc;*.m;

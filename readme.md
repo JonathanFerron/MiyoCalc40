@@ -4,7 +4,7 @@
 This is a project for a trough-hole only RPN calculator with a flexible configuration. The idea is for it to be minimalist, meant as a complement to other tools that the 
 user would typically have on hand (computer, formula cheat sheet, etc.) rather than as a replacement, and made with easy to solder through-hole components.
 
-The MiyoCalc40 _PCB work_ is licensed under a
+The MiyoCalc40 **PCB work** is licensed under a
 [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License][cc-by-nc-sa].
 
 [![CC BY-NC-SA 4.0][cc-by-nc-sa-image]][cc-by-nc-sa]
@@ -13,7 +13,7 @@ The MiyoCalc40 _PCB work_ is licensed under a
 [cc-by-nc-sa-image]: https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png
 [cc-by-nc-sa-shield]: https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg
 
-The MiyoCalc40 Firmware is licensed under the GNU General Public License version 3:
+The MiyoCalc40 **Firmware** is licensed under the GNU General Public License version 3:
 Copyright (C) 2023 Jonathan Ferron
 
 This program is free software: you can redistribute it and/or modify
