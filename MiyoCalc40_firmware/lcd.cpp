@@ -215,7 +215,10 @@ void ERM19264_UC1609_T::LCDString(char *characters, uint8_t col, uint8_t page)
 
 void ERM19264_UC1609_T::LCDCharSeq(uint8_t indexes[], uint8_t col, uint8_t page)
 {
-
+  for (uint8_t i=0; i < sizeof(indexes)/sizeof(indexes[0]); i++)
+  {
+    LCDChar(indexes[i], col + i * (MCFFONTWIDTH + MCFFONTSPACER), page);
+  }
 }
 
 void ERM19264_UC1609_T::LCDSetContrast(uint8_t cont)

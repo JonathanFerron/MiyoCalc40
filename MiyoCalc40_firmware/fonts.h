@@ -4,7 +4,7 @@
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 
-#define MCFLETOFFSET 'A' - 10
+#define MCFLETOFFSET ('A' - 10)
 #define MCFFONTWIDTH 12
 #define MCFFONTSPACER 2
 

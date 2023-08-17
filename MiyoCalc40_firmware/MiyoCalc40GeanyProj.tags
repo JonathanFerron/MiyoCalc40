@@ -4,128 +4,141 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
-BACKGROUND	.\ERM19264_UC1609_T.h	25;"	macro
+BACKGROUND	.\lcd.h	17;"	macro
 BACKLIGHT_H	.\backlight.h	3;"	macro
 CALC_H	.\calc.h	5;"	macro
 CARDS_H	.\cards.h	2;"	macro
-CD	.\main.cpp	94;"	macro	file:
+column_pin_array	.\matrix.c	63;"	variable
 CONFIG_H	.\config.h	5;"	macro
-CS	.\main.cpp	93;"	macro	file:
-ERM19264_UC1609_T	.\ERM19264_UC1609_T.cpp	16;"	function	class:ERM19264_UC1609_T	signature:(int8_t cd, int8_t rst, int8_t cs)
-ERM19264_UC1609_T	.\ERM19264_UC1609_T.h	110;"	class
-ERM19264_UC1609_T	.\ERM19264_UC1609_T.h	113;"	prototype	class:ERM19264_UC1609_T	signature:(int8_t cd, int8_t rst, int8_t cs, int8_t sclk, int8_t din)
-ERM19264_UC1609_T	.\ERM19264_UC1609_T.h	115;"	prototype	class:ERM19264_UC1609_T	signature:(int8_t cd, int8_t rst, int8_t cs)
-ERM19264_UC1609_T_H	.\ERM19264_UC1609_T.h	10;"	macro
+ERM19264_UC1609_T	.\lcd.cpp	12;"	function	class:ERM19264_UC1609_T	signature:(int8_t cd, int8_t rst, int8_t cs)
+ERM19264_UC1609_T	.\lcd.h	102;"	class
+ERM19264_UC1609_T	.\lcd.h	105;"	prototype	class:ERM19264_UC1609_T	signature:(int8_t cd, int8_t rst, int8_t cs, int8_t sclk, int8_t din)
+ERM19264_UC1609_T	.\lcd.h	107;"	prototype	class:ERM19264_UC1609_T	signature:(int8_t cd, int8_t rst, int8_t cs)
 FONTS_H	.\fonts.h	2;"	macro
-FOREGROUND	.\ERM19264_UC1609_T.h	24;"	macro
-INVERSE	.\ERM19264_UC1609_T.h	26;"	macro
-LCDbegin	.\ERM19264_UC1609_T.cpp	41;"	function	class:ERM19264_UC1609_T	signature:(uint8_t VbiasPOT)
-LCDbegin	.\ERM19264_UC1609_T.h	122;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t VbiasPot = UC1609_DEFAULT_GN_PM )
-LCDBitmap	.\ERM19264_UC1609_T.cpp	229;"	function	class:ERM19264_UC1609_T	signature:(int16_t x, int16_t y, uint8_t w, uint8_t h, const uint8_t* data)
-LCDBitmap	.\ERM19264_UC1609_T.h	132;"	prototype	class:ERM19264_UC1609_T	signature:(int16_t x, int16_t y, uint8_t w, uint8_t h, const uint8_t* data)
-LCDChar	.\ERM19264_UC1609_T.cpp	327;"	function	class:ERM19264_UC1609_T	signature:(uint8_t index, uint8_t col, uint8_t page)
-LCDChar	.\ERM19264_UC1609_T.h	134;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t index, uint8_t col, uint8_t page)
-LCDCharSeq	.\ERM19264_UC1609_T.cpp	383;"	function	class:ERM19264_UC1609_T	signature:(uint8_t indexes[], uint8_t col, uint8_t page)
-LCDCharSeq	.\ERM19264_UC1609_T.h	136;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t indexes[], uint8_t col, uint8_t page)
-LCDDot	.\ERM19264_UC1609_T.cpp	348;"	function	class:ERM19264_UC1609_T	signature:(uint8_t col, uint8_t page)
-LCDDot	.\ERM19264_UC1609_T.h	135;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t col, uint8_t page)
-LCDEnable	.\ERM19264_UC1609_T.cpp	117;"	function	class:ERM19264_UC1609_T	signature:(uint8_t bits)
-LCDEnable	.\ERM19264_UC1609_T.h	125;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t on)
-LCDFillScreen	.\ERM19264_UC1609_T.cpp	196;"	function	class:ERM19264_UC1609_T	signature:(uint8_t dataPattern=0, uint8_t delay=0)
-LCDFillScreen	.\ERM19264_UC1609_T.h	126;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t pixel, uint8_t mircodelay)
-LCDGotoXY	.\ERM19264_UC1609_T.cpp	302;"	function	class:ERM19264_UC1609_T	signature:(uint8_t column , uint8_t page)
-LCDGotoXY	.\ERM19264_UC1609_T.h	119;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t column , uint8_t page)
-LCDinit	.\ERM19264_UC1609_T.cpp	74;"	function	class:ERM19264_UC1609_T	signature:()
-LCDinit	.\ERM19264_UC1609_T.h	123;"	prototype	class:ERM19264_UC1609_T	signature:(void)
-LCDPowerDown	.\ERM19264_UC1609_T.cpp	173;"	function	class:ERM19264_UC1609_T	signature:(void)
-LCDPowerDown	.\ERM19264_UC1609_T.h	124;"	prototype	class:ERM19264_UC1609_T	signature:(void)
-LCDSetContrast	.\ERM19264_UC1609_T.cpp	388;"	function	class:ERM19264_UC1609_T	signature:(uint8_t cont)
-LCDSetContrast	.\ERM19264_UC1609_T.h	133;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t cont)
-LCDString	.\ERM19264_UC1609_T.cpp	373;"	function	class:ERM19264_UC1609_T	signature:(char *characters, uint8_t col, uint8_t page)
-LCDString	.\ERM19264_UC1609_T.h	121;"	prototype	class:ERM19264_UC1609_T	signature:(char *characters, uint8_t col, uint8_t page)
-LCD_FONT_CUSTOM_H	.\LCD_FONT_CUSTOM.h	12;"	macro
-LCD_H	.\lcd.h	2;"	macro
-LCD_HEIGHT	.\ERM19264_UC1609_T.h	107;"	variable
-LCD_WIDTH	.\ERM19264_UC1609_T.h	106;"	variable
-loop	.\main.cpp	130;"	function	signature:()
-loop	.\main.h	8;"	prototype	signature:()
-main	.\main.cpp	100;"	function	signature:()
+FOREGROUND	.\lcd.h	16;"	macro
+INVERSE	.\lcd.h	18;"	macro
+keypos_c	.\matrix.c	69;"	variable
+keypos_r	.\matrix.c	68;"	variable
+LCDbegin	.\lcd.cpp	22;"	function	class:ERM19264_UC1609_T	signature:(uint8_t VbiasPOT)
+LCDbegin	.\lcd.h	114;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t VbiasPot = UC1609_DEFAULT_GN_PM )
+LCDBitmap	.\lcd.cpp	115;"	function	class:ERM19264_UC1609_T	signature:(int16_t x, int16_t y, uint8_t w, uint8_t h, const uint8_t* data)
+LCDBitmap	.\lcd.h	124;"	prototype	class:ERM19264_UC1609_T	signature:(int16_t x, int16_t y, uint8_t w, uint8_t h, const uint8_t* data)
+LCDChar	.\lcd.cpp	160;"	function	class:ERM19264_UC1609_T	signature:(uint8_t index, uint8_t col, uint8_t page)
+LCDChar	.\lcd.h	126;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t index, uint8_t col, uint8_t page)
+LCDCharSeq	.\lcd.cpp	216;"	function	class:ERM19264_UC1609_T	signature:(uint8_t indexes[], uint8_t col, uint8_t page)
+LCDCharSeq	.\lcd.h	128;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t indexes[], uint8_t col, uint8_t page)
+LCDDot	.\lcd.cpp	181;"	function	class:ERM19264_UC1609_T	signature:(uint8_t col, uint8_t page)
+LCDDot	.\lcd.h	127;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t col, uint8_t page)
+LCDEnable	.\lcd.cpp	77;"	function	class:ERM19264_UC1609_T	signature:(uint8_t bits)
+LCDEnable	.\lcd.h	117;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t on)
+LCDFillScreen	.\lcd.cpp	97;"	function	class:ERM19264_UC1609_T	signature:(uint8_t dataPattern=0, uint8_t delay=0)
+LCDFillScreen	.\lcd.h	118;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t pixel, uint8_t mircodelay)
+LCDGotoXY	.\lcd.cpp	151;"	function	class:ERM19264_UC1609_T	signature:(uint8_t column , uint8_t page)
+LCDGotoXY	.\lcd.h	111;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t column , uint8_t page)
+LCDinit	.\lcd.cpp	34;"	function	class:ERM19264_UC1609_T	signature:()
+LCDinit	.\lcd.h	115;"	prototype	class:ERM19264_UC1609_T	signature:(void)
+lcdon	.\main.cpp	54;"	variable
+LCDPowerDown	.\lcd.cpp	86;"	function	class:ERM19264_UC1609_T	signature:(void)
+LCDPowerDown	.\lcd.h	116;"	prototype	class:ERM19264_UC1609_T	signature:(void)
+LCDSetContrast	.\lcd.cpp	221;"	function	class:ERM19264_UC1609_T	signature:(uint8_t cont)
+LCDSetContrast	.\lcd.h	125;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t cont)
+LCDString	.\lcd.cpp	206;"	function	class:ERM19264_UC1609_T	signature:(char *characters, uint8_t col, uint8_t page)
+LCDString	.\lcd.h	113;"	prototype	class:ERM19264_UC1609_T	signature:(char *characters, uint8_t col, uint8_t page)
+LCD_CD	.\main.cpp	47;"	macro	file:
+LCD_CS	.\main.cpp	46;"	macro	file:
+LCD_H	.\lcd.h	8;"	macro
+LCD_HEIGHT	.\lcd.h	99;"	variable
+LCD_RST	.\main.cpp	48;"	macro	file:
+LCD_WIDTH	.\lcd.h	98;"	variable
+loop	.\main.cpp	136;"	function	signature:()
+loop	.\main.h	5;"	prototype	signature:()
+loopOld	.\main.cpp	164;"	function	signature:()
+loopOld	.\main.h	13;"	prototype	signature:()
+main	.\main.cpp	56;"	function	signature:()
 MAIN_H	.\main.h	2;"	macro
-MATRIX_H	.\matrix.h	3;"	macro
+MATRIX_H	.\matrix.h	9;"	macro
 MCFFONTSPACER	.\fonts.h	9;"	macro
 MCFFONTWIDTH	.\fonts.h	8;"	macro
 MCFLETOFFSET	.\fonts.h	7;"	macro
 MCFMINUS	.\fonts.h	11;"	macro
 MiyoCalcFont_Degree	.\fonts.h	182;"	variable
 MiyoCalcFont_Dot	.\fonts.h	176;"	variable
-mylcd	.\main.cpp	98;"	prototype	file:	signature:(CD, RST, CS)
+mylcd	.\main.cpp	52;"	prototype	file:	signature:(LCD_CD, LCD_RST, LCD_CS)
+NUM_COLUMN_PINS	.\matrix.c	55;"	macro	file:
+NUM_ROW_PINS	.\matrix.c	56;"	macro	file:
 PROGMEM	.\fonts.h	28;"	variable
-PROGMEM	.\LCD_FONT_CUSTOM.h	18;"	macro
 PROGRAMMING_H	.\programming.h	2;"	macro
-RST	.\main.cpp	95;"	macro	file:
-send_command	.\ERM19264_UC1609_T.cpp	107;"	function	class:ERM19264_UC1609_T	signature:(uint8_t command, uint8_t value)
-send_command	.\ERM19264_UC1609_T.h	141;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t command, uint8_t value)
-send_data	.\ERM19264_UC1609_T.cpp	288;"	function	class:ERM19264_UC1609_T	signature:(uint8_t byte)
-send_data	.\ERM19264_UC1609_T.h	140;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t data)
-setup	.\main.cpp	116;"	function	signature:()
-setup	.\main.h	6;"	prototype	signature:()
-setupLCD	.\main.cpp	123;"	function	signature:()
-setupLCD	.\main.h	7;"	prototype	signature:()
-SPI_DIRECTION	.\ERM19264_UC1609_T.h	100;"	macro
-SPI_FREQ	.\ERM19264_UC1609_T.h	99;"	macro
-SPI_UC1609_CLOCK_DIV	.\ERM19264_UC1609_T.h	102;"	macro
-SPI_UC1609_MODE	.\ERM19264_UC1609_T.h	101;"	macro
-testBitmap	.\main.cpp	221;"	function	signature:()
-testContrast	.\main.cpp	195;"	function	signature:()
-testSomeText	.\main.cpp	239;"	function	signature:()
-testSomeText	.\main.h	5;"	prototype	signature:()
-testStillNumbers	.\main.cpp	148;"	function	signature:()
-testStillNumbers	.\main.h	4;"	prototype	signature:()
-UC1609_ADDRESS_CONTROL	.\ERM19264_UC1609_T.h	37;"	macro
-UC1609_ADDRESS_SET	.\ERM19264_UC1609_T.h	38;"	macro
-UC1609_ALL_PIXEL_ON	.\ERM19264_UC1609_T.h	58;"	macro
-UC1609_ASCII_OFFSET	.\ERM19264_UC1609_T.h	82;"	macro
-UC1609_ASCII_OFFSET	.\ERM19264_UC1609_T.h	84;"	macro
-UC1609_BIAS_RATIO	.\ERM19264_UC1609_T.h	50;"	macro
-UC1609_BIAS_RATIO_SET	.\ERM19264_UC1609_T.h	51;"	macro
-UC1609_CD_SetHigh	.\ERM19264_UC1609_T.h	93;"	macro
-UC1609_CD_SetLow	.\ERM19264_UC1609_T.h	94;"	macro
-UC1609_CS_SetHigh	.\ERM19264_UC1609_T.h	91;"	macro
-UC1609_CS_SetLow	.\ERM19264_UC1609_T.h	92;"	macro
-UC1609_DEFAULT_GN_PM	.\ERM19264_UC1609_T.h	54;"	macro
-UC1609_DISPLAY_ON	.\ERM19264_UC1609_T.h	57;"	macro
-UC1609_FONTPADDING	.\ERM19264_UC1609_T.h	87;"	macro
-UC1609_FONTWIDTH	.\ERM19264_UC1609_T.h	88;"	macro
-UC1609_FRAMERATE_REG	.\ERM19264_UC1609_T.h	47;"	macro
-UC1609_FRAMERATE_SET	.\ERM19264_UC1609_T.h	48;"	macro
-UC1609_GET_STATUS	.\ERM19264_UC1609_T.h	29;"	macro
-UC1609_GN_PM	.\ERM19264_UC1609_T.h	53;"	macro
-UC1609_HIGHFREQ_DELAY	.\ERM19264_UC1609_T.h	103;"	macro
-UC1609_INIT_DELAY	.\ERM19264_UC1609_T.h	77;"	macro
-UC1609_INVERSE_DISPLAY	.\ERM19264_UC1609_T.h	59;"	macro
-UC1609_LCD_CONTROL	.\ERM19264_UC1609_T.h	56;"	macro
-UC1609_PC_SET	.\ERM19264_UC1609_T.h	35;"	macro
-UC1609_POWERON_DELAY1	.\ERM19264_UC1609_T.h	71;"	macro
-UC1609_POWERON_DELAY2	.\ERM19264_UC1609_T.h	73;"	macro
-UC1609_POWERON_DELAY3	.\ERM19264_UC1609_T.h	75;"	macro
-UC1609_POWER_CONTROL	.\ERM19264_UC1609_T.h	34;"	macro
-UC1609_ROTATION_FLIP_ONE	.\ERM19264_UC1609_T.h	65;"	macro
-UC1609_ROTATION_FLIP_THREE	.\ERM19264_UC1609_T.h	66;"	macro
-UC1609_ROTATION_FLIP_TWO	.\ERM19264_UC1609_T.h	63;"	macro
-UC1609_ROTATION_NORMAL	.\ERM19264_UC1609_T.h	64;"	macro
-UC1609_RST_SetHigh	.\ERM19264_UC1609_T.h	95;"	macro
-UC1609_RST_SetLow	.\ERM19264_UC1609_T.h	96;"	macro
-UC1609_SCROLL	.\ERM19264_UC1609_T.h	60;"	macro
-UC1609_SET_COLADD_LSB	.\ERM19264_UC1609_T.h	41;"	macro
-UC1609_SET_COLADD_MSB	.\ERM19264_UC1609_T.h	42;"	macro
-UC1609_SET_PAGEADD	.\ERM19264_UC1609_T.h	40;"	macro
-UC1609_SYSTEM_RESET	.\ERM19264_UC1609_T.h	32;"	macro
-UC1609_TEMP_COMP_REG	.\ERM19264_UC1609_T.h	44;"	macro
-UC1609_TEMP_COMP_SET	.\ERM19264_UC1609_T.h	45;"	macro
+row_pin_array	.\matrix.c	60;"	variable
+scanKB	.\matrix.c	124;"	function
+scanKB	.\matrix.h	12;"	prototype	signature:()
+send_command	.\lcd.cpp	67;"	function	class:ERM19264_UC1609_T	signature:(uint8_t command, uint8_t value)
+send_command	.\lcd.h	133;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t command, uint8_t value)
+send_data	.\lcd.cpp	143;"	function	class:ERM19264_UC1609_T	signature:(uint8_t byte)
+send_data	.\lcd.h	132;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t data)
+setup	.\main.cpp	72;"	function	signature:()
+setup	.\main.h	4;"	prototype	signature:()
+setupBacklight	.\main.cpp	90;"	function	signature:()
+setupBacklight	.\main.h	11;"	prototype	signature:()
+setupLCD	.\main.cpp	83;"	function	signature:()
+setupLCD	.\main.h	10;"	prototype	signature:()
+setupMatrix	.\matrix.c	80;"	function
+setupMatrix	.\matrix.h	11;"	prototype	signature:()
+SPI_DIRECTION	.\lcd.h	92;"	macro
+SPI_FREQ	.\lcd.h	91;"	macro
+SPI_UC1609_CLOCK_DIV	.\lcd.h	94;"	macro
+SPI_UC1609_MODE	.\lcd.h	93;"	macro
+testBitmap	.\main.cpp	249;"	function	signature:()
+testContrast	.\main.cpp	223;"	function	signature:()
+testSomeText	.\main.cpp	267;"	function	signature:()
+testSomeText	.\main.h	8;"	prototype	signature:()
+testStillNumbers	.\main.cpp	176;"	function	signature:()
+testStillNumbers	.\main.h	7;"	prototype	signature:()
+UC1609_ADDRESS_CONTROL	.\lcd.h	29;"	macro
+UC1609_ADDRESS_SET	.\lcd.h	30;"	macro
+UC1609_ALL_PIXEL_ON	.\lcd.h	50;"	macro
+UC1609_ASCII_OFFSET	.\lcd.h	74;"	macro
+UC1609_ASCII_OFFSET	.\lcd.h	76;"	macro
+UC1609_BIAS_RATIO	.\lcd.h	42;"	macro
+UC1609_BIAS_RATIO_SET	.\lcd.h	43;"	macro
+UC1609_CD_SetHigh	.\lcd.h	85;"	macro
+UC1609_CD_SetLow	.\lcd.h	86;"	macro
+UC1609_CS_SetHigh	.\lcd.h	83;"	macro
+UC1609_CS_SetLow	.\lcd.h	84;"	macro
+UC1609_DEFAULT_GN_PM	.\lcd.h	46;"	macro
+UC1609_DISPLAY_ON	.\lcd.h	49;"	macro
+UC1609_FONTPADDING	.\lcd.h	79;"	macro
+UC1609_FONTWIDTH	.\lcd.h	80;"	macro
+UC1609_FRAMERATE_REG	.\lcd.h	39;"	macro
+UC1609_FRAMERATE_SET	.\lcd.h	40;"	macro
+UC1609_GET_STATUS	.\lcd.h	21;"	macro
+UC1609_GN_PM	.\lcd.h	45;"	macro
+UC1609_HIGHFREQ_DELAY	.\lcd.h	95;"	macro
+UC1609_INIT_DELAY	.\lcd.h	69;"	macro
+UC1609_INVERSE_DISPLAY	.\lcd.h	51;"	macro
+UC1609_LCD_CONTROL	.\lcd.h	48;"	macro
+UC1609_PC_SET	.\lcd.h	27;"	macro
+UC1609_POWERON_DELAY1	.\lcd.h	63;"	macro
+UC1609_POWERON_DELAY2	.\lcd.h	65;"	macro
+UC1609_POWERON_DELAY3	.\lcd.h	67;"	macro
+UC1609_POWER_CONTROL	.\lcd.h	26;"	macro
+UC1609_ROTATION_FLIP_ONE	.\lcd.h	57;"	macro
+UC1609_ROTATION_FLIP_THREE	.\lcd.h	58;"	macro
+UC1609_ROTATION_FLIP_TWO	.\lcd.h	55;"	macro
+UC1609_ROTATION_NORMAL	.\lcd.h	56;"	macro
+UC1609_RST_SetHigh	.\lcd.h	87;"	macro
+UC1609_RST_SetLow	.\lcd.h	88;"	macro
+UC1609_SCROLL	.\lcd.h	52;"	macro
+UC1609_SET_COLADD_LSB	.\lcd.h	33;"	macro
+UC1609_SET_COLADD_MSB	.\lcd.h	34;"	macro
+UC1609_SET_PAGEADD	.\lcd.h	32;"	macro
+UC1609_SYSTEM_RESET	.\lcd.h	24;"	macro
+UC1609_TEMP_COMP_REG	.\lcd.h	36;"	macro
+UC1609_TEMP_COMP_SET	.\lcd.h	37;"	macro
+unused_pin_array	.\matrix.c	66;"	variable
 UTIL_H	.\util.h	2;"	macro
-VbiasPOT	.\main.cpp	80;"	macro	file:
-_LCD_CD	.\ERM19264_UC1609_T.h	146;"	member	class:ERM19264_UC1609_T
-_LCD_CS	.\ERM19264_UC1609_T.h	145;"	member	class:ERM19264_UC1609_T
-_LCD_RST	.\ERM19264_UC1609_T.h	147;"	member	class:ERM19264_UC1609_T
-_VbiasPOT	.\ERM19264_UC1609_T.h	150;"	member	class:ERM19264_UC1609_T
-~ERM19264_UC1609_T	.\ERM19264_UC1609_T.h	117;"	function	class:ERM19264_UC1609_T	signature:()
+VbiasPOT	.\main.cpp	33;"	macro	file:
+_LCD_CD	.\lcd.h	138;"	member	class:ERM19264_UC1609_T
+_LCD_CS	.\lcd.h	137;"	member	class:ERM19264_UC1609_T
+_LCD_RST	.\lcd.h	139;"	member	class:ERM19264_UC1609_T
+_VbiasPOT	.\lcd.h	142;"	member	class:ERM19264_UC1609_T
+~ERM19264_UC1609_T	.\lcd.h	109;"	function	class:ERM19264_UC1609_T	signature:()

@@ -30,7 +30,7 @@
 #include "fonts.h"
 #include "main.h"
 
-#define VbiasPOT 0x0C // Constrast: 0x0A to 0x20 tend to work well
+#define VbiasPOT 0x0C // Default constrast: 0x0A to 0x20 tend to work well
 
 // GPIO 5-wire SPI interface
 
@@ -43,18 +43,15 @@
 */
 
 // uncomment for avr-da
-#define LCD_CS PIN_PA7  // GPIO pin number pick any you want
-#define LCD_CD PIN_PA2 // GPIO pin number pick any you want 
-#define LCD_RST PIN_PA3 // GPIO pin number pick any you want
-
+#define LCD_CS PIN_PA7  // AVR pin connected to LCD CS pin
+#define LCD_CD PIN_PA2 // AVR pin connected to LCD CD pin
+#define LCD_RST PIN_PA3 // AVR pin connected to LCD Reset pin
 
 
 // Global variables
 ERM19264_UC1609_T  mylcd(LCD_CD, LCD_RST, LCD_CS); // construct object using hardware SPI: CD, RST, CS
 
 int lcdon;  // to track if lcd is turned on or not
-
-
 
 int main() {
 //  onBeforeInit(); // Empty callback called before init but after the .init stuff. First normal code executed
@@ -63,7 +60,7 @@ int main() {
 
   /* Insert here any code that needs to run before interrupts are
    * enabled but after all other core initialization. */
-  sei();  // enable interrupts (by default, comment out if not desired).
+  sei();  // enable interrupts (could consider turning on interupts only after the setup() function, if it matters at all).
   
   setup();
   
@@ -81,9 +78,7 @@ void setup() {
   setupLCD();
   lcdon = true;
   setupBacklight(); 
-}
-
-
+} // setup()
 
 void setupLCD()  // this should be moved to the lcd file
 {
@@ -96,7 +91,6 @@ void setupBacklight()  // this should be moved to the backlight file
 {
   pinMode(PIN_PA1, OUTPUT); // set LCD LED Backlight pin to output mode
 }
-
 
 
 /*
@@ -140,10 +134,7 @@ may be able to only enable interupt on one pin))
     end if					
  */
 void loop() 
-{
-  // set columns as input pull-up
-  // Rows as output low
-  
+{  
   // scan keys
   scanKB();
  
@@ -157,16 +148,17 @@ void loop()
   
     // refresh lcd
     mylcd.LCDFillScreen(0x00, 0); // clear screen
-    mylcd.LCDChar(27, 14*0, 0*3);  // R       TODO: make use of MCFLETOFFSET
+    mylcd.LCDChar('R' - MCFLETOFFSET, 14*0, 0*3);  // R
     mylcd.LCDChar(keypos_r, 14*1, 0 * 3);
-    mylcd.LCDChar(12, 14*3, 0*3); // C 
+    mylcd.LCDChar('C' - MCFLETOFFSET, 14*3, 0*3); // C 
     mylcd.LCDChar(keypos_c, 14*4, 0 * 3);  
     
     
   } // end if non-full keypos 
   
-}
+} // loop()
 
+// old loop() code for testing
 void loopOld() {
   //testContrast();
   testStillNumbers();
@@ -177,8 +169,9 @@ void loopOld() {
   //delay(10000);
   //digitalWrite(PIN_PA1, LOW);
 //  testBitmap();
-}
+} // loopOld()
 
+// shows how we would print numbers when displaying 3 elements of the stack (X at bottom, then Y, then Z on top)
 void testStillNumbers()
 {
   mylcd.LCDFillScreen(0x00, 0); // clear screen
@@ -215,6 +208,7 @@ void testStillNumbers()
   
   delay(5000);
   
+  // how to show hex numbers
   mylcd.LCDFillScreen(0x00, 0); // clear screen
   mylcd.LCDChar(0xA, 14*0, 0 * 3); // col 0-11, page 0-1
   mylcd.LCDChar(0xB, 14*1, 1 * 3); // col 0-11, page 0-1
@@ -226,13 +220,14 @@ void testStillNumbers()
   delay(5000);
 }
 
+// this shows how to change the contrast at run time to something other than the default
 void testContrast() {
   for (byte c = 10; c <= 32; c++) {
     char hexString[3];
     char decString[4];    
     sprintf(hexString, "0x%02X", c);
     sprintf(decString, "%03d", c);    
-    mylcd.LCDSetContrast(c);
+    mylcd.LCDSetContrast(c);  
 
     //mylcd.LCDGotoXY(0, 0);
     mylcd.LCDString(hexString, 0, 0);
@@ -252,6 +247,7 @@ void testContrast() {
   }
 }
 
+// example of how to print logos, etc, on the LCD. may want to use for indicators such as degrees vs radiant, and 'shift' mode (f, g, h)
 void testBitmap() {
   //mylcd.LCDBitmap(0, 24 , 16, 16, smallImage);
   //mylcd.LCDBitmap(0,0,169,16,testImage);
@@ -270,9 +266,10 @@ void testBitmap() {
     
 }
 
+// example of how to print letters on the LCD. Also shows where the numbers would start when displaying 6 numbers on screen. (e.g. a full stack with X, Z, Z, T, U and V)
 void testSomeText() {
   mylcd.LCDFillScreen(0x00, 0); // clear screen
-  mylcd.LCDChar(21, 0, 0); mylcd.LCDChar(21, 96, 0);  // TODO: make use of MCFLETOFFSET
+  mylcd.LCDChar(21, 0, 0); mylcd.LCDChar(21, 96, 0);  // TODO: make use of MCFLETOFFSET (replace hard-coded integer in first parameter by 'L' - MCFLETOFFSET, etc.)
   mylcd.LCDChar(10, 0, 3); mylcd.LCDChar(19, 96, 3);
   mylcd.LCDChar(23, 0, 6); mylcd.LCDChar(23, 96, 6);
   delay(5000);

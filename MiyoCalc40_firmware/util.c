@@ -15,10 +15,10 @@ Discharge curve fairly flat from 3.25V to 3.15V
 From 3.4V (100% SOC, 300mAh) to 3.25V (90% SOC, 270mAh), convex curve (from 45 degree to flat)
 From 3.15V (20% SOC) to 3.0V (10% SOC, 30mAh), concave curve (from flat to 45 degree)
 From 3.0V to 2.6V (0% SOC), still concave curve, but rapidly decreasing (from 45 degree to almost 90 degree pointing down)
-Add a discharge curve plot on the silkscreen
+Add a discharge curve plot on the silkscreen (base plate, along with 'cheat sheet' to use calculator)
 Nominal voltage of LiFePO4 battery: 3.2V
 MCU voltage range: 1.8V to 5.5V
-LCD voltage tolerance range: 3.0V to 3.6V (3.3V ideal)
+LCD voltage tolerance range: 3.0V to 3.6V (3.3V ideal): actually shuts down at 2V
 
 store battery ideally at 3.2V (50% of SOC)
 
