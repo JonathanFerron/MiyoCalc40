@@ -28,13 +28,17 @@ long_line_behaviour=2
 long_line_column=175
 
 [files]
-current_page=5
-FILE_NAME_0=92;Markdown;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5CTo%20Dos.md;0;2
-FILE_NAME_1=0;C++;0;EUTF-8;0;1;0;C%3A%5CUsers%5CJonathan%5CAppData%5CLocal%5CArduino15%5Cpackages%5CDxCore%5Chardware%5Cmegaavr%5C1.5.6%5Cvariants%5C28pin-standard%5Cpins_arduino.h;0;2
-FILE_NAME_2=34707;C++;0;EUTF-8;0;1;0;C%3A%5CUsers%5CJonathan%5CAppData%5CLocal%5CArduino15%5Cpackages%5CDxCore%5Chardware%5Cmegaavr%5C1.5.6%5Ccores%5Cdxcore%5CArduino.h;0;2
+current_page=0
+FILE_NAME_0=152;Markdown;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5CTo%20Dos.md;0;2
+FILE_NAME_1=1392;C++;0;EUTF-8;0;1;0;C%3A%5CUsers%5CJonathan%5CAppData%5CLocal%5CArduino15%5Cpackages%5CDxCore%5Chardware%5Cmegaavr%5C1.5.6%5Cvariants%5C28pin-standard%5Cpins_arduino.h;0;2
+FILE_NAME_2=49455;C++;0;EUTF-8;0;1;0;C%3A%5CUsers%5CJonathan%5CAppData%5CLocal%5CArduino15%5Cpackages%5CDxCore%5Chardware%5Cmegaavr%5C1.5.6%5Ccores%5Cdxcore%5CArduino.h;0;2
 FILE_NAME_3=131542;C++;0;EUTF-8;0;1;0;C%3A%5CUsers%5CJonathan%5CAppData%5CLocal%5CArduino15%5Cpackages%5CDxCore%5Ctools%5Cavr-gcc%5C7.3.0-atmel3.6.1-azduino6%5Cavr%5Cinclude%5Cavr%5Cioavr128da28.h;0;2
-FILE_NAME_4=0;Markdown;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cresources%5CKicad%20how%20to.md;0;2
-FILE_NAME_5=659;Markdown;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cresources%5Cmarkdown-cheat-sheet.md;0;2
+FILE_NAME_4=5551;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Cmain.cpp;0;2
+FILE_NAME_5=199;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Clcd.h;0;2
+FILE_NAME_6=6181;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Cfonts.h;0;2
+FILE_NAME_7=0;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Clcd.cpp;0;2
+FILE_NAME_8=11667;C;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cresources%5Ccsnippets.c;0;2
+FILE_NAME_9=912;Markdown;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cresources%5CKicad%20how%20to.md;0;2
 
 [prjorg]
 source_patterns=*.c;*.C;*.cpp;*.cxx;*.c++;*.cc;*.m;

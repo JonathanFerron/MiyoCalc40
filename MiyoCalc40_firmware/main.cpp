@@ -1,54 +1,3 @@
-/* Combined Main Pseudo Code: 
- Main:					
-  Init MCU: 					
-    active mode					
-    set-up column pins as input with pull-up and row pins as output low					
-    set unused pins as input pull-up, and disable the digital input buffer on the unused pins (porta.pin0ctrl = port_pullupen_bm | port_isc_input_disable_gc)					
-    set 'calcoff' = false
-
-  setup calc: see repocalc, openrpncalc, dcalc for examples
-  
-  setupLCD(): already done
-					
-  main Loop Begin:					
-    go in power-down sleep mode (set power down sleep mode and enable sleep, enable bothedges interrups for all column pins) (unless we're in 'off' state, in which case 
-    may be able to only enable interupt on one pin))					
-      upon wake interupt (port isr wake-up button press wakes up the mcu from sleep)					
-        debounce 3ms to 20ms (10 times 2ms) using PIT (periodic interupt timer, programmed to trigger an interrupt every millisecond, lowpower_delay_ms function, set interrupt 
-        to fire every 32 RTC clock cycles and enable PIT, enable PIT interrupts), validating logic low level on a column each time: btn_debounce() function					
-        
-        if logic low level still detected in a column					
-          then scan keys (scan matrix) via function call: scankb() from matrix.c					
-					
-          if calc is off, power up lcd if 'on' button was pressed (key position for this can be stored in a separate global variable used directly in 'main'), 
-            record calc_off variable = false
-          else (calc is on)
-            if in mem store or recall mode:
-              call mem store or recall with key pos, should have a max of 38 possible var 
-            else
-              with key position (from scankb), lookup (cards.c) function pointer (action)
-              process action via function call: from 'action' struct from 'calc' (if in calc mode) or 'config' (if in config mode), 
-              action in program mode, when a key is pressed to be recorded, is a function that will call another function with a keycode to log/record it					
-              if in 'calc mode'
-                if 'off' button (combination) was pressed (can tell based on the keycode alone), power down lcd and calc, record calc_off variable = true         
-                else, process keycode, go to 24 mhz to execute calculations: call the function via the function pointer, and provide it the keycode that was also looked up
-                end if
-              end if
-            end if
-          endif
-
-          refresh lcd when necessary (typically after calculation has been processed and before going back to sleep)  					
-          inner loop begin (idle until key is released):					
-            if logic low level on any column still					
-              then power down sleep					
-                port isr wake-up: button is released					
-            end if					
-          end inner loop					
-          may want to debouce here as well (openrpncalc uses 10ms)					
-        end if					
-  end main loop 
- */
- 
  /* Other notes:
 
 	use static vars if necessary
@@ -76,7 +25,8 @@
      
 */
 
-#include "ERM19264_UC1609_T.h"
+#include "matrix.h"
+#include "lcd.h"
 #include "fonts.h"
 #include "main.h"
 
@@ -93,12 +43,18 @@
 */
 
 // uncomment for avr-da
-#define CS PIN_PA7  // GPIO pin number pick any you want
-#define CD PIN_PA2 // GPIO pin number pick any you want 
-#define RST PIN_PA3 // GPIO pin number pick any you want
+#define LCD_CS PIN_PA7  // GPIO pin number pick any you want
+#define LCD_CD PIN_PA2 // GPIO pin number pick any you want 
+#define LCD_RST PIN_PA3 // GPIO pin number pick any you want
+
+
 
 // Global variables
-ERM19264_UC1609_T  mylcd(CD, RST, CS); // construct object using hardware SPI: CD, RST, CS
+ERM19264_UC1609_T  mylcd(LCD_CD, LCD_RST, LCD_CS); // construct object using hardware SPI: CD, RST, CS
+
+int lcdon;  // to track if lcd is turned on or not
+
+
 
 int main() {
 //  onBeforeInit(); // Empty callback called before init but after the .init stuff. First normal code executed
@@ -117,34 +73,109 @@ int main() {
 }
 
 void setup() {
-  //pinMode(PIN_PA7, OUTPUT);  // this was the test piece of code to blink a led on pin A7
-  setupLCD();
+  setupMatrix();
   
-  pinMode(PIN_PA1, OUTPUT); // to test LCD LED Backlight
+  // setupCalc(); this should go in the calc.c and calc.h files
+  //setup calc: see repocalc, openrpncalc, dcalc for examples
+   
+  setupLCD();
+  lcdon = true;
+  setupBacklight(); 
 }
 
-void setupLCD()
+
+
+void setupLCD()  // this should be moved to the lcd file
 {
   mylcd.LCDbegin(VbiasPOT); // initialize the LCD
   mylcd.LCDFillScreen(0x00, 0); // clear screen  
   delay(50);
 }
 
-void loop() {
-  /*
-  digitalWrite(PIN_PA7, HIGH);  // This was the test piece of code to blink a led on pin A7
-  delay(500);
-  digitalWrite(PIN_PA7, LOW);
-  delay(500);
-  */
+void setupBacklight()  // this should be moved to the backlight file
+{
+  pinMode(PIN_PA1, OUTPUT); // set LCD LED Backlight pin to output mode
+}
+
+
+
+/*
+go in power-down sleep mode (set power down sleep mode and enable sleep, enable bothedges interrups for all column pins) (unless we're in 'off' state, in which case 
+may be able to only enable interupt on one pin))					
+  upon wake interupt (port isr wake-up button press wakes up the mcu from sleep)					
+    debounce 3ms to 20ms (10 times 2ms) using PIT (periodic interupt timer, programmed to trigger an interrupt every millisecond, lowpower_delay_ms function, set interrupt 
+    to fire every 32 RTC clock cycles and enable PIT, enable PIT interrupts), validating logic low level on a column each time: btn_debounce() function					
+    
+    if logic low level still detected in a column					
+      then scan keys (scan matrix) via function call: scankb() from matrix.c					
+      
+      if calc is off, power up lcd if 'on' button was pressed (key position for this can be stored in a separate global variable used directly in 'main'), 
+        record calc_off variable = false
+      else (calc is on)
+        if in mem store or recall mode:
+          call mem store or recall with key pos, should have a max of 38 possible var 
+        else
+          with key position (from scankb), lookup (cards.c) function pointer and keycode (action struct)
+          
+          if in 'calc mode'
+            if 'off' button (combination) was pressed (can tell based on the keycode alone), power down lcd and calc, record calc_off variable = true         
+            else
+              process action via function call (from function pointer): from 'action' struct from 'calc' (if in calc mode) or 'config' (if in config mode)
+                provide it the keycode that was also looked up
+                action in program mode, when a key is pressed to be recorded, is a function that will call another function with a keycode to log/record it					
+            end if
+          end if
+        end if
+      endif
+
+      refresh lcd when necessary (typically after calculation has been processed and before going back to sleep)  					
+      
+      inner loop begin (idle until key is released):					
+        if logic low level on any column still					
+          then power down sleep					
+            port isr wake-up: button is released					
+        end if					
+      end inner loop					
+      may want to debouce here as well (openrpncalc uses 10ms)					
+    end if					
+ */
+void loop() 
+{
+  // set columns as input pull-up
+  // Rows as output low
+  
+  // scan keys
+  scanKB();
+ 
+  // if non-null keypos:
+  if (keypos_r != 0xff)
+  {
+    
+    // lookup function pointer+keycode (action struct): this should include re-setting the keypos to 'null' once the action is obtained
+  
+    // process action via function call: from 'action' struct from 'calc', call the function and provide it the keycode (not the keypos) that was also looked up. 
+  
+    // refresh lcd
+    mylcd.LCDFillScreen(0x00, 0); // clear screen
+    mylcd.LCDChar(27, 14*0, 0*3);  // R       TODO: make use of MCFLETOFFSET
+    mylcd.LCDChar(keypos_r, 14*1, 0 * 3);
+    mylcd.LCDChar(12, 14*3, 0*3); // C 
+    mylcd.LCDChar(keypos_c, 14*4, 0 * 3);  
+    
+    
+  } // end if non-full keypos 
+  
+}
+
+void loopOld() {
   //testContrast();
   testStillNumbers();
   testSomeText();
   
   // test backlight
-  digitalWrite(PIN_PA1, HIGH);
-  delay(10000);
-  digitalWrite(PIN_PA1, LOW);
+  //digitalWrite(PIN_PA1, HIGH);
+  //delay(10000);
+  //digitalWrite(PIN_PA1, LOW);
 //  testBitmap();
 }
 
