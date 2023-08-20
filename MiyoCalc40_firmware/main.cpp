@@ -22,6 +22,10 @@
       call suspend_tick() helper function: Suspend 'Tick' interupt
             Otherwise the Systick interrupt will wake up the device within 1ms. look up how to do that with avr-da.
       call enterstop2mode() helper function: Enter in Low power Stop 2. look up how to do that with avr-da.
+  
+  see following likes for useful info:
+    dxcore/megaavr/extras/ioheaders/readme.md
+    dxcore/megaavr/extras/DA28.md
      
 */
 
@@ -55,7 +59,8 @@ int lcdon;  // to track if lcd is turned on or not
 
 int main() {
 //  onBeforeInit(); // Empty callback called before init but after the .init stuff. First normal code executed
-  init(); // Interrupts are turned on just prior to init() returning.
+  init(); // implemented in wiring.c
+  // by default, dxcore enables TCA0 timers at startup to use with pwm. see megaavr/extras/refcallbacks.md
 //  initVariant();
 
   /* Insert here any code that needs to run before interrupts are
@@ -78,6 +83,8 @@ void setup() {
   setupLCD();
   lcdon = true;
   setupBacklight(); 
+  
+  // look into turning off TCD0 to save power
 } // setup()
 
 void setupLCD()  // this should be moved to the lcd file
@@ -87,15 +94,22 @@ void setupLCD()  // this should be moved to the lcd file
   delay(50);
 }
 
+// pwm set-up on pin A1
 void setupBacklight()  // this should be moved to the backlight file
 {
   pinMode(PIN_PA1, OUTPUT); // set LCD LED Backlight pin to output mode
+  PORTMUX.TCAROUTEA = PORTMUX_TCA0_PORTA_gc;  // route TCA to port A for PWM. Pin PA1 is on WO1 (waveform output 1)
+  // see ref_timers.md in dxcore documentation
+  // tca0 is configured by default as 8 bit timer with 6 output channels (we'll only need one): this allows for 256 different values for the duty cycle
+  // we'll use the default prescaler which should give a frequency of 1471 Hz (this is with a prescale of 64). Could be changed to a prescaler of 256, but then 
+  // frequency may be too low at 368 Hz. This would be done via TCA0.SPLIT.CTRLA = (TCA0.SPLIT.CTRLA & ~(0b00001110)) | TCA_SPLIT_CLKSEL_DIV256_gc
 }
 
 
 /*
 go in power-down sleep mode (set power down sleep mode and enable sleep, enable bothedges interrups for all column pins) (unless we're in 'off' state, in which case 
-may be able to only enable interupt on one pin))					
+may be able to only enable interupt on one pin)): see dxcore/megaavr/extras/powersave.md, do not use avr/power.h
+		
   upon wake interupt (port isr wake-up button press wakes up the mcu from sleep)					
     debounce 3ms to 20ms (10 times 2ms) using PIT (periodic interupt timer, programmed to trigger an interrupt every millisecond, lowpower_delay_ms function, set interrupt 
     to fire every 32 RTC clock cycles and enable PIT, enable PIT interrupts), validating logic low level on a column each time: btn_debounce() function					
@@ -157,6 +171,20 @@ void loop()
   } // end if non-full keypos 
   
 } // loop()
+
+void loopTestBacklightPWM()
+{
+  for (int i = 0; i <= 10; i++)
+  {
+    int dutycycle = min(26*i, 254);
+    analogWrite(PIN_PA1, dutycycle);
+    mylcd.LCDFillScreen(0x00, 0); // clear screen
+    mylcd.LCDChar(dutycycle / 100, 0, 0);
+    mylcd.LCDChar((dutycycle % 100)/ 10, MCFFONTWIDTH+MCFFONTSPACER, 0);
+    mylcd.LCDChar(dutycycle % 10, (MCFFONTWIDTH+MCFFONTSPACER) * 2, 0);
+    delay(1000);
+  }  
+}
 
 // old loop() code for testing
 void loopOld() {
@@ -274,3 +302,10 @@ void testSomeText() {
   mylcd.LCDChar(23, 0, 6); mylcd.LCDChar(23, 96, 6);
   delay(5000);
 }
+
+
+// dxcore/megaavr/extras/ref_timers.md and takingovertca0.md
+void testBacklight()
+{
+  
+} // testBacklight()
