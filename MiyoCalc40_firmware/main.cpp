@@ -26,6 +26,9 @@
   see following likes for useful info:
     dxcore/megaavr/extras/ioheaders/readme.md
     dxcore/megaavr/extras/DA28.md
+    * 
+  
+  MCU draws about 6.0mA at 3.2V when actively running at 24 MHz
      
 */
 
@@ -75,17 +78,24 @@ int main() {
 }
 
 void setup() {
+   
+  setupMCU();
   setupMatrix();
   
-  // setupCalc(); this should go in the calc.c and calc.h files
+  // setupCalc(); this method should be implemented in the calc.c and calc.h files
   //setup calc: see repocalc, openrpncalc, dcalc for examples
    
   setupLCD();
   lcdon = true;
   setupBacklight(); 
   
-  // look into turning off TCD0 to save power
+ 
 } // setup()
+
+void setupMCU()
+{
+  // look into turning off TCD0 to save power (call takeoverTCD0() perhaps )
+}
 
 void setupLCD()  // this should be moved to the lcd file
 {
@@ -102,7 +112,7 @@ void setupBacklight()  // this should be moved to the backlight file
   // see ref_timers.md in dxcore documentation
   // tca0 is configured by default as 8 bit timer with 6 output channels (we'll only need one): this allows for 256 different values for the duty cycle
   // we'll use the default prescaler which should give a frequency of 1471 Hz (this is with a prescale of 64). Could be changed to a prescaler of 256, but then 
-  // frequency may be too low at 368 Hz. This would be done via TCA0.SPLIT.CTRLA = (TCA0.SPLIT.CTRLA & ~(0b00001110)) | TCA_SPLIT_CLKSEL_DIV256_gc
+  // frequency may be too low at 368 Hz? This would be done via TCA0.SPLIT.CTRLA = (TCA0.SPLIT.CTRLA & ~(0b00001110)) | TCA_SPLIT_CLKSEL_DIV256_gc
 }
 
 
@@ -115,7 +125,7 @@ may be able to only enable interupt on one pin)): see dxcore/megaavr/extras/powe
     to fire every 32 RTC clock cycles and enable PIT, enable PIT interrupts), validating logic low level on a column each time: btn_debounce() function					
     
     if logic low level still detected in a column					
-      then scan keys (scan matrix) via function call: scankb() from matrix.c					
+      then scan keys (scan matrix) via function call: scankb()			
       
       if calc is off, power up lcd if 'on' button was pressed (key position for this can be stored in a separate global variable used directly in 'main'), 
         record calc_off variable = false
@@ -182,15 +192,16 @@ void loopTestBacklightPWM()
     mylcd.LCDChar(dutycycle / 100, 0, 0);
     mylcd.LCDChar((dutycycle % 100)/ 10, MCFFONTWIDTH+MCFFONTSPACER, 0);
     mylcd.LCDChar(dutycycle % 10, (MCFFONTWIDTH+MCFFONTSPACER) * 2, 0);
-    delay(1000);
+    delay(5000);
   }  
 }
 
 // old loop() code for testing
 void loopOld() {
   //testContrast();
-  testStillNumbers();
-  testSomeText();
+  //testStillNumbers();
+  //testSomeText();
+  testSomeOtherText();
   
   // test backlight
   //digitalWrite(PIN_PA1, HIGH);
@@ -303,9 +314,12 @@ void testSomeText() {
   delay(5000);
 }
 
-
-// dxcore/megaavr/extras/ref_timers.md and takingovertca0.md
-void testBacklight()
+void testSomeOtherText()
 {
-  
-} // testBacklight()
+  mylcd.LCDFillScreen(0x00, 0); // clear screen
+  mylcd.LCDString("NOAH", 0, 0);
+  mylcd.LCDString("AUDREY", 0, 3);
+  mylcd.LCDString("LIAM", 0, 6);
+  uint8_t txt1[] = {35, 26, 33}; mylcd.LCDCharSeq(txt1, sizeof(txt1)/sizeof(txt1[0]), 96, 0);
+  delay(5000);
+}

@@ -6,10 +6,12 @@ void loop();
 
 void testStillNumbers();
 void testSomeText();
+void testSomeOtherText();
 
+void setupMCU();
 void setupLCD();
 void setupBacklight();
 
-void loopOld();
+//void loopOld();
 
 #endif

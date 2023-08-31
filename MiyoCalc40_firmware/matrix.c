@@ -52,8 +52,6 @@ Combine row and column into an int (e.g. 2 nibbles encoded in an uint8) or a set
 
 // Defines
 //define number_of_columns and number_of_rows
-#define NUM_COLUMN_PINS 10
-#define NUM_ROW_PINS 4
 
 // Global variables
 //declare const for row pin and column pin arrays (contain pin numbers)

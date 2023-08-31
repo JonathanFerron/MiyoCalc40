@@ -1,6 +1,8 @@
 /* 
  * In part borrowed from the ERM19264_UC1609 project by Gavin Lyons: https://github.com/gavinlyonsrepo/ERM19264_UC1609
  * ERM19264 LCD driven by UC1609C controller
+ * 
+ * LCD draws about 270 to 290 uA at 3.2V (higher number is when more pixels are 'on')
  */
 
 #include "lcd.h"
@@ -213,9 +215,9 @@ void ERM19264_UC1609_T::LCDString(char *characters, uint8_t col, uint8_t page)
   }
 }
 
-void ERM19264_UC1609_T::LCDCharSeq(uint8_t indexes[], uint8_t col, uint8_t page)
+void ERM19264_UC1609_T::LCDCharSeq(uint8_t indexes[], uint8_t size, uint8_t col, uint8_t page)
 {
-  for (uint8_t i=0; i < sizeof(indexes)/sizeof(indexes[0]); i++)
+  for (uint8_t i=0; i < size; i++)
   {
     LCDChar(indexes[i], col + i * (MCFFONTWIDTH + MCFFONTSPACER), page);
   }

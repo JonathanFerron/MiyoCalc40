@@ -10,6 +10,8 @@
 
 #define MCFMINUS 36
 
+#define MCFNULCHAR 0xFF  // this is considered a null character in the 'mnemonic' for an 'action' when less than 5 characters are needed
+
 
 /* 1 byte sent to LCD at a time. Data is sent for 8 pixels, scanned vertically, and uses the Least Significant Bit (LSB) ordering (top pixel is the LSB).
  * 1 is a black pixel, 0 is a white pixel

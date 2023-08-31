@@ -39,9 +39,29 @@ openrpncalc pseudocode and structure (from calc.c):
 
 dcalc pseudocode and structure:
 
-
 repocalc pseudocode and structure: 
 
 
 
+use variable depth stack (min 1, max 8, elements): first two still refered to as x and y, but really they are s0 and s1
+initialize with only 1 variable in the stack (x), at 0.0
+
+show 6 stack registers on screen (3 high, reduce nbr of dec for 6), include mem (heap) reg up to a grand total of 6: X, Y, Z, T, S, R, (Q, P)
+
+Display 6 max items from the stack and memory registers on screen (with 6 digits when displaying 6 items). When displaying only 3 stack items, show up to 9 digits.
+
+Show deg (little degree sign, circle) vs rad (little pi sign) mode indicatod in corner.
+
+show shift indicator in corner of screen: f g h (small font)
+
+memory registers (heap): maximum of 36 registers from 0 to 9 and from A to Z. we can refer to them as R(0), R(1), etc. 
+
 */
+
+// Includes
+#include "calc.h"
+
+// this one should be moved to the 'calc.c' file
+void enter_number(uint8_t keycode)
+{
+}

@@ -30,4 +30,33 @@ should take about 3 to 5 hours to charge battery from 10% SOC to 90% SOC (240mAh
 
 Typical discharge when on will likely be around 5mA (mostly from LCD, really): or measure when using calc with a multimeter
 5mA / 300mAh = 0.02C
+
+Voltage measurement code:
+ 
+For Atmega328p, this would be
+use ADC with fixed reference. Can measure Reference Voltage (1.1V) against VCC. 
+ADC = (Vin * 1024) / Vref    =>    ADC = (1.1v * 1024) / Vcc    =>    Vcc = (1.1v * 1024) / ADC
+ADMUX = 0b00100001
+ADCSRA = _BV(ADEN) | _BV(ADPS1) | _BV(ADPS0)
+delay 1ms
+...
+see wp.josh.com, battery fuel gauge with zero parts and zero pins on avr
+
+on avr-da:
+* ADC and VREF: ADC0
+* ADCenable: CTRLA bit 0
+* single ended conversion: CTRLA bit 5
+* 10 bit conversion: CTRLA bit 3:2
+* ADC0.RES = RES = VAinp * 1024 / VADCREF  (VADCREF = VREF.ADC0REF). this will yield an int from 0 to 1023 inclusive
+* 
+* selection of ADC input: MUXPOS
+* slightly preferable for VDD around 3V or 3.1V: 2.5V reference
+* pick ADCREF = VDD and DACREF = 2.5V
+* pick DACREF0 = VREF.DAC0REF
+* 
+* VREF.ADC0REF.REFSEL = 4V096, value 0x2
+* VREF.DAC0REF.REFSEL = VDD, value 0x5
+
+
 */
+

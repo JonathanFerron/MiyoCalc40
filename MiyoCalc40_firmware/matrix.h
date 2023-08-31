@@ -8,6 +8,9 @@
 #ifndef MATRIX_H
   #define MATRIX_H
   
+  #define NUM_COLUMN_PINS 10
+  #define NUM_ROW_PINS 4
+  
   void setupMatrix();
   void scanKB();
   

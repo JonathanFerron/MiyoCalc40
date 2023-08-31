@@ -125,7 +125,7 @@ class ERM19264_UC1609_T {
     void LCDSetContrast(uint8_t cont);
     void LCDChar(uint8_t index, uint8_t col, uint8_t page);
     void LCDDot(uint8_t col, uint8_t page);
-    void LCDCharSeq(uint8_t indexes[], uint8_t col, uint8_t page);
+    void LCDCharSeq(uint8_t indexes[], uint8_t size, uint8_t col, uint8_t page);
            
   private:
 
