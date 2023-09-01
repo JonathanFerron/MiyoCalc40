@@ -37,12 +37,6 @@ openrpncalc pseudocode and structure (from calc.c):
   variables: array of double (use single to start with), storage space for variables
 
 
-dcalc pseudocode and structure:
-
-repocalc pseudocode and structure: 
-
-
-
 use variable depth stack (min 1, max 8, elements): first two still refered to as x and y, but really they are s0 and s1
 initialize with only 1 variable in the stack (x), at 0.0
 

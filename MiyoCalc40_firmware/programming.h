@@ -36,7 +36,7 @@
  * 
  * FOR
  *   init count (16 bit signed integer)
- *   COUNT? (6 keycodes, unless we want to reuse the 'X?Y' keycode and repurpose as a COUNT? in the context of a FOR loop)
+ *   COUNT? (reuse the 'X?Y' keycode and repurpose as a COUNT?n in the context of a FOR loop)
  *   n (float from which we will take integer portion)
  *   Do stuff
  * NEXT
