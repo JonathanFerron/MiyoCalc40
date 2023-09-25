@@ -55,9 +55,11 @@ Combine row and column into an int (e.g. 2 nibbles encoded in an uint8) or a set
 
 // Global variables
 //declare const for row pin and column pin arrays (contain pin numbers)
+// rows from top (keypos_r=0 for row 1) to bottom (keypos_r=3 for row 4)
 const uint8_t row_pin_array[NUM_ROW_PINS] = {
 		PIN_PD0, PIN_PD1, PIN_PD2, PIN_PD3};
 
+// columns from left (keypos_c=0 for col A) to right (keypos_c=9 for col J)
 const uint8_t column_pin_array[NUM_COLUMN_PINS] = {
 		PIN_PC0, PIN_PC1, PIN_PC2, PIN_PC3, PIN_PD4, PIN_PD5, PIN_PD6, PIN_PD7, PIN_PF1, PIN_PF0};
     
@@ -101,7 +103,7 @@ void setupMatrix()
   PORTA.PINCONFIG = PORT_PULLUPEN_bm | PORT_ISC_INPUT_DISABLE_gc;
   PORTA.PINCTRLSET = 0b00100001;
   
-  keypos_r = 0xff;  // initialize keypos to 'null', which we'll define as 0xff by convention
+  keypos_r = 0xff;  // initialize keypos to 'null', which we'll define as 0xff by convention, may want to define that as 'keyposnull' for readability
   keypos_c = 0xff;
 }
 
@@ -164,7 +166,7 @@ void scanKB()
       
       // row pins
       PORTD.DIRTGL = PIN0_bm | PIN1_bm | PIN2_bm | PIN3_bm; // toggle direction to output
-      PORTD.OUTCLR = PIN0_bm | PIN1_bm | PIN2_bm | PIN3_bm; // low: can this be optimized out as well?
+      PORTD.OUTCLR = PIN0_bm | PIN1_bm | PIN2_bm | PIN3_bm; // low: can this be optimized out as well by running it just once in setupMatrix() ?
       
       break;  // break out of the loop across each column
     } // if a column pin was low

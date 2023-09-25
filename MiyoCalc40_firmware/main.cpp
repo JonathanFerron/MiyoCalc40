@@ -1,33 +1,14 @@
  /* Other notes:
-
-	use static vars if necessary
   
   calc, config and programming mode: should be stored in a global status field that can be set and checked, could be an enum
   f, g, h shift modifiers: should each be a bool global variable that can be set and checked
-  config screen: should be stored in a global status fiels as well that can be set and checked, could be an enum (only relevant in 'config' mode)
+  current config screen: should be stored in a global status fiels as well that can be set and checked, could be an enum (only relevant in 'config' mode)
   
   see repocalc, openrpncalc, dcalc (main.c) for examples
         H:\My Drive\MiyoCalc40\resources\openrpncalc
         H:\My Drive\MiyoCalc40\resources\repocalc
         H:\My Drive\MiyoCalc40\resources\dcalc-2.12
        
-  Open RPN Calc:
-    helper function switch_to_input() to switch input pins to simple input pull-up mode (no interrupt)
-
-    helper function put_to_sleep() to switch input pins back to interupt mode and put mcu in sleep mode
-      set all input pins to pullup with interupt falling mode
-      call enable_sleep_on_exit() helper function: Set SLEEPONEXIT bit. When this bit is set, the processor 
-            re-enters SLEEP mode when an interruption handling is over. look at avr matrix scanning code and 
-            avr128da28 datasheet to figure out how to do that with an avr-da chip
-      call suspend_tick() helper function: Suspend 'Tick' interupt
-            Otherwise the Systick interrupt will wake up the device within 1ms. look up how to do that with avr-da.
-      call enterstop2mode() helper function: Enter in Low power Stop 2. look up how to do that with avr-da.
-  
-  see following likes for useful info:
-    dxcore/megaavr/extras/ioheaders/readme.md
-    dxcore/megaavr/extras/DA28.md
-    * 
-  
   MCU draws about 6.0mA at 3.2V when actively running at 24 MHz
      
 */
@@ -36,8 +17,9 @@
 #include "lcd.h"
 #include "fonts.h"
 #include "main.h"
+#include "cards.h"
 
-#define VbiasPOT 0x0C // Default constrast: 0x0A to 0x20 tend to work well
+#define LCD_Default_Contrast 0x0C // Default LCD constrast: 0x0A to 0x20 tend to work well. Consider renaming this to something like LCD_DEF_Contrast.
 
 // GPIO 5-wire SPI interface
 
@@ -95,11 +77,20 @@ void setup() {
 void setupMCU()
 {
   // look into turning off TCD0 to save power (call takeoverTCD0() perhaps )
+  
+  // setup ADC for battery voltage: consider moving this to a separate setupBattVoltMonitor() function
+  VREF.ADC0REF = VREF_REFSEL_2V048_gc;     // Set the ADC's voltage reference to 2.048V.
+  VREF.ACREF = VREF_REFSEL_VDD_gc;         // Set the Analog Comparator's shared voltage reference to VDD.
+  AC0.DACREF = 128;                        // set DACREF variable to 128 (will be divider by 256)
+  ADC0.MUXPOS = ADC_MUXPOS_DACREF0_gc;     // Measure DACREF0
+  ADC0.CTRLC = ADC_PRESC_DIV64_gc;         // 375kHz clock (24,000,000 / 64)
+  ADC0.CTRLA = ADC_ENABLE_bm;              // Single, 12-bit, should move this inside the voltage calculation function, turn on before measuring, measure, then turn off when done
+  //ADC0.CTRLA |= ADC_ENABLE_bm;
 }
 
-void setupLCD()  // this should be moved to the lcd file
+void setupLCD()
 {
-  mylcd.LCDbegin(VbiasPOT); // initialize the LCD
+  mylcd.LCDbegin(LCD_Default_Contrast); // initialize the LCD
   mylcd.LCDFillScreen(0x00, 0); // clear screen  
   delay(50);
 }
@@ -157,7 +148,7 @@ may be able to only enable interupt on one pin)): see dxcore/megaavr/extras/powe
       may want to debouce here as well (openrpncalc uses 10ms)					
     end if					
  */
-void loop() 
+void loopNew() 
 {  
   // scan keys
   scanKB();
@@ -167,9 +158,12 @@ void loop()
   {
     
     // lookup function pointer+keycode (action struct): this should include re-setting the keypos to 'null' once the action is obtained
-  
-    // process action via function call: from 'action' struct from 'calc', call the function and provide it the keycode (not the keypos) that was also looked up. 
-  
+    action current_action = keytoaction();
+    keypos_c = 0xff; keypos_r = 0xff; 
+    
+    // process action via function call: from 'action' struct from 'cards', call the function from 'calc' and provide it the keycode (not the keypos) that was also looked up. 
+    current_action.fct(current_action.keycode);
+    
     // refresh lcd
     mylcd.LCDFillScreen(0x00, 0); // clear screen
     mylcd.LCDChar('R' - MCFLETOFFSET, 14*0, 0*3);  // R
@@ -181,6 +175,111 @@ void loop()
   } // end if non-full keypos 
   
 } // loop()
+
+// old loop() code for testing
+void loop() {
+  //testContrast();
+  testStillNumbers();
+  //testSomeText();
+  //testSomeOtherText();
+  //testBatteryVoltage();
+  
+  // test backlight
+  //digitalWrite(PIN_PA1, HIGH);
+  //delay(10000);
+  //digitalWrite(PIN_PA1, LOW);
+//  testBitmap();
+} // loopOld()
+
+
+// see http://www.technoblogy.com/list?3KLH
+// http://www.technoblogy.com/show?3K82
+// http://www.technoblogy.com/show?3KJR
+/** 
+ * Measuring VDD on an AVR128DA28
+
+With the DA series things are a bit complicated, and I had to do some experimentation to work out what was going on because it isn't fully explained in the datasheet.
+
+The ADC.MUXPOS register on the AVR128DA28 let's you choose to read one of three voltage reference options: DACREF0, DACREF1, and DACREF2.
+
+It turns out that these are generated by the AC (Analog Comparator) peripheral. DACREFn is:
+ACn.DACREF / 256 × VREF.ACREF
+
+where VREF.ACREF is the single Analog Comparator voltage reference, which is shared between all three Analog Comparators, and ACn.DACREF 
+is a byte stored in the DACREF register for Analog Comparator n which sets a voltage divider.
+
+The ACn.DACREF values all default to 255, so DACREF0, DACREF1, and DACREF2 are initially all 255/256 times the Analog Comparator shared VREF setting. Note that the 
+255/256 factor is significant. It makes the default voltage references from DACREF0, DACREF1, and DACREF2 1.02V rather than the 1.024V you might expect.
+
+Setting up the ADC
+
+The procedure to set up the ADC is:
+
+    Set the ADC's voltage reference to 1.024V.
+    Set the Analog Comparator's shared voltage reference to VDD.
+    Set Analog Comparator 0's DACREF value to 32.
+    Set the ADC MUXPOS so the ADC measures DACREF0.
+
+Here's the code to implement this:
+
+void ADCSetup () {
+  VREF.ADC0REF = VREF_REFSEL_1V024_gc;
+  VREF.ACREF = VREF_REFSEL_VDD_gc;
+  AC0.DACREF = 32;                                     // Maximum DACREF0 voltage
+  ADC0.MUXPOS = ADC_MUXPOS_DACREF0_gc;                 // Measure DACREF0
+  ADC0.CTRLC = ADC_PRESC_DIV64_gc;                     // 375kHz clock
+  ADC0.CTRLA = ADC_ENABLE_bm;                          // Single, 12-bit
+}
+
+The datasheet specifies that the ADC clock should be at least 150kHz, so I've chosen a divider of 64 which gives a clock of 375kHz with a 24MHz processor clock.
+Reading the voltage
+
+Here's the routine to measure the supply voltage:
+
+void MeasureVoltage () {
+  ADC0.COMMAND = ADC_STCONV_bm;                        // Start conversion
+  while (ADC0.COMMAND & ADC_STCONV_bm);                // Wait for completion
+  uint16_t adc_reading = ADC0.RES;                     // ADC conversion result
+  uint16_t voltage = adc_reading/50;
+  Buffer[0] = voltage/10; Buffer[1]= voltage%10;
+}
+
+The ADC is now measuring 32/256 or 1/8 of VDD, which will always be within range of the 1.024 voltage reference.
+
+The calculation is:
+Result / 4096 × 1.024 = V / 8
+
+So:
+V = Result / 500, in volts
+
+To get VDD in tenths of a volt we therefore need to divide the ADC reading by 50.
+
+The maximum voltage we can measure this way is 4095/500 or 8.19V, which is well above the maximum supply voltage of 5.5V.
+
+Note that you can also use the same 'backwards' technique as on the older ATmega and ATtiny chips, although I can't think of any advantage; 
+if you're interested see Measuring Your Own Supply Voltage 2.
+ * 
+ * 
+ **/
+void testBatteryVoltage()  // move this to the util.c file
+{
+  ADC0.COMMAND = ADC_STCONV_bm;                        // Start conversion
+  while (ADC0.COMMAND & ADC_STCONV_bm);                // Wait for completion
+  uint16_t adc_reading = ADC0.RES;                     // ADC conversion result
+  //uint16_t voltage = adc_reading/5;                    // convert to voltage * 100
+  uint16_t voltage = adc_reading;
+  //int Buffer[3] = {0, 0, 0};
+  int Buffer[4] = {0, 0, 0, 0};
+  Buffer[0] = voltage/1000; Buffer[1]= (voltage%1000)/100; Buffer[2] = (voltage%100)/10; Buffer[3] = voltage % 10;  
+  
+  // print out battery voltage on lcd
+  mylcd.LCDFillScreen(0x00, 0); // clear screen
+  mylcd.LCDChar(Buffer[0], 0, 0);
+  mylcd.LCDChar(Buffer[1], MCFFONTWIDTH+MCFFONTSPACER, 0);
+  mylcd.LCDChar(Buffer[2], (MCFFONTWIDTH+MCFFONTSPACER) * 2, 0);
+  mylcd.LCDChar(Buffer[3], (MCFFONTWIDTH+MCFFONTSPACER) * 3, 0);
+  delay(2000);
+}
 
 void loopTestBacklightPWM()
 {
@@ -196,21 +295,7 @@ void loopTestBacklightPWM()
   }  
 }
 
-// old loop() code for testing
-void loopOld() {
-  //testContrast();
-  //testStillNumbers();
-  //testSomeText();
-  testSomeOtherText();
-  
-  // test backlight
-  //digitalWrite(PIN_PA1, HIGH);
-  //delay(10000);
-  //digitalWrite(PIN_PA1, LOW);
-//  testBitmap();
-} // loopOld()
-
-// shows how we would print numbers when displaying 3 elements of the stack (X at bottom, then Y, then Z on top)
+// shows how we would print numbers when displaying 3 elements of the stack (X at bottom, Y in middle, and Z on top)
 void testStillNumbers()
 {
   mylcd.LCDFillScreen(0x00, 0); // clear screen
@@ -249,12 +334,12 @@ void testStillNumbers()
   
   // how to show hex numbers
   mylcd.LCDFillScreen(0x00, 0); // clear screen
-  mylcd.LCDChar(0xA, 14*0, 0 * 3); // col 0-11, page 0-1
-  mylcd.LCDChar(0xB, 14*1, 1 * 3); // col 0-11, page 0-1
-  mylcd.LCDChar(0xC, 14*2, 2 * 3); // col 0-11, page 0-1
-  mylcd.LCDChar(0xD, 14*3, 1 * 3); // col 0-11, page 0-1
-  mylcd.LCDChar(0xE, 14*4, 0 * 3); // col 0-11, page 0-1
-  mylcd.LCDChar(0xF, 14*5, 1 * 3); // col 0-11, page 0-1
+  mylcd.LCDChar(0xA, 14*0, 0 * 3); // col 0-14, page 0-1
+  mylcd.LCDChar(0xB, 14*1, 1 * 3); 
+  mylcd.LCDChar(0xC, 14*2, 2 * 3); 
+  mylcd.LCDChar(0xD, 14*3, 1 * 3); 
+  mylcd.LCDChar(0xE, 14*4, 0 * 3); 
+  mylcd.LCDChar(0xF, 14*5, 1 * 3); 
    
   delay(5000);
 }

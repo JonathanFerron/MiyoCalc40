@@ -148,7 +148,7 @@ void ERM19264_UC1609_T::send_data(uint8_t byte)
 } 
 
 // Desc: goes to XY position
-// Param1 : coloumn 0-192
+// Param1 : column 0-192
 // Param2  : page 0-7
 void ERM19264_UC1609_T::LCDGotoXY(uint8_t column , uint8_t page)
 {
@@ -159,6 +159,9 @@ void ERM19264_UC1609_T::LCDGotoXY(uint8_t column , uint8_t page)
   UC1609_CS_SetHigh;
 }
 
+// param : index, provide index of character from MiyoCalcFont table
+// Param : column 0-192
+// Param  : page 0-7
 void ERM19264_UC1609_T::LCDChar(uint8_t index, uint8_t col, uint8_t page)
 {
   UC1609_CS_SetLow;
@@ -180,6 +183,8 @@ void ERM19264_UC1609_T::LCDChar(uint8_t index, uint8_t col, uint8_t page)
   UC1609_CS_SetHigh;
 }
 
+// Param1 : column 0-192
+// Param2  : page 0-7
 void ERM19264_UC1609_T::LCDDot(uint8_t col, uint8_t page)
 {
   UC1609_CS_SetLow;
@@ -205,6 +210,8 @@ void ERM19264_UC1609_T::LCDDot(uint8_t col, uint8_t page)
 // Desc: draws passed  character array
 // Param1: pointer to start of character array
 // careful with this: the function should only be called with upper case letters. No symbols, no numbers, no lower case.
+// Param1 : column 0-192
+// Param2  : page 0-7
 void ERM19264_UC1609_T::LCDString(char *characters, uint8_t col, uint8_t page)
 {
   uint8_t i = 0;
@@ -223,6 +230,7 @@ void ERM19264_UC1609_T::LCDCharSeq(uint8_t indexes[], uint8_t size, uint8_t col,
   }
 }
 
+// set contrast, values from 0x0A to 0x20 tend to work well
 void ERM19264_UC1609_T::LCDSetContrast(uint8_t cont)
 {
   UC1609_CD_SetLow;

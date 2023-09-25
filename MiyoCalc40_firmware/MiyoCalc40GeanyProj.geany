@@ -28,16 +28,28 @@ long_line_behaviour=2
 long_line_column=175
 
 [files]
-current_page=3
-FILE_NAME_0=424;Markdown;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5CTo%20Dos.md;0;2
+current_page=8
+FILE_NAME_0=399;Markdown;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5CTo%20Dos.md;0;2
 FILE_NAME_1=12207;C;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cresources%5Ccsnippets.c;0;2
 FILE_NAME_2=912;Markdown;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cresources%5CKicad%20how%20to.md;0;2
-FILE_NAME_3=185;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Ccards.h;0;2
-FILE_NAME_4=3328;C;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Ccards.c;0;2
-FILE_NAME_5=7324;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Cmain.cpp;0;2
-FILE_NAME_6=1593;C;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Cmatrix.c;0;2
-FILE_NAME_7=96;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Ccalc.h;0;2
-FILE_NAME_8=1769;C;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Ccalc.c;0;2
+FILE_NAME_3=4148;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Ccards.h;0;2
+FILE_NAME_4=2360;C;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Ccards.c;0;2
+FILE_NAME_5=13134;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Cmain.cpp;0;2
+FILE_NAME_6=1915;C;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Cmatrix.c;0;2
+FILE_NAME_7=406;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Ccalc.h;0;2
+FILE_NAME_8=8076;C;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Ccalc.c;0;2
+FILE_NAME_9=0;Markdown;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5CDesign%20Principles.md;0;2
+FILE_NAME_10=1645;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Cfonts.h;0;2
+FILE_NAME_11=1385;C;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Cutil.c;0;2
+FILE_NAME_12=5848;C;0;EUTF-8;0;1;0;C%3A%5CUsers%5CJonathan%5CAppData%5CLocal%5CArduino15%5Cpackages%5CDxCore%5Chardware%5Cmegaavr%5C1.5.6%5Ccores%5Cdxcore%5Cwiring_analog.c;0;2
+FILE_NAME_13=108408;C++;0;EUTF-8;0;1;0;C%3A%5CUsers%5CJonathan%5CAppData%5CLocal%5CArduino15%5Cpackages%5CDxCore%5Ctools%5Cavr-gcc%5C7.3.0-atmel3.6.1-azduino6%5Cavr%5Cinclude%5Cavr%5Cioavr128da28.h;0;2
+FILE_NAME_14=0;C;0;EUTF-8;0;1;0;C%3A%5CUsers%5CJonathan%5CAppData%5CLocal%5CArduino15%5Cpackages%5CDxCore%5Chardware%5Cmegaavr%5C1.5.6%5Ccores%5Cdxcore%5Cwiring.c;0;2
+FILE_NAME_15=3221;C++;0;EUTF-8;0;1;0;C%3A%5CUsers%5CJonathan%5CAppData%5CLocal%5CArduino15%5Cpackages%5CDxCore%5Chardware%5Cmegaavr%5C1.5.6%5Cvariants%5C28pin-standard%5Cpins_arduino.h;0;2
+FILE_NAME_16=21377;C++;0;EUTF-8;0;1;0;C%3A%5CUsers%5CJonathan%5CAppData%5CLocal%5CArduino15%5Cpackages%5CDxCore%5Chardware%5Cmegaavr%5C1.5.6%5Ccores%5Cdxcore%5CArduino.h;0;2
+FILE_NAME_17=166;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Cmain.h;0;2
+FILE_NAME_18=0;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Cmatrix.h;0;2
+FILE_NAME_19=13125;C;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cresources%5Copenrpncalc%5Ccalc.c;0;2
+FILE_NAME_20=4417;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Clcd.h;0;2
 
 [prjorg]
 source_patterns=*.c;*.C;*.cpp;*.cxx;*.c++;*.cc;*.m;

@@ -26,7 +26,7 @@
  * Alternatively in the future, we could consider a font that is 18 pixels high, and reduce the gap between 2 rows of numbers to 5 pixels. May or may not 'feel' too 'tight'.
  */
 
-// 10 char, 12 col by 16 row (2 pages) each
+// 12 col by 16 row (2 pages) each
 static const uint8_t MiyoCalcFont[] PROGMEM = {
   0xf0,	0xfc,	0x0e,	0x07,	0x03,	0x03,	0x03,	0x07,	0x0e,	0xfc,	0xf0,	0x00,
   0x0f,	0x3f,	0x70,	0xe0,	0xc0,	0xc0,	0xc0,	0xe0,	0x70,	0x3f,	0x0f,	0x00,  // 0  @0
