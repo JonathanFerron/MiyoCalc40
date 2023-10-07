@@ -13,11 +13,15 @@
      
 */
 
+#include <stdbool.h>
+#include <avr/sleep.h>
+
 #include "matrix.h"
 #include "lcd.h"
 #include "fonts.h"
 #include "main.h"
 #include "cards.h"
+#include "calc.h"
 
 #define LCD_Default_Contrast 0x0C // Default LCD constrast: 0x0A to 0x20 tend to work well. Consider renaming this to something like LCD_DEF_Contrast.
 
@@ -64,13 +68,11 @@ void setup() {
   setupMCU();
   setupMatrix();
   
-  // setupCalc(); this method should be implemented in the calc.c and calc.h files
-  //setup calc: see repocalc, openrpncalc, dcalc for examples
+  calc_init();  
    
   setupLCD();
-  lcdon = true;
-  setupBacklight(); 
-  
+    
+  setupBacklight();  
  
 } // setup()
 
@@ -86,6 +88,9 @@ void setupMCU()
   ADC0.CTRLC = ADC_PRESC_DIV64_gc;         // 375kHz clock (24,000,000 / 64)
   ADC0.CTRLA = ADC_ENABLE_bm;              // Single, 12-bit, should move this inside the voltage calculation function, turn on before measuring, measure, then turn off when done
   //ADC0.CTRLA |= ADC_ENABLE_bm;
+  
+  set_sleep_mode(SLEEP_MODE_STANDBY);  
+  sleep_enable();
 }
 
 void setupLCD()
@@ -93,6 +98,7 @@ void setupLCD()
   mylcd.LCDbegin(LCD_Default_Contrast); // initialize the LCD
   mylcd.LCDFillScreen(0x00, 0); // clear screen  
   delay(50);
+  lcdon = true;
 }
 
 // pwm set-up on pin A1
@@ -108,63 +114,67 @@ void setupBacklight()  // this should be moved to the backlight file
 
 
 /*
-go in power-down sleep mode (set power down sleep mode and enable sleep, enable bothedges interrups for all column pins) (unless we're in 'off' state, in which case 
-may be able to only enable interupt on one pin)): see dxcore/megaavr/extras/powersave.md, do not use avr/power.h
+go in sleep mode (enable sleep, enable bothedges interrups for all column pins) : see dxcore/megaavr/extras/powersave.md
 		
-  upon wake interupt (port isr wake-up button press wakes up the mcu from sleep)					
-    debounce 3ms to 20ms (10 times 2ms) using PIT (periodic interupt timer, programmed to trigger an interrupt every millisecond, lowpower_delay_ms function, set interrupt 
-    to fire every 32 RTC clock cycles and enable PIT, enable PIT interrupts), validating logic low level on a column each time: btn_debounce() function					
+upon wake interupt (port isr wake-up button press wakes up the mcu from sleep)					
+  debounce 3ms to 20ms (10 times 2ms) using PIT (periodic interupt timer, programmed to trigger an interrupt every millisecond, lowpower_delay_ms function, set interrupt 
+  to fire every 32 RTC clock cycles and enable PIT, enable PIT interrupts), validating logic low level on a column each time: btn_debounce() function					
+  
+  if logic low level still detected in a column					
+    then scan keys (scan matrix) via function call: scankb()			
     
-    if logic low level still detected in a column					
-      then scan keys (scan matrix) via function call: scankb()			
-      
-      if calc is off, power up lcd if 'on' button was pressed (key position for this can be stored in a separate global variable used directly in 'main'), 
-        record calc_off variable = false
-      else (calc is on)
-        if in mem store or recall mode:
-          call mem store or recall with key pos, should have a max of 38 possible var 
-        else
-          with key position (from scankb), lookup (cards.c) function pointer and keycode (action struct)
-          
-          if in 'calc mode'
-            if 'off' button (combination) was pressed (can tell based on the keycode alone), power down lcd and calc, record calc_off variable = true         
-            else
-              process action via function call (from function pointer): from 'action' struct from 'calc' (if in calc mode) or 'config' (if in config mode)
-                provide it the keycode that was also looked up
-                action in program mode, when a key is pressed to be recorded, is a function that will call another function with a keycode to log/record it					
-            end if
+    if calc is off, power it up if 'on' button was pressed      
+    else (lcd is on)
+      if in mem store, recall mode or clear mode (see the mem_recall_mode, mem_store_mode and mem_clear_mode boolean variables):
+        call mem store, recall, or clear with key pos (2D), should have a max of 40 possible var : call apply_memory_rcl(uint8_t r, uint8_t c), apply_memory_sto(uint8_t r, uint8_t c) and apply_memory_clr(uint8_t r, uint8_t c)
+      else
+        with key position (from scankb), lookup function pointer and keycode (action struct)
+        
+        if in 'calc mode'
+          if 'off' button (combination) was pressed (can tell based on action), power down            
+          else
+            process action via function call (from function pointer): from 'action' struct from 'calc' (if in calc mode) or 'config' (if in config mode)
+              provide it the keycode that was also looked up
+              action in program mode, when a key is pressed to be recorded, is a function that will call another function with a keycode to log/record it					
           end if
         end if
-      endif
-
-      refresh lcd when necessary (typically after calculation has been processed and before going back to sleep)  					
-      
-      inner loop begin (idle until key is released):					
-        if logic low level on any column still					
-          then power down sleep					
-            port isr wake-up: button is released					
-        end if					
-      end inner loop					
-      may want to debouce here as well (openrpncalc uses 10ms)					
-    end if					
+      end if
+    endif
+    
+    inner loop begin (idle until key is released):					
+      if logic low level on any column still					
+        then sleep					
+          port isr wake-up: button is released					
+      end if					
+    end inner loop					
+    may want to debouce here as well (openrpncalc uses 10ms)				
+  end if					
  */
 void loopNew() 
 {  
   // scan keys
   scanKB();
+  
+  // if lcd is off, power it up if 'on' button was pressed
+  if (keypos_r == ONOFFKEYPOS_R && keypos_c == ONOFFKEYPOS_C && !lcdon)
+  {
+    setupLCD();
+    lcdon = true;
+    set_sleep_mode(SLEEP_MODE_STANDBY);
+  } // 'power on' lcd
  
   // if non-null keypos:
   if (keypos_r != 0xff)
   {
     
-    // lookup function pointer+keycode (action struct): this should include re-setting the keypos to 'null' once the action is obtained
+    // lookup function pointer+keycode (action struct)
     action current_action = keytoaction();
-    keypos_c = 0xff; keypos_r = 0xff; 
+    keypos_c = 0xff; keypos_r = 0xff; // reset keypos to 'null' after action is obtained
     
-    // process action via function call: from 'action' struct from 'cards', call the function from 'calc' and provide it the keycode (not the keypos) that was also looked up. 
+    // process action via function call: from 'action' struct, call the function and provide it the keycode that was also looked up. 
     current_action.fct(current_action.keycode);
     
-    // refresh lcd
+    // refresh lcd : this will become obsolete since we'll refresh the lcd from within the actions, when necessary
     mylcd.LCDFillScreen(0x00, 0); // clear screen
     mylcd.LCDChar('R' - MCFLETOFFSET, 14*0, 0*3);  // R
     mylcd.LCDChar(keypos_r, 14*1, 0 * 3);
@@ -172,14 +182,17 @@ void loopNew()
     mylcd.LCDChar(keypos_c, 14*4, 0 * 3);  
     
     
-  } // end if non-full keypos 
+  } // end processing of non-full keypos 
   
 } // loop()
 
 // old loop() code for testing
 void loop() {
   //testContrast();
-  testStillNumbers();
+  //testStillNumbers();
+  //testStillNumbers2();  // rename to testStack()
+  //testActionsWithoutKeyboard();
+  simulateInput();
   //testSomeText();
   //testSomeOtherText();
   //testBatteryVoltage();
@@ -198,20 +211,18 @@ void loop() {
 /** 
  * Measuring VDD on an AVR128DA28
 
-With the DA series things are a bit complicated, and I had to do some experimentation to work out what was going on because it isn't fully explained in the datasheet.
+The ADC.MUXPOS register on the AVR128DA28 lets you choose to read a voltage reference option: DACREF0
 
-The ADC.MUXPOS register on the AVR128DA28 let's you choose to read one of three voltage reference options: DACREF0, DACREF1, and DACREF2.
+It turns out that this is generated by the AC (Analog Comparator) peripheral. DACREF0 is:
+AC0.DACREF / 256 × VREF.ACREF
 
-It turns out that these are generated by the AC (Analog Comparator) peripheral. DACREFn is:
-ACn.DACREF / 256 × VREF.ACREF
+where VREF.ACREF is the single Analog Comparator voltage reference, and AC0.DACREF 
+is a byte stored in the DACREF register for Analog Comparator 0 which sets a voltage divider.
 
-where VREF.ACREF is the single Analog Comparator voltage reference, which is shared between all three Analog Comparators, and ACn.DACREF 
-is a byte stored in the DACREF register for Analog Comparator n which sets a voltage divider.
+The AC0.DACREF value defaults to 255, so DACREF0 is initially 255/256 times the Analog Comparator VREF setting. Note that the 
+255/256 factor is significant. It makes the default voltage references from DACREF0 1.02V rather than the 1.024V you might expect.
 
-The ACn.DACREF values all default to 255, so DACREF0, DACREF1, and DACREF2 are initially all 255/256 times the Analog Comparator shared VREF setting. Note that the 
-255/256 factor is significant. It makes the default voltage references from DACREF0, DACREF1, and DACREF2 1.02V rather than the 1.024V you might expect.
-
-Setting up the ADC
+Setting up the ADC:
 
 The procedure to set up the ADC is:
 
@@ -232,6 +243,7 @@ void ADCSetup () {
 }
 
 The datasheet specifies that the ADC clock should be at least 150kHz, so I've chosen a divider of 64 which gives a clock of 375kHz with a 24MHz processor clock.
+
 Reading the voltage
 
 Here's the routine to measure the supply voltage:
@@ -256,9 +268,6 @@ To get VDD in tenths of a volt we therefore need to divide the ADC reading by 50
 
 The maximum voltage we can measure this way is 4095/500 or 8.19V, which is well above the maximum supply voltage of 5.5V.
 
-Note that you can also use the same 'backwards' technique as on the older ATmega and ATtiny chips, although I can't think of any advantage; 
-if you're interested see Measuring Your Own Supply Voltage 2.
- * 
  * 
  **/
 void testBatteryVoltage()  // move this to the util.c file
@@ -296,9 +305,11 @@ void loopTestBacklightPWM()
 }
 
 // shows how we would print numbers when displaying 3 elements of the stack (X at bottom, Y in middle, and Z on top)
+// use this as a template for the DrawNum() function in calc.cpp (which will print to the LCD on a given page from a given number_for_lcd struct)
 void testStillNumbers()
 {
   mylcd.LCDFillScreen(0x00, 0); // clear screen
+  /*
   mylcd.LCDChar(3, 14*0, 0 * 3); // col 0-11, page 0-1
   mylcd.LCDDot(14*1, 0*3); // col 14-16
   mylcd.LCDChar(1, 14*1 + 5, 0 * 3); // col 19-30
@@ -309,7 +320,58 @@ void testStillNumbers()
   mylcd.LCDChar(2, 14*6 + 5 + 3, 0 * 3); 
   mylcd.LCDChar(6, 14*7 + 5 + 3*2, 0 * 3);
   mylcd.LCDChar(5, 14*8 + 5 + 3*2, 0 * 3);   
+  */
   
+  /*
+  mylcd.LCDChar(3, 14*0, 0 * 3); // col 0-11, page 0-1
+  mylcd.LCDDot(14*1, 0*3); // col 14-16
+  mylcd.LCDChar(1, 14*1 + 5, 0 * 3); // col 19-30
+  mylcd.LCDChar(4, 14*2 + 5, 0 * 3); // col 33-44
+  mylcd.LCDChar(1, 14*3 + 5, 0 * 3); 
+  mylcd.LCDChar(5, 14*4 + 5 + 4, 0 * 3); 
+  mylcd.LCDChar(9, 14*5 + 5 + 4, 0 * 3); 
+  mylcd.LCDChar(2, 14*6 + 5 + 4, 0 * 3); 
+  mylcd.LCDChar(6, 14*7 + 5 + 4*2, 0 * 3);
+  mylcd.LCDChar(5, 14*8 + 5 + 4*2, 0 * 3);
+  */
+  
+  number_for_lcd numforlcdZ;
+  
+  numforlcdZ.digits[0] = 3; numforlcdZ.digits[1] = 1; numforlcdZ.digits[2] = 4;
+  numforlcdZ.digits[3] = 1; numforlcdZ.digits[4] = 5; numforlcdZ.digits[5] = 9;
+  numforlcdZ.digits[6] = 2; numforlcdZ.digits[7] = 6; numforlcdZ.digits[8] = 5;  
+  numforlcdZ.sign = 0;  // positive
+  numforlcdZ.dec_point_pos = 1;
+  numforlcdZ.num_digits = 9;
+  numforlcdZ.show_dec_point = true;
+  
+  uint8_t col = 0;
+  
+  for (uint8_t d = 0; d < numforlcdZ.num_digits; d++)
+  {
+    if (d == numforlcdZ.dec_point_pos && numforlcdZ.show_dec_point)
+    {
+      mylcd.LCDDot(col, ZLCDPAGE);
+      col += MCFDECPOINTWIDTH + MCFFONTSPACER;
+    }
+    
+    mylcd.LCDChar(numforlcdZ.digits[d], col, ZLCDPAGE);
+    col += MCFFONTWIDTH + MCFFONTSPACER;
+    
+    int8_t thousandcheck = d + 1 - numforlcdZ.dec_point_pos;
+    
+    if ( (thousandcheck % 3 == 0) && (thousandcheck != 0) )
+    {
+      col += MCFTHOUSANDSPACER;
+    }     
+  }
+  
+  if (numforlcdZ.dec_point_pos == numforlcdZ.num_digits && numforlcdZ.show_dec_point)
+  {
+    mylcd.LCDDot(col, ZLCDPAGE);
+  }
+  
+  /*
   mylcd.LCDChar(5, 14*0, 1 * 3); // col 0, page 3-4
   mylcd.LCDChar(6, 14*1, 1 * 3); // 
   mylcd.LCDChar(0, 14*2+3, 1 * 3); // 
@@ -329,8 +391,82 @@ void testStillNumbers()
   mylcd.LCDChar(1, 14*6 + 5 + 3, 2 * 3); 
   mylcd.LCDChar(8, 14*7 + 5 + 3*2, 2 * 3);
   mylcd.LCDChar(3, 14*8 + 5 + 3*2, 2 * 3);   
+  */
   
-  delay(5000);
+  
+  number_for_lcd numforlcdY;
+  
+  numforlcdY.digits[0] = 5; numforlcdY.digits[1] = 6; numforlcdY.digits[2] = 0;
+  numforlcdY.digits[3] = 0; numforlcdY.digits[4] = 0; numforlcdY.digits[5] = 0;
+  numforlcdY.digits[6] = 0; numforlcdY.digits[7] = 0;  
+  numforlcdY.sign = 0;  // positive
+  numforlcdY.dec_point_pos = 8;
+  numforlcdY.num_digits = 8;
+  numforlcdY.show_dec_point = false;
+  
+  col = 0;
+  
+  for (uint8_t d = 0; d < numforlcdY.num_digits; d++)
+  {
+    if (d == numforlcdY.dec_point_pos && numforlcdY.show_dec_point)
+    {
+      mylcd.LCDDot(col, YLCDPAGE);
+      col += MCFDECPOINTWIDTH + MCFFONTSPACER;
+    }
+    
+    mylcd.LCDChar(numforlcdY.digits[d], col, YLCDPAGE);
+    col += MCFFONTWIDTH + MCFFONTSPACER;
+    
+    int8_t thousandcheck = d + 1 - numforlcdY.dec_point_pos;
+    
+    if ( (thousandcheck % 3 == 0) && (thousandcheck != 0) )
+    {
+      col += MCFTHOUSANDSPACER;
+    }     
+  }
+  
+  if (numforlcdY.dec_point_pos == numforlcdY.num_digits && numforlcdY.show_dec_point)
+  {
+    mylcd.LCDDot(col, YLCDPAGE);
+  }
+  
+  number_for_lcd numforlcdX;
+  
+  numforlcdX.digits[0] = 2; numforlcdX.digits[1] = 7; numforlcdX.digits[2] = 1;
+  numforlcdX.digits[3] = 8; numforlcdX.digits[4] = 2; numforlcdX.digits[5] = 8;
+  numforlcdX.digits[6] = 1; numforlcdX.digits[7] = 8; numforlcdX.digits[8] = 3; 
+  numforlcdX.sign = 0;  // positive
+  numforlcdX.dec_point_pos = 0;
+  numforlcdX.num_digits = 9;
+  numforlcdX.show_dec_point = true;
+  
+  col = 0;
+  
+  for (uint8_t d = 0; d < numforlcdX.num_digits; d++)
+  {
+    if (d == numforlcdX.dec_point_pos && numforlcdX.show_dec_point)
+    {
+      mylcd.LCDDot(col, XLCDPAGE);
+      col += MCFDECPOINTWIDTH + MCFFONTSPACER;
+    }
+    
+    mylcd.LCDChar(numforlcdX.digits[d], col, XLCDPAGE);
+    col += MCFFONTWIDTH + MCFFONTSPACER;
+    
+    int8_t thousandcheck = d + 1 - numforlcdX.dec_point_pos;
+    
+    if ( (thousandcheck % 3 == 0) && (thousandcheck != 0) )
+    {
+      col += MCFTHOUSANDSPACER;
+    }     
+  }
+  
+  if (numforlcdX.dec_point_pos == numforlcdX.num_digits && numforlcdX.show_dec_point)
+  {
+    mylcd.LCDDot(col, XLCDPAGE);
+  }
+  
+  delay(20000);
   
   // how to show hex numbers
   mylcd.LCDFillScreen(0x00, 0); // clear screen
@@ -341,8 +477,8 @@ void testStillNumbers()
   mylcd.LCDChar(0xE, 14*4, 0 * 3); 
   mylcd.LCDChar(0xF, 14*5, 1 * 3); 
    
-  delay(5000);
-}
+  delay(2000);
+} // testStillNumbers()
 
 // this shows how to change the contrast at run time to something other than the default
 void testContrast() {
@@ -370,6 +506,9 @@ void testContrast() {
     //delay(50);    
   }
 }
+
+
+
 
 // example of how to print logos, etc, on the LCD. may want to use for indicators such as degrees vs radiant, and 'shift' mode (f, g, h)
 void testBitmap() {
@@ -405,6 +544,16 @@ void testSomeOtherText()
   mylcd.LCDString("NOAH", 0, 0);
   mylcd.LCDString("AUDREY", 0, 3);
   mylcd.LCDString("LIAM", 0, 6);
-  uint8_t txt1[] = {35, 26, 33}; mylcd.LCDCharSeq(txt1, sizeof(txt1)/sizeof(txt1[0]), 96, 0);
+  uint8_t txt1[] = {35, 26, 33}; 
+  mylcd.LCDCharSeq(txt1, sizeof(txt1)/sizeof(txt1[0]), 96, 0);
   delay(5000);
 }
+
+// if 'off' button (combination) was pressed (can tell based on action), power down lcd and configure 'sleep mode' to powerdown
+void power_down(uint8_t keycode)
+{
+  mylcd.FullLCDPowerDown(); 
+  lcdon = false;
+  
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+} // power_down()

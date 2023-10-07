@@ -1,8 +1,9 @@
 // function prototypes for cards.c
+/*
 #ifdef __cplusplus
   extern "C" {
 #endif
-
+*/
 #ifndef CARDS_H
 #define CARDS_H
 
@@ -29,8 +30,8 @@
 #define KC_F           0x0F
 
 #define KC_POINT       0x10  // .
-#define KC_CHGSGN      0x11
-#define KC_EEX         0x12
+#define KC_CHGSGN      0x11  // + and -
+#define KC_EEX         0x12  // scientific notation entry
 #define KC_PI          0x13  // pi constant (3.14)
 
 // group for fundamental operations
@@ -42,7 +43,7 @@
 #define KC_ROOT		     0x35  // y^(1/x)
 #define KC_MULTINV	   0x36	 // 1/x
 #define KC_ABS	       0x37	
-#define KC_SQRT		     0x38
+#define KC_SQRT		     0x38  // square root
 #define KC_SQUARE		   0x39  // x * x
 #define KC_LN		       0x3A  // natural log
 #define KC_EXP		     0x3B  // e^x
@@ -53,11 +54,11 @@
 
 // group for stack manipulation
 #define KC_ENTER	     0x50
-#define KC_DROPX	     0x51	
-#define KC_SWAP	       0x52	
-#define KC_ROLL	       0x53	 // rolldown
-#define KC_ROLLINV	   0x54	 // roolup
-#define KC_CLRX		     0x55
+#define KC_DROPX	     0x51	 // drop
+#define KC_SWAP	       0x52	 // swap x and y
+#define KC_ROLLDN	     0x53	 // rolldown
+#define KC_ROLLUP	     0x54	 // roolup
+#define KC_BKSCLRX     0x55  // backspace and clear x
 #define KC_LASTX	     0x56	
 #define KC_CLRSTCK	   0x57  // clear stack
 
@@ -101,7 +102,7 @@
 #define KCP_CASE	     0xD3		
 #define KCP_WHEN	     0xD4		
 #define KCP_OTHER		   0xD5	
-#define KCP_ENDCAS	   0xD6	 // end case	
+#define KCP_ENDCAS	   0xD6	 // end case
 #define KCP_SETFLAG	   0xD7		
 #define KCP_CLRFLAG	   0xD8		
 #define KCP_FOR		     0xD9	
@@ -143,6 +144,9 @@
 #define KC_NOP         0xFF  // no operation
 
   // end of keycode definitions
+  
+#define ONOFFKEYPOS_R 0x03
+#define ONOFFKEYPOS_C 0x04
 
 // structures
 typedef struct _action
@@ -153,12 +157,22 @@ typedef struct _action
   // may want to add an 'opmode' variable here (define possible values in an enum) to indicate the type of action (actions that modify x only, actions that do something with x and y and drop one element from stack, etc.)
 } action;
 
+enum layers
+{
+  baseLayer = 0,
+  fLayer,
+  gLayer,
+  hLayer
+};
+
 // function prototypes
 action keytoaction();
 
+
 #endif
 
+/*
 #ifdef __cplusplus
   }
 #endif
-
+*/

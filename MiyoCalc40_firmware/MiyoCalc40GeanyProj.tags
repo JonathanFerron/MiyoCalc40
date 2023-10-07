@@ -4,55 +4,68 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
-action	.\cards.c	72;"	typedef	typeref:struct:_action	file:
-ACT_0	.\cards.c	78;"	variable
-ACT_1	.\cards.c	79;"	variable
-ACT_2	.\cards.c	80;"	variable
-ACT_3	.\cards.c	81;"	variable
-ACT_4	.\cards.c	82;"	variable
-ACT_5	.\cards.c	83;"	variable
-ACT_6	.\cards.c	84;"	variable
-ACT_7	.\cards.c	85;"	variable
-ACT_8	.\cards.c	86;"	variable
-ACT_9	.\cards.c	87;"	variable
-ACT_A	.\cards.c	88;"	variable
-ACT_ADD	.\cards.c	95;"	variable
-ACT_B	.\cards.c	89;"	variable
-ACT_C	.\cards.c	90;"	variable
-ACT_D	.\cards.c	91;"	variable
-ACT_E	.\cards.c	92;"	variable
-ACT_ENTER	.\cards.c	97;"	variable
-ACT_F	.\cards.c	93;"	variable
-ACT_NOP	.\cards.c	99;"	variable
-apply_func_1to1	.\calc.c	67;"	function	signature:(uint8_t keycode)
+action	.\cards.h	154;"	typedef	typeref:struct:_action
+ACT_0	.\cards.c	69;"	variable
+ACT_1	.\cards.c	70;"	variable
+ACT_2	.\cards.c	71;"	variable
+ACT_3	.\cards.c	72;"	variable
+ACT_4	.\cards.c	73;"	variable
+ACT_5	.\cards.c	74;"	variable
+ACT_6	.\cards.c	75;"	variable
+ACT_7	.\cards.c	76;"	variable
+ACT_8	.\cards.c	77;"	variable
+ACT_9	.\cards.c	78;"	variable
+ACT_A	.\cards.c	79;"	variable
+ACT_ADD	.\cards.c	86;"	variable
+ACT_B	.\cards.c	80;"	variable
+ACT_C	.\cards.c	81;"	variable
+ACT_D	.\cards.c	82;"	variable
+ACT_E	.\cards.c	83;"	variable
+ACT_ENTER	.\cards.c	88;"	variable
+ACT_F	.\cards.c	84;"	variable
+ACT_NOP	.\cards.c	90;"	variable
+apply_func_1to1	.\calc.c	277;"	function	signature:(uint8_t keycode)
 apply_func_1to1	.\calc.h	20;"	prototype	signature:(uint8_t keycode)
-apply_func_2to1	.\calc.c	71;"	function	signature:(uint8_t keycode)
+apply_func_2to1	.\calc.c	313;"	function	signature:(uint8_t keycode)
 apply_func_2to1	.\calc.h	21;"	prototype	signature:(uint8_t keycode)
 BACKGROUND	.\lcd.h	17;"	macro
 BACKLIGHT_H	.\backlight.h	7;"	macro
-baseLayer	.\cards.c	106;"	enumerator	enum:calcproglayers	file:
-calcproglayers	.\cards.c	104;"	enum	file:
-calc_cards	.\cards.c	114;"	variable
+baseLayer	.\cards.c	97;"	enumerator	enum:calcproglayers	file:
+calcproglayers	.\cards.c	95;"	enum	file:
+calc_cards	.\cards.c	105;"	variable
 CALC_H	.\calc.h	12;"	macro
+calc_init	.\calc.c	148;"	function
 CARDS_H	.\cards.h	7;"	macro
+clear_input	.\calc.c	134;"	function
+clear_stack	.\calc.c	124;"	function
 column_pin_array	.\matrix.c	63;"	variable
 CONFIG_H	.\config.h	5;"	macro
-do_nothing	.\calc.c	75;"	function	signature:(uint8_t keycode)
+convert_input	.\calc.c	238;"	function
+dec_point_pos	.\main.cpp	307;"	member	struct:__anon1	file:
+digits	.\main.cpp	305;"	member	struct:__anon1	file:
+dispmode	.\calc.c	74;"	variable
+do_nothing	.\calc.c	349;"	function	signature:(uint8_t keycode)
 do_nothing	.\calc.h	17;"	prototype	signature:(uint8_t keycode)
-enter_enter	.\calc.c	63;"	function	signature:(uint8_t keycode)
+enter_enter	.\calc.c	264;"	function	signature:(uint8_t keycode)
 enter_enter	.\calc.h	19;"	prototype	signature:(uint8_t keycode)
-enter_number	.\calc.c	59;"	function	signature:(uint8_t keycode)
+enter_number	.\calc.c	209;"	function	signature:(uint8_t keycode)
 enter_number	.\calc.h	18;"	prototype	signature:(uint8_t keycode)
+enter_pressed	.\calc.c	101;"	member	struct:__anon2	file:
 ERM19264_UC1609_T	.\lcd.cpp	14;"	function	class:ERM19264_UC1609_T	signature:(int8_t cd, int8_t rst, int8_t cs)
 ERM19264_UC1609_T	.\lcd.h	102;"	class
 ERM19264_UC1609_T	.\lcd.h	105;"	prototype	class:ERM19264_UC1609_T	signature:(int8_t cd, int8_t rst, int8_t cs, int8_t sclk, int8_t din)
 ERM19264_UC1609_T	.\lcd.h	107;"	prototype	class:ERM19264_UC1609_T	signature:(int8_t cd, int8_t rst, int8_t cs)
-fct	.\cards.c	69;"	member	struct:_action	file:
-fLayer	.\cards.c	107;"	enumerator	enum:calcproglayers	file:
+error_flag	.\calc.c	69;"	variable
+expentry	.\calc.c	103;"	member	struct:__anon2	file:
+exponent	.\calc.c	98;"	member	struct:__anon2	file:
+expsign	.\calc.c	99;"	member	struct:__anon2	file:
+fct	.\cards.h	151;"	member	struct:_action
+fLayer	.\cards.c	98;"	enumerator	enum:calcproglayers	file:
 FONTS_H	.\fonts.h	2;"	macro
 FOREGROUND	.\lcd.h	16;"	macro
-gLayer	.\cards.c	108;"	enumerator	enum:calcproglayers	file:
-hLayer	.\cards.c	109;"	enumerator	enum:calcproglayers	file:
+gLayer	.\cards.c	99;"	enumerator	enum:calcproglayers	file:
+hLayer	.\cards.c	100;"	enumerator	enum:calcproglayers	file:
+input	.\calc.c	108;"	variable
 INVERSE	.\lcd.h	18;"	macro
 KCP_CASE	.\cards.h	101;"	macro
 KCP_CEQUN	.\cards.h	122;"	macro
@@ -155,19 +168,21 @@ KC_STOREG	.\cards.h	65;"	macro
 KC_SUBS	.\cards.h	38;"	macro
 KC_SWAP	.\cards.h	57;"	macro
 KC_TAN	.\cards.h	72;"	macro
-keycode	.\cards.c	68;"	member	struct:_action	file:
+keycode	.\cards.h	150;"	member	struct:_action
 keypos_c	.\matrix.c	69;"	variable
 keypos_r	.\matrix.c	68;"	variable
-keytoaction	.\cards.c	154;"	function
+keytoaction	.\cards.c	145;"	function
+keytoaction	.\cards.h	157;"	prototype	signature:()
+lastx	.\calc.c	68;"	variable
 LCDbegin	.\lcd.cpp	24;"	function	class:ERM19264_UC1609_T	signature:(uint8_t VbiasPOT)
 LCDbegin	.\lcd.h	114;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t VbiasPot = UC1609_DEFAULT_GN_PM )
 LCDBitmap	.\lcd.cpp	117;"	function	class:ERM19264_UC1609_T	signature:(int16_t x, int16_t y, uint8_t w, uint8_t h, const uint8_t* data)
 LCDBitmap	.\lcd.h	124;"	prototype	class:ERM19264_UC1609_T	signature:(int16_t x, int16_t y, uint8_t w, uint8_t h, const uint8_t* data)
-LCDChar	.\lcd.cpp	162;"	function	class:ERM19264_UC1609_T	signature:(uint8_t index, uint8_t col, uint8_t page)
+LCDChar	.\lcd.cpp	165;"	function	class:ERM19264_UC1609_T	signature:(uint8_t index, uint8_t col, uint8_t page)
 LCDChar	.\lcd.h	126;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t index, uint8_t col, uint8_t page)
-LCDCharSeq	.\lcd.cpp	218;"	function	class:ERM19264_UC1609_T	signature:(uint8_t indexes[], uint8_t size, uint8_t col, uint8_t page)
+LCDCharSeq	.\lcd.cpp	225;"	function	class:ERM19264_UC1609_T	signature:(uint8_t indexes[], uint8_t size, uint8_t col, uint8_t page)
 LCDCharSeq	.\lcd.h	128;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t indexes[], uint8_t size, uint8_t col, uint8_t page)
-LCDDot	.\lcd.cpp	183;"	function	class:ERM19264_UC1609_T	signature:(uint8_t col, uint8_t page)
+LCDDot	.\lcd.cpp	188;"	function	class:ERM19264_UC1609_T	signature:(uint8_t col, uint8_t page)
 LCDDot	.\lcd.h	127;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t col, uint8_t page)
 LCDEnable	.\lcd.cpp	79;"	function	class:ERM19264_UC1609_T	signature:(uint8_t bits)
 LCDEnable	.\lcd.h	117;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t on)
@@ -177,38 +192,51 @@ LCDGotoXY	.\lcd.cpp	153;"	function	class:ERM19264_UC1609_T	signature:(uint8_t co
 LCDGotoXY	.\lcd.h	111;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t column , uint8_t page)
 LCDinit	.\lcd.cpp	36;"	function	class:ERM19264_UC1609_T	signature:()
 LCDinit	.\lcd.h	115;"	prototype	class:ERM19264_UC1609_T	signature:(void)
-lcdon	.\main.cpp	42;"	variable
+lcdon	.\main.cpp	45;"	variable
 LCDPowerDown	.\lcd.cpp	88;"	function	class:ERM19264_UC1609_T	signature:(void)
 LCDPowerDown	.\lcd.h	116;"	prototype	class:ERM19264_UC1609_T	signature:(void)
-LCDSetContrast	.\lcd.cpp	226;"	function	class:ERM19264_UC1609_T	signature:(uint8_t cont)
+LCDSetContrast	.\lcd.cpp	234;"	function	class:ERM19264_UC1609_T	signature:(uint8_t cont)
 LCDSetContrast	.\lcd.h	125;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t cont)
-LCDString	.\lcd.cpp	208;"	function	class:ERM19264_UC1609_T	signature:(char *characters, uint8_t col, uint8_t page)
+LCDString	.\lcd.cpp	215;"	function	class:ERM19264_UC1609_T	signature:(char *characters, uint8_t col, uint8_t page)
 LCDString	.\lcd.h	113;"	prototype	class:ERM19264_UC1609_T	signature:(char *characters, uint8_t col, uint8_t page)
-LCD_CD	.\main.cpp	35;"	macro	file:
-LCD_CS	.\main.cpp	34;"	macro	file:
+LCD_CD	.\main.cpp	38;"	macro	file:
+LCD_CS	.\main.cpp	37;"	macro	file:
+LCD_Default_Contrast	.\main.cpp	24;"	macro	file:
 LCD_H	.\lcd.h	8;"	macro
 LCD_HEIGHT	.\lcd.h	99;"	variable
-LCD_RST	.\main.cpp	36;"	macro	file:
+LCD_RST	.\main.cpp	39;"	macro	file:
 LCD_WIDTH	.\lcd.h	98;"	variable
-loop	.\main.cpp	176;"	function	signature:()
+loop	.\main.cpp	182;"	function	signature:()
 loop	.\main.h	5;"	prototype	signature:()
-loopNew	.\main.cpp	150;"	function	signature:()
-loopTestBacklightPWM	.\main.cpp	280;"	function	signature:()
-main	.\main.cpp	44;"	function	signature:()
+loopNew	.\main.cpp	153;"	function	signature:()
+loopTestBacklightPWM	.\main.cpp	286;"	function	signature:()
+main	.\main.cpp	47;"	function	signature:()
 MAIN_H	.\main.h	2;"	macro
+mantissa	.\calc.c	96;"	member	struct:__anon2	file:
 MATRIX_H	.\matrix.h	9;"	macro
-MCFFONTSPACER	.\fonts.h	9;"	macro
+max_mantissa	.\calc.c	81;"	variable
+MCFDECPOINTWIDTH	.\fonts.h	9;"	macro
+MCFFONTSPACER	.\fonts.h	10;"	macro
 MCFFONTWIDTH	.\fonts.h	8;"	macro
 MCFLETOFFSET	.\fonts.h	7;"	macro
-MCFMINUS	.\fonts.h	11;"	macro
-MCFNULCHAR	.\fonts.h	13;"	macro
-MiyoCalcFont_Degree	.\fonts.h	184;"	variable
-MiyoCalcFont_Dot	.\fonts.h	178;"	variable
-mnemonic	.\cards.c	70;"	member	struct:_action	file:
-mylcd	.\main.cpp	40;"	prototype	file:	signature:(LCD_CD, LCD_RST, LCD_CS)
+MCFMINUS	.\fonts.h	13;"	macro
+MCFNULCHAR	.\fonts.h	15;"	macro
+MCFTHOUSANDSPACER	.\fonts.h	11;"	macro
+MiyoCalcFont_Degree	.\fonts.h	186;"	variable
+MiyoCalcFont_Dot	.\fonts.h	180;"	variable
+mnemonic	.\cards.h	152;"	member	struct:_action
+mpos	.\calc.c	105;"	member	struct:__anon2	file:
+mylcd	.\main.cpp	43;"	prototype	file:	signature:(LCD_CD, LCD_RST, LCD_CS)
+number_for_lcd	.\main.cpp	310;"	typedef	typeref:struct:__anon1	file:
+numforlcdX	.\main.cpp	312;"	variable
+numforlcdY	.\main.cpp	313;"	variable
+numforlcdZ	.\main.cpp	314;"	variable
 NUM_COLUMN_PINS	.\matrix.h	11;"	macro
+num_digits	.\main.cpp	308;"	member	struct:__anon1	file:
 NUM_ROW_PINS	.\matrix.h	12;"	macro
-PROGMEM	.\fonts.h	30;"	variable
+point	.\calc.c	104;"	member	struct:__anon2	file:
+precision	.\calc.c	77;"	variable
+PROGMEM	.\fonts.h	32;"	variable
 PROGRAMMING_H	.\programming.h	2;"	macro
 row_pin_array	.\matrix.c	59;"	variable
 scanKB	.\matrix.c	124;"	function
@@ -217,30 +245,44 @@ send_command	.\lcd.cpp	69;"	function	class:ERM19264_UC1609_T	signature:(uint8_t 
 send_command	.\lcd.h	133;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t command, uint8_t value)
 send_data	.\lcd.cpp	145;"	function	class:ERM19264_UC1609_T	signature:(uint8_t byte)
 send_data	.\lcd.h	132;"	prototype	class:ERM19264_UC1609_T	signature:(uint8_t data)
-setup	.\main.cpp	61;"	function	signature:()
+setup	.\main.cpp	64;"	function	signature:()
 setup	.\main.h	4;"	prototype	signature:()
-setupBacklight	.\main.cpp	98;"	function	signature:()
+setupBacklight	.\main.cpp	101;"	function	signature:()
 setupBacklight	.\main.h	14;"	prototype	signature:()
-setupLCD	.\main.cpp	90;"	function	signature:()
+setupLCD	.\main.cpp	93;"	function	signature:()
 setupLCD	.\main.h	13;"	prototype	signature:()
 setupMatrix	.\matrix.c	80;"	function
 setupMatrix	.\matrix.h	14;"	prototype	signature:()
-setupMCU	.\main.cpp	76;"	function	signature:()
+setupMCU	.\main.cpp	79;"	function	signature:()
 setupMCU	.\main.h	12;"	prototype	signature:()
+set_trigconv	.\calc.c	111;"	function
+shift	.\calc.c	76;"	variable
+show_dec_point	.\main.cpp	309;"	member	struct:__anon1	file:
+sign	.\calc.c	97;"	member	struct:__anon2	file:
+sign	.\main.cpp	306;"	member	struct:__anon1	file:
 SPI_DIRECTION	.\lcd.h	92;"	macro
 SPI_FREQ	.\lcd.h	91;"	macro
 SPI_UC1609_CLOCK_DIV	.\lcd.h	94;"	macro
 SPI_UC1609_MODE	.\lcd.h	93;"	macro
-testBatteryVoltage	.\main.cpp	260;"	function	signature:()
+stack	.\calc.c	67;"	variable
+stack_drop	.\calc.c	174;"	function
+stack_push	.\calc.c	166;"	function	signature:(double num)
+stack_rotate_down	.\calc.c	191;"	function
+stack_rotate_up	.\calc.c	181;"	function
+started	.\calc.c	100;"	member	struct:__anon2	file:
+testBatteryVoltage	.\main.cpp	266;"	function	signature:()
 testBatteryVoltage	.\main.h	10;"	prototype	signature:()
-testBitmap	.\main.cpp	371;"	function	signature:()
-testContrast	.\main.cpp	344;"	function	signature:()
-testSomeOtherText	.\main.cpp	398;"	function	signature:()
+testBitmap	.\main.cpp	513;"	function	signature:()
+testContrast	.\main.cpp	486;"	function	signature:()
+testSomeOtherText	.\main.cpp	540;"	function	signature:()
 testSomeOtherText	.\main.h	9;"	prototype	signature:()
-testSomeText	.\main.cpp	390;"	function	signature:()
+testSomeText	.\main.cpp	532;"	function	signature:()
 testSomeText	.\main.h	8;"	prototype	signature:()
-testStillNumbers	.\main.cpp	295;"	function	signature:()
+testStillNumbers	.\main.cpp	317;"	function	signature:()
 testStillNumbers	.\main.h	7;"	prototype	signature:()
+trigconv	.\calc.c	75;"	variable
+trigmode	.\calc.c	73;"	variable
+t_input	.\calc.c	106;"	typedef	typeref:struct:__anon2	file:
 UC1609_ADDRESS_CONTROL	.\lcd.h	29;"	macro
 UC1609_ADDRESS_SET	.\lcd.h	30;"	macro
 UC1609_ALL_PIXEL_ON	.\lcd.h	50;"	macro
@@ -284,9 +326,12 @@ UC1609_TEMP_COMP_REG	.\lcd.h	36;"	macro
 UC1609_TEMP_COMP_SET	.\lcd.h	37;"	macro
 unused_pin_array	.\matrix.c	66;"	variable
 UTIL_H	.\util.h	2;"	macro
-VbiasPOT	.\main.cpp	21;"	macro	file:
-x____x	.\cards.c	100;"	macro	file:
-_action	.\cards.c	66;"	struct	file:
+variables	.\calc.c	71;"	variable
+XLCDPAGE	.\main.cpp	302;"	macro	file:
+x____x	.\cards.c	91;"	macro	file:
+YLCDPAGE	.\main.cpp	301;"	macro	file:
+ZLCDPAGE	.\main.cpp	300;"	macro	file:
+_action	.\cards.h	148;"	struct
 _LCD_CD	.\lcd.h	138;"	member	class:ERM19264_UC1609_T
 _LCD_CS	.\lcd.h	137;"	member	class:ERM19264_UC1609_T
 _LCD_RST	.\lcd.h	139;"	member	class:ERM19264_UC1609_T

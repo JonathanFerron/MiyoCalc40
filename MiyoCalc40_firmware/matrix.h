@@ -1,9 +1,11 @@
 // function prototypes for matrix.c
 #include <stdint.h>
 
+/*
 #ifdef __cplusplus
   extern "C" {
 #endif
+*/
 
 #ifndef MATRIX_H
   #define MATRIX_H
@@ -19,6 +21,8 @@
 
 #endif
 
+/*
 #ifdef __cplusplus
   }
 #endif
+*/

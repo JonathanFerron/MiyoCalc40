@@ -114,9 +114,10 @@ class ERM19264_UC1609_T {
     void LCDbegin(uint8_t VbiasPot = UC1609_DEFAULT_GN_PM );
     void LCDinit(void);
     void LCDPowerDown(void);
+    void FullLCDPowerDown(void);
     void LCDEnable(uint8_t on);
     void LCDFillScreen(uint8_t pixel, uint8_t mircodelay);
-    //void LCDFillPage(uint8_t pixels);
+    void LCDFillPage(uint8_t pixels);
     //void LCDrotate(uint8_t rotatevalue);
     //void LCDinvertDisplay(uint8_t on);
     //void LCDAllpixelsOn(uint8_t bits);

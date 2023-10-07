@@ -93,6 +93,15 @@ void ERM19264_UC1609_T::LCDPowerDown(void)
   LCDEnable(0);
 }
 
+void ERM19264_UC1609_T::FullLCDPowerDown(void)
+{
+  LCDPowerDown();
+  UC1609_CS_SetLow;
+  UC1609_RST_SetLow;
+  UC1609_CD_SetLow;
+  SPI.end();  
+}
+
 // Desc: Fill the screen with a datapattern 
 // Param1: datapattern can be set to zero to clear screen (not buffer) range 0x00 to 0ff
 // Param2: optional delay in microseconds can be set to zero normally.
@@ -107,6 +116,20 @@ void ERM19264_UC1609_T::LCDFillScreen(uint8_t dataPattern=0, uint8_t delay=0)
   }
 UC1609_CS_SetHigh;
 }
+
+// Desc: Fill the chosen page(1-8)  with a datapattern 
+// Param1: datapattern can be set to 0 to FF (not buffer)
+void ERM19264_UC1609_T::LCDFillPage(uint8_t dataPattern=0) 
+{
+  UC1609_CS_SetLow;
+  uint16_t numofbytes = ((LCD_WIDTH * (LCD_HEIGHT /8))/8); // (width * height/8)/8 = 192 bytes
+  for (uint16_t i = 0; i < numofbytes; i++) 
+  {
+    send_data(dataPattern);
+  }
+  UC1609_CS_SetHigh;
+}
+
 
 //Desc: Draw a bitmap in PROGMEM to the screen
 //Param1: x offset 0-192
@@ -164,6 +187,8 @@ void ERM19264_UC1609_T::LCDGotoXY(uint8_t column , uint8_t page)
 // Param  : page 0-7
 void ERM19264_UC1609_T::LCDChar(uint8_t index, uint8_t col, uint8_t page)
 {
+  if (index == MCFNULCHAR) return;
+  
   UC1609_CS_SetLow;
   send_command(UC1609_SET_COLADD_LSB, (col & 0x0F)); 
   send_command(UC1609_SET_COLADD_MSB, (col & 0xF0) >> 4);
