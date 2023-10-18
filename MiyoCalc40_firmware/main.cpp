@@ -44,7 +44,7 @@
 // Global variables
 ERM19264_UC1609_T  mylcd(LCD_CD, LCD_RST, LCD_CS); // construct object using hardware SPI: CD, RST, CS
 
-int lcdon;  // to track if lcd is turned on or not
+int lcdon;  // to track if lcd is turned on or not, to do: change this to 'calcon'
 
 int main() {
 //  onBeforeInit(); // Empty callback called before init but after the .init stuff. First normal code executed
@@ -68,11 +68,11 @@ void setup() {
   setupMCU();
   setupMatrix();
   
-  calc_init();  
-   
   setupLCD();
     
-  setupBacklight();  
+  setupBacklight();
+  
+  calc_init();  
  
 } // setup()
 
@@ -91,7 +91,37 @@ void setupMCU()
   
   set_sleep_mode(SLEEP_MODE_STANDBY);  
   sleep_enable();
+  /* Enable BOTHEDGES interrupts for columns */
+  PORTC.PIN0CTRL |= PORT_ISC_BOTHEDGES_gc;
+  PORTC.PIN1CTRL |= PORT_ISC_BOTHEDGES_gc;
+  PORTC.PIN2CTRL |= PORT_ISC_BOTHEDGES_gc;
+  PORTC.PIN3CTRL |= PORT_ISC_BOTHEDGES_gc;
+  PORTD.PIN4CTRL |= PORT_ISC_BOTHEDGES_gc;
+  PORTD.PIN5CTRL |= PORT_ISC_BOTHEDGES_gc;
+  PORTD.PIN6CTRL |= PORT_ISC_BOTHEDGES_gc;
+  PORTD.PIN7CTRL |= PORT_ISC_BOTHEDGES_gc;
+  PORTF.PIN0CTRL |= PORT_ISC_BOTHEDGES_gc;
+  PORTF.PIN1CTRL |= PORT_ISC_BOTHEDGES_gc;
 }
+
+ISR(PORTC_PORT_vect)
+{
+	/* Clear interrupt flag */
+	VPORTC.INTFLAGS = PIN0_bm | PIN1_bm | PIN2_bm | PIN3_bm;
+}
+
+ISR(PORTD_PORT_vect)
+{
+	/* Clear interrupt flag */
+	VPORTD.INTFLAGS = PIN4_bm | PIN5_bm | PIN6_bm | PIN7_bm;
+}
+
+ISR(PORTF_PORT_vect)
+{
+	/* Clear interrupt flag */
+	VPORTF.INTFLAGS = PIN0_bm | PIN1_bm;
+}
+ 
 
 void setupLCD()
 {
@@ -150,51 +180,138 @@ upon wake interupt (port isr wake-up button press wakes up the mcu from sleep)
     may want to debouce here as well (openrpncalc uses 10ms)				
   end if					
  */
-void loopNew() 
-{  
-  // scan keys
-  scanKB();
+bool press_valid = false;
+void loop() 
+{ 
+  // go in sleep mode
+  sleep_cpu();
   
-  // if lcd is off, power it up if 'on' button was pressed
-  if (keypos_r == ONOFFKEYPOS_R && keypos_c == ONOFFKEYPOS_C && !lcdon)
+  // debounce 10 * 2ms = 20ms
+  press_valid = true;
+  for(uint8_t i = 0; i < 10; i++)
+	{
+		// initialize before scanning
+    keypos_c = 0xff; keypos_r = 0xff;
+    scanKB(); // scan kb
+    /* If no button is pressed, flag press as non-valid */
+		if(keypos_c == 0xff && keypos_r == 0xff)
+		{
+			press_valid = false;
+			break;
+		}
+		//lp_delay_ms(2);
+    delay(2);  // to-do: chg this to PIT based delay to save power
+	}  // end for loop for debouncing
+  
+  // if key press is valid, then move on to scan and process key press
+  if (press_valid)
   {
-    setupLCD();
-    lcdon = true;
-    set_sleep_mode(SLEEP_MODE_STANDBY);
-  } // 'power on' lcd
- 
-  // if non-null keypos:
-  if (keypos_r != 0xff)
-  {
+    // scan keys
+    scanKB();
     
-    // lookup function pointer+keycode (action struct)
-    action current_action = keytoaction();
-    keypos_c = 0xff; keypos_r = 0xff; // reset keypos to 'null' after action is obtained
-    
-    // process action via function call: from 'action' struct, call the function and provide it the keycode that was also looked up. 
-    current_action.fct(current_action.keycode);
-    
-    // refresh lcd : this will become obsolete since we'll refresh the lcd from within the actions, when necessary
-    mylcd.LCDFillScreen(0x00, 0); // clear screen
-    mylcd.LCDChar('R' - MCFLETOFFSET, 14*0, 0*3);  // R
-    mylcd.LCDChar(keypos_r, 14*1, 0 * 3);
-    mylcd.LCDChar('C' - MCFLETOFFSET, 14*3, 0*3); // C 
-    mylcd.LCDChar(keypos_c, 14*4, 0 * 3);  
-    
-    
-  } // end processing of non-full keypos 
+    // if lcd is off, power it up if 'on' button was pressed
+    if (keypos_r == ONOFFKEYPOS_R && keypos_c == ONOFFKEYPOS_C && !lcdon)
+    {
+      setupLCD();
+      lcdon = true;
+      if (input.started)
+      {
+        LCDDrawInput();
+      }
+      else
+      {
+        LCDDrawStackAndMem();
+      }
+      
+      set_sleep_mode(SLEEP_MODE_STANDBY);
+      shift = baseLayer;
+      keypos_c = 0xff; keypos_r = 0xff; // reset keypos to 'null' after action is obtained
+    } // 'power on' lcd
+   
+    // if non-null keypos and calc is on:
+    if (lcdon && keypos_r != 0xff)
+    {
+      // if in mem store, recall mode or clear mode
+      if (mem_recall_mode || mem_store_mode || mem_clear_mode)
+      {
+        if (mem_recall_mode)
+        {
+          // process action
+          // call apply_memory_rcl(uint8_t r, uint8_t c) to recall the variable to X
+          apply_memory_rcl(keypos_r, keypos_c);
+          keypos_c = 0xff; keypos_r = 0xff; // reset keypos to 'null' after action is obtained
+          
+          // reset mode to false after action has been processed
+          mem_recall_mode = false;
+        
+        }
+        else if (mem_store_mode)
+        {
+          // process action
+          apply_memory_sto(keypos_r, keypos_c);
+          keypos_c = 0xff; keypos_r = 0xff; // reset keypos to 'null' after action is obtained
+          
+          // reset mode to false after action has been processed
+          mem_store_mode = false;        
+        }
+        else // we're in mem clear mode
+        {
+          // process action
+          apply_memory_clr(keypos_r, keypos_c);
+          keypos_c = 0xff; keypos_r = 0xff; // reset keypos to 'null' after action is obtained
+          
+          // reset mode to false after action has been processed
+          mem_clear_mode = false;
+        }        
+        
+      }
+      else // not in mem store, recall, or clear mode
+      {
+        // lookup function pointer+keycode (action struct)
+        action current_action = keytoaction();
+        // refresh lcd : this will become obsolete since we'll refresh the lcd from within the actions, when necessary
+        /*
+        mylcd.LCDFillScreen(0x00, 0); // clear screen
+        mylcd.LCDChar('R' - MCFLETOFFSET, 14*0, 0*3);  // R
+        mylcd.LCDChar(keypos_r, 14*1, 0 * 3);
+        mylcd.LCDChar('C' - MCFLETOFFSET, 14*3, 0*3); // C 
+        mylcd.LCDChar(keypos_c, 14*4, 0 * 3);  
+        */
+        
+        keypos_c = 0xff; keypos_r = 0xff; // reset keypos to 'null' after action is obtained
+        
+        // process action via function call: from 'action' struct, call the function and provide it the keycode that was also looked up. 
+        current_action.fct(current_action.keycode);
+        
+        // if (current shift is not base layer && keycode of function that was just executed is not a layer shift keycode that corresponds to the current layer), then move back to base layer
+        if (!((current_action.mnemonic[0] == ACT_SHFT_F.mnemonic[0] && current_action.mnemonic[1] == ACT_SHFT_F.mnemonic[1] && shift == fLayer) ||
+              (current_action.mnemonic[0] == ACT_SHFT_G.mnemonic[0] && current_action.mnemonic[1] == ACT_SHFT_G.mnemonic[1] && shift == gLayer) || 
+              (current_action.mnemonic[0] == ACT_SHFT_H.mnemonic[0] && current_action.mnemonic[1] == ACT_SHFT_H.mnemonic[1] && shift == hLayer)))
+        {
+          enter_shift_base(KC_NOP);
+        }
+      }     
+      
+      do
+      {
+        keypos_c = 0xff; keypos_r = 0xff;
+        scanKB();
+      } while (keypos_c != 0xff || keypos_r != 0xff);
+      
+    } // end processing of non-null keypos 
+  } // end processing of valid key press
   
 } // loop()
 
 // old loop() code for testing
-void loop() {
+void loopTests() {
   //testContrast();
   //testStillNumbers();
   //testStillNumbers2();  // rename to testStack()
   //testActionsWithoutKeyboard();
-  simulateInput();
+  // simulateInput();
   //testSomeText();
-  //testSomeOtherText();
+  testSomeOtherText();
   //testBatteryVoltage();
   
   // test backlight
@@ -477,7 +594,7 @@ void testStillNumbers()
   mylcd.LCDChar(0xE, 14*4, 0 * 3); 
   mylcd.LCDChar(0xF, 14*5, 1 * 3); 
    
-  delay(2000);
+  delay(20000);
 } // testStillNumbers()
 
 // this shows how to change the contrast at run time to something other than the default
@@ -506,8 +623,6 @@ void testContrast() {
     //delay(50);    
   }
 }
-
-
 
 
 // example of how to print logos, etc, on the LCD. may want to use for indicators such as degrees vs radiant, and 'shift' mode (f, g, h)
@@ -550,10 +665,11 @@ void testSomeOtherText()
 }
 
 // if 'off' button (combination) was pressed (can tell based on action), power down lcd and configure 'sleep mode' to powerdown
-void power_down(uint8_t keycode)
+void power_down(__attribute__ ((unused)) uint8_t keycode)
 {
   mylcd.FullLCDPowerDown(); 
   lcdon = false;
+  //LCDDrawStackAndMem();
   
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 } // power_down()

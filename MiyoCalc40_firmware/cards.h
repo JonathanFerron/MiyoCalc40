@@ -168,6 +168,9 @@ enum layers
 // function prototypes
 action keytoaction();
 
+extern const action ACT_SHFT_F;
+extern const action ACT_SHFT_G;
+extern const action ACT_SHFT_H;
 
 #endif
 

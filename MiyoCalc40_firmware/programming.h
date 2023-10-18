@@ -4,7 +4,7 @@
 
 #endif
 
-/* Programming features ('program mode' calculator functionalies):
+/* Programming features ('program mode' calculator functionalities):
  * 
  * IF
  *   X?0 (6 keycodes) or X?Y (6 keycodes) or Flag(n) = True (1 keycode, provide flag number on next instruction)
@@ -78,8 +78,8 @@
  *  in a given program, allocate 16 elements at a time and dynamically grow size (number of program rows): so allocate 16 in capacity and *prog at once, but only 
  *  increment size and fill in *prog one row at a time  
  * 
-up and down: avail as direct keys when in prog mode (don't exist in calc mode); put them on keys that are unlikely to be recorded in prog mode, eg factorial and clr reg 
-(top most center red keys), and shift these two functions in prog mode
+up and down: avail as direct keys when in prog mode (don't exist in calc mode); put them on keys that are unlikely to be recorded in prog mode, eg 
+top most center red keys, and shift these two functions on the f layer in prog mode
 
 avail as shifted key to go in (expect prog label next) and out of prgm mode: prgm (pr)
 
@@ -96,7 +96,7 @@ Add ability to XEQ program step by step: with no intervention in the middle asid
 
 pgm saved in sram by Default. can be backup in flash (appdata) using 'save' or 'push' function (must be done prior to removng battery to keep pgms)
 
-load, save (entire set of all programs), pull (a single prgm) as shifted keys from pgm mode
+load, save (entire set of all programs), pull (a single prgm) from config mode
 wake, sleep button: use interrupt approach to wake mcu
 
 use 1 or 2 512 byte pages for programs. 1 byte keycode per instruction (maximum of 256 keycodes)

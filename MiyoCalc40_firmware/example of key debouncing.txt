@@ -1,0 +1,111 @@
+#include <avr/interrupt.h>
+#include <avr/sleep.h>
+
+#define PRESS_VALID 0x01
+
+int main(void)
+{
+	/* Initializes MCU, drivers and middleware */
+	atmel_start_init();
+
+	while(true)
+	{
+		/* Sleep until key press wakes up the CPU */
+		sleep_mode();
+		/* PRESS_VALID flag in GPIOR0 is high if a valid press is detected */
+		btn_debounce();
+
+		/* If the key press was valid */
+		if((GPIOR0 & PRESS_VALID) == PRESS_VALID)
+		{
+			scan_keys();
+			check_passcode();
+			/* Wait for all buttons to be released */
+			while((COLUMN_PORT.IN & COLUMN_gm) != COLUMN_gm)
+			{
+				/* Sleep until key release wakes up the CPU */
+				sleep_mode();
+			}
+		}
+	}
+}
+int8_t SLPCTRL_init()
+{
+
+	SLPCTRL.CTRLA = 0 << SLPCTRL_SEN_bp       /* Sleep enable: disabled */
+	                | SLPCTRL_SMODE_PDOWN_gc; /* Power-down Mode */
+
+	return 0;
+}
+
+void SLPCTRL_set_sleep_mode(SLPCTRL_SMODE_t setmode)
+{
+	SLPCTRL.CTRLA = (SLPCTRL.CTRLA & ~SLPCTRL_SMODE_gm) | (setmode & SLPCTRL_SMODE_gm);
+}
+
+ISR(PORTC_PORT_vect)
+{
+	/* Clear interrupt flag */
+	COLUMN_PORT.INTFLAGS = COLUMN_gm;
+}
+
+void btn_debounce()
+{
+	/* GPIOR0 bit 0 (PRESS_VALID) is press validation flag */
+	GPIOR0 |= PRESS_VALID;
+	for(uint8_t i = 0; i < 10; i++)
+	{
+		/* If no button is pressed */
+		if((COLUMN_PORT.IN & COLUMN_gm) == COLUMN_gm)
+		{
+			GPIOR0 &= ~PRESS_VALID;
+			break;
+		}
+		lp_delay_ms(2);
+	}
+}
+
+
+void lp_delay_ms(uint16_t delay)
+{
+	volatile uint16_t pit_cnt = 0;
+	/* Enable PIT interrupt */
+	RTC.PITINTCTRL = RTC_PI_bm;
+	/* Going to sleep until number of ms has been reached */
+	while(pit_cnt != delay)
+	{
+		sleep_mode();
+		pit_cnt += 1;
+	}
+	/* Disable PIT interrupt */
+	RTC.PITINTCTRL &= ~RTC_PI_bm;
+}
+
+
+ISR(RTC_PIT_vect)
+{
+	/* Clear interrupt flag */
+	RTC.PITINTFLAGS = RTC_PI_bm;
+}
+
+int8_t RTC_0_init()
+{
+
+	while (RTC.STATUS > 0) { /* Wait for all register to be synchronized */
+	}
+
+	RTC.CTRLA = RTC_PRESCALER_DIV1_gc   /* 1 */
+	            | 1 << RTC_RTCEN_bp     /* Enable: enabled */
+	            | 0 << RTC_RUNSTDBY_bp; /* Run In Standby: disabled */
+
+	while (RTC.PITSTATUS > 0) { /* Wait for all register to be synchronized */
+	}
+
+	RTC.PITCTRLA = RTC_PERIOD_CYC32_gc  /* RTC Clock Cycles 32 */
+	               | 1 << RTC_PITEN_bp; /* Enable: enabled */
+
+	return 0;
+}
+
+
+

@@ -32,7 +32,6 @@ openrpncalc pseudocode and structure (from calc.c):
     the convert_input ad clear_input from the apply_op function inside the 
     apply_func_atob() functions.
 
-  t_input input : structure that we likely want to copy
   stack: array of double (use single to start with)
   lastx: double (use single)
   error_flag: boolean
@@ -81,7 +80,7 @@ double variables[4][10] =
 int trigmode;     // Trigonometric mode: 0-DEG, 1-RAD
 int dispmode;     // Display mode: 0-NORM, 1-SCI, 2-ENG
 double trigconv;  // Trigonometric conversion constant, 1 for RAD, (pi/180.) for DEG
-int precision;         // Precision in NORMAL context
+int precision;         // Precision (number of significant digits)
 
 bool mem_recall_mode;
 bool mem_store_mode;
@@ -102,27 +101,8 @@ uint64_t max_mantissa[9] = {
 		999999999LL
 };
 
-// Input structure typedef
-typedef struct {
-  char mantissa[12];   // Mantissa digits array
-  char sign;           // Sign: 0 for "+", 1 for "-"
-  char exponent[3];    // Exponent digits array
-  char expsign;        // Sign of the exponent: 0 for "+", 1 for "-"
-  char started;        // 1 if input mode is active
-  char enter_pressed;  // 1 if "ENTER" key was just pressed
-                       // (such that we need to replace the current X value by the new number)
-  char expentry;       // 1 if exponent is being entered
-  int8_t point;        // Decimal point position
-  int8_t mpos;         // Number of mantissa digits entered
-} t_input;
 
 t_input input; // Input structure
-
-
-
-//number_for_lcd numforlcdX; // number for LCD structure, likely want to move this into the LCDNumber() and LCDDrawInput() functions as local variables rather than globals, used by DrawNum() (passed as a parameter)
-//number_for_lcd numforlcdY; // number for LCD structure
-//number_for_lcd numforlcdZ; // number for LCD structure
 
 // Set the trigconv constant depending on current trigonometric mode
 void set_trigconv() 
@@ -163,10 +143,10 @@ void clear_input() {
 
 // intitialization
 void calc_init() {
-  trigmode = 0;
-  dispmode = 0; 
+  trigmode = 1;  // use RAD mode by default
+  dispmode = 0;  // normal display mode by default
   shift = baseLayer;  // base layer
-  precision = 6; // should be 9
+  precision = 6; // should be 9 once we implement true double precision floating points
   
   mem_recall_mode = false;
   mem_store_mode = false;  
@@ -177,10 +157,8 @@ void calc_init() {
   clear_input();
   clear_stack();
   //draw_status(); // needs to be implemented
-  //draw_stack();  // needs to be implemented
+  LCDDrawStackAndMem();
 }
-
-
 
 
 // Push the number to stack
@@ -218,14 +196,6 @@ void stack_rotate_down() {
 	stack[3] = tmp;
 }
 
-// see draw_char(), draw_number_split(), draw_number_sci(), draw_number_eng(), draw_number_all(), draw_number(), draw_stack(), draw_input() and draw_decpoint() functions from OpenRPNCalc for some ideas on updating LCD with stack
-
-// see draw_status() function from OpenRPNCalc for ideas on updating LCD with shift (f, g, h) and trig mode (degrees vs radian) indicators
-
-// see draw_error() as well from OpenRPNCalc when an error is encountered that should be shown on screen
-
-
-
 // function definitions
 void enter_number(uint8_t keycode)
 {
@@ -234,12 +204,13 @@ void enter_number(uint8_t keycode)
     if (!input.enter_pressed && !error_flag) 
     {
       stack_push(0); 
-      //draw_stack();  // need to implement this, now called LCDDrawStackAndMem
+      LCDDrawStackAndMem();
     }
     error_flag = 0; 
     input.started = 1;
     input.enter_pressed = 0;
   }
+  
   if (input.expentry == 0) 
   {
     if (input.mpos < 10 && !(keycode==0 && input.point == 0 && input.mpos == 0)) 
@@ -253,7 +224,7 @@ void enter_number(uint8_t keycode)
     input.exponent[1] = input.exponent[0];
     input.exponent[0] = keycode;
   }
-  //draw_input();   // need to implement this, now called LCDDrawInput()
+  LCDDrawInput();
 } // enter_number()
 
 double convert_input() 
@@ -292,7 +263,7 @@ void enter_enter(__attribute__ ((unused)) uint8_t keycode)
   if (error_flag) return; 
   input.enter_pressed = 1;
   stack_push(stack[0]);
-  //draw_stack();   // need to implement, now called LCDDrawStackAndMem
+  LCDDrawStackAndMem();
 } // enter_enter()
 
 void apply_func_1to1(uint8_t keycode)
@@ -319,18 +290,37 @@ void apply_func_1to1(uint8_t keycode)
     case KC_MULTINV: f = 1./x; break;
     case KC_ABS: f = fabs(x); break;
     case KC_SQUARE: f = x*x; break;
+    case KC_LN: f = log(x); break;
+    case KC_EXP: f = exp(x); break;
+    case KC_FACT: f = factorial(x); break;
+    case KC_ROUND: f = round(x); break;
+    case KC_FRAC: f = x - trunc(x); break;
+    case KC_INTEG: f = trunc(x); break;
     /* 
     case OP_LG: f = log10(x); break;
-    case OP_LN: f = log(x); break;
-    case OP_EXP: f = exp(x); break;
     case OP_POW10: f = pow(10., x); break;    
     */
     default: break;
 	}
   lastx = stack[0];  
   stack[0] = f;  
-  //draw_stack();  // need to implement, now called LCDDrawStackAndMem
+  LCDDrawStackAndMem();
 } // apply_func_1to1
+
+double factorial(double x)
+{
+    if (x <= 0.0) return 0;
+
+    double i;
+    double result = 1.0;
+ 
+    // loop from 2 to n to get the factorial
+    for (i = 2; i <= x; i++) {
+        result *= i;
+    }
+ 
+    return result;
+}
 
 void apply_func_2to1(uint8_t keycode)
 {
@@ -358,7 +348,7 @@ void apply_func_2to1(uint8_t keycode)
   lastx = stack[0];  
   stack_drop();
   stack[0] = f;  
-  //draw_stack();  // need to implement, now called LCDDrawStackAndMem
+  LCDDrawStackAndMem();
 } // apply_func_2to1
 
 void enter_backspace_clrx(__attribute__ ((unused)) uint8_t keycode) 
@@ -394,13 +384,13 @@ void enter_backspace_clrx(__attribute__ ((unused)) uint8_t keycode)
           input.expsign = 0;
       }
     }
-    //draw_input(); 
+    LCDDrawInput(); 
   } 
   else // input is not started when backspace button is pressed
   {
     error_flag = 0;     
     stack[0] = 0;  // clear x
-    // draw_stack(); 
+    LCDDrawStackAndMem(); 
   }
 } // enter_backspace()
 
@@ -411,7 +401,7 @@ void enter_decpoint(__attribute__ ((unused)) uint8_t keycode)
     if (!input.enter_pressed && !error_flag) 
     { 
       stack_push(0);       
-      //draw_stack(); 
+      LCDDrawStackAndMem(); 
     }
     error_flag = 0; 
     input.started = 1;
@@ -422,7 +412,7 @@ void enter_decpoint(__attribute__ ((unused)) uint8_t keycode)
     if (input.mpos == 0) input.mantissa[input.mpos++] = 0; 
     input.point = input.mpos; 
   }
-  //draw_input(); 
+  LCDDrawInput(); 
 } // enter_decpoint()
 
 void enter_sign(__attribute__ ((unused)) uint8_t keycode) 
@@ -433,11 +423,11 @@ void enter_sign(__attribute__ ((unused)) uint8_t keycode)
     } else {
       input.expsign = 1-input.expsign; 
     }
-    //draw_input(); 
+    LCDDrawInput(); 
   } else {
     if (error_flag) return; 
     stack[0] = -stack[0];
-    //draw_stack(); 
+    LCDDrawStackAndMem(); 
   }
 } // enter_sign()
 
@@ -447,7 +437,8 @@ void enter_drop(__attribute__ ((unused)) uint8_t keycode) {
     clear_input(); 
   }
   input.enter_pressed = 0;
-  stack_drop(); 
+  stack_drop();
+  LCDDrawStackAndMem();
 }
 
 void enter_swap_xy(__attribute__ ((unused)) uint8_t keycode) {
@@ -459,7 +450,8 @@ void enter_swap_xy(__attribute__ ((unused)) uint8_t keycode) {
   input.enter_pressed = 0;
   double tmp = stack[0]; 
   stack[0] = stack[1]; 
-  stack[1] = tmp;  
+  stack[1] = tmp;
+  LCDDrawStackAndMem(); 
 }
 
 void enter_rotate(uint8_t keycode) {
@@ -475,6 +467,7 @@ void enter_rotate(uint8_t keycode) {
   } else {
     stack_rotate_up();
   }
+  LCDDrawStackAndMem();
 } // enter_rotate()
 
 void enter_shift_base(__attribute__ ((unused)) uint8_t keycode) {
@@ -504,7 +497,7 @@ void enter_exp(__attribute__ ((unused)) uint8_t keycode)
     //error_flag = 0;
     if (!input.enter_pressed && !error_flag) {
       stack_push(0);
-      //draw_stack(); 
+      LCDDrawStackAndMem(); 
     }
     error_flag = 0; 
     input.started = 1;
@@ -516,7 +509,7 @@ void enter_exp(__attribute__ ((unused)) uint8_t keycode)
     input.mpos = 1;
   }
   input.expentry = 1; 
-  //draw_input(); 
+  LCDDrawInput(); 
 } // enter_exp()
 
 void apply_const(uint8_t keycode) {
@@ -527,8 +520,8 @@ void apply_const(uint8_t keycode) {
 	input.enter_pressed = 0;
 	double f = 0.;
 	switch(keycode) {
-	case KC_PI: f = M_PI; break;
-	default: break;
+    case KC_PI: f = M_PI; break;
+    default: break;
 	}
 
 	if (!error_flag) {
@@ -537,6 +530,7 @@ void apply_const(uint8_t keycode) {
 	    error_flag = 0;
 	    stack[0] = f;
 	}
+  LCDDrawStackAndMem();
 } // apply_const()
 
 void enter_lastx(__attribute__ ((unused)) uint8_t keycode) {
@@ -551,6 +545,7 @@ void enter_lastx(__attribute__ ((unused)) uint8_t keycode) {
     error_flag = 0; 
     stack[0] = lastx;
   }
+  LCDDrawStackAndMem(); 
 } // enter_lastx
 
 void enter_clear(__attribute__ ((unused)) uint8_t keycode) {
@@ -560,6 +555,7 @@ void enter_clear(__attribute__ ((unused)) uint8_t keycode) {
   }
   input.enter_pressed = 0;
   clear_stack();
+  LCDDrawStackAndMem();
 } // enter_clear
 
 // this will be called directly from loop() when calculator is already in mem rcl mode, and a key (variable name to recall) is provided
@@ -576,6 +572,7 @@ void apply_memory_rcl(uint8_t r, uint8_t c) {
     error_flag = 0;
     stack[0] = f;
 	}
+  LCDDrawStackAndMem();
 }
 
 // this will be called directly from loop() when calculator is already in mem sto mode, and a key (variable name to store to) is provided
@@ -587,6 +584,7 @@ void apply_memory_sto(uint8_t r, uint8_t c) {
 	}
 	input.enter_pressed = 0;
 	variables[r][c] = stack[0];
+  LCDDrawStackAndMem();
 }
 
 // this will be called directly from loop() when calculator is already in mem clr mode, and a key (variable name to store to) is provided
@@ -598,6 +596,7 @@ void apply_memory_clr(uint8_t r, uint8_t c) {
 	}
 	input.enter_pressed = 0;
 	variables[r][c] = 0;
+  LCDDrawStackAndMem();
 }
 
 void toggle_mem_mode(uint8_t keycode)
@@ -614,11 +613,16 @@ void toggle_mem_mode(uint8_t keycode)
 void do_nothing(__attribute__ ((unused)) uint8_t keycode)
 {}
 
-// pull from main.cpp (testStillNumbers())
 // print a number to the LCD on given page from a given number_for_lcd struct
 void LCDDrawNum(number_for_lcd *nfl, uint8_t page)
 {
   uint8_t col = 0;
+  
+  if (nfl->sign)
+  {
+    mylcd.LCDChar(MCFMINUS, col, page);
+    col += MCFFONTWIDTH + MCFFONTSPACER;
+  }
   
   for (uint8_t d = 0; d < nfl->num_digits; d++)
   {
@@ -643,7 +647,7 @@ void LCDDrawNum(number_for_lcd *nfl, uint8_t page)
   {
     mylcd.LCDDot(col, page);
   }
-} // DrawNum
+} // LCDDrawNum
 
 // convert num into an number_for_lcd struct and send it to page by calling the DrawNum() function
 // expect LCDNumber() to be called by LCDDrawStack()
@@ -694,13 +698,11 @@ void LCDNumber(double num, uint8_t page)
     uint8_t ch = mantissa % 10; 
     mantissa = mantissa/10;
     
-    //draw_char(-(j+1), pos, ch+'0', 1);  // convert this to a write to the number_for_lcd variable
     nfl.digits[j] = ch;
     
     if (mantissa == 0 && pointpos + j >= precision) break;
   }
   
-  //if (_mantissa<0) draw_char(-(j+2), pos, '-', 1);  // convert this to a write to the number_for_lcd variable
   if (_mantissa<0)
   {
     nfl.sign = 1;
@@ -708,7 +710,7 @@ void LCDNumber(double num, uint8_t page)
   {
     nfl.sign = 0;
   }
-  //draw_decpoint(-(precision-pointpos), pos);  // convert this to a write to the number_for_lcd variable
+
   nfl.num_digits = j+1;
   nfl.dec_point_pos = nfl.num_digits - precision + pointpos;  
   nfl.show_dec_point = (nfl.dec_point_pos < nfl.num_digits);
@@ -728,6 +730,7 @@ void LCDNumber(double num, uint8_t page)
     }
   }
   **/
+
   // reverse the 'digits' array so as to be ready for LCDDrawNum function
   int l=0;
   int r = j;
@@ -745,7 +748,6 @@ void LCDNumber(double num, uint8_t page)
   //mylcd.LCDChar(nfl.num_digits, 14*2, 0 * 3);
   
   LCDDrawNum(&nfl, page);
-  
 }  // LCDNumber()
 
 // call LCDNumber for all of the stack and mem registers that we want to show on screen
@@ -777,15 +779,14 @@ void LCDDrawInput()
   }
   
   nfl.sign = input.sign;  
-  nfl.dec_point_pos = nfl.num_digits - precision + input.point;
-  nfl.show_dec_point = true;  // look into making this a bit more sophisticated
+  nfl.dec_point_pos = (input.point == 0) ? input.mpos : input.point;
+  nfl.show_dec_point = (input.point > 0);
   
   // draw the input in the X page
   LCDDrawNum(&nfl, XLCDPAGE);
 } // LCDDrawInput()
 
 
-// rename to testStack()
 void testStillNumbers2()
 {
   stack[0] = 2.25;

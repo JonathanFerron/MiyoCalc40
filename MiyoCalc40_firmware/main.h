@@ -18,6 +18,7 @@ void setupMCU();
 void setupLCD();
 void setupBacklight();
 
-//void loopOld();
+void loopTests();
+void loopTestBacklightPWM();
 
 #endif

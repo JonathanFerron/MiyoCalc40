@@ -30,6 +30,23 @@
   extern bool mem_clear_mode;
   
   extern int shift;
+  
+  // Input structure typedef
+  typedef struct {
+    char mantissa[12];   // Mantissa digits array
+    char sign;           // Sign: 0 for "+", 1 for "-"
+    char exponent[3];    // Exponent digits array
+    char expsign;        // Sign of the exponent: 0 for "+", 1 for "-"
+    char started;        // 1 if input mode is active
+    char enter_pressed;  // 1 if "ENTER" key was just pressed
+                         // (such that we need to replace the current X value by the new number)
+    char expentry;       // 1 if exponent is being entered
+    int8_t point;        // Decimal point position
+    int8_t mpos;         // Number of mantissa digits entered
+  } t_input;
+
+  
+  extern t_input input;
 
   // function prototypes
   void calc_init();
@@ -62,6 +79,10 @@
   void testStillNumbers2();
   void testActionsWithoutKeyboard();
   void simulateInput();
+  double factorial(double x);
+  
+  void LCDDrawStackAndMem();
+  void LCDDrawInput();
 
 #endif
 

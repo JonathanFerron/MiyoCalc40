@@ -5,7 +5,7 @@
   * 
  * matrix: matrix scanning code
  * 
- * cards: contains mapping from matrix key positions to 'actions' for each 'mode'
+ * cards: contains mapping from matrix key positions to 'actions' for each 'mode' and 'card'
  * 
  * calc: number crunching mode
  *   
@@ -16,7 +16,7 @@
  * 
  * config: configuration mode
  *   backlight: to turn on/off backlight and set pwm duty cycle
- *   util: to display battery voltage, ...
+ *   util: to display battery voltage, etc
  *
  */
 
