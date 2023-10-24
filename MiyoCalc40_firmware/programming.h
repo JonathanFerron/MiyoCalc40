@@ -72,7 +72,7 @@
  * Programs: array of 36 'dynamic array' structs (one for each of 36 programs, 0 to 9 and A to Z):
  * each struct could look like this:
  *  uint16 size, default to 0
- *  uint16 capacity, default to 0
+ *  uint16 capacity, default to 0, cap at ?
  *  uint8 *prog, default to null pointer
  *  char name, name of program ('0', '1', ..., 'A', ..., 'Z')
  *  in a given program, allocate 16 elements at a time and dynamically grow size (number of program rows): so allocate 16 in capacity and *prog at once, but only 
@@ -99,6 +99,6 @@ pgm saved in sram by Default. can be backup in flash (appdata) using 'save' or '
 load, save (entire set of all programs), pull (a single prgm) from config mode
 wake, sleep button: use interrupt approach to wake mcu
 
-use 1 or 2 512 byte pages for programs. 1 byte keycode per instruction (maximum of 256 keycodes)
+use n x 512 byte pages for programs (see what's the minimum option in DxCore). 1 byte keycode per instruction (maximum of 256 keycodes)
  * 
  */

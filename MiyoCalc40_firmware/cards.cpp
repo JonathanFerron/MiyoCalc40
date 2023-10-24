@@ -51,7 +51,7 @@ const action ACT_F = {KC_F, &enter_number, {'F' - MCFLETOFFSET, MCFNULCHAR, MCFN
 const action ACT_POINT = {KC_POINT, &enter_decpoint, {MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR}};  // need to implement a decimal point character in the main font table
 const action ACT_CHGSGN = {KC_CHGSGN, &enter_sign, {39, 36, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR}};
 const action ACT_EEX = {KC_EEX, &enter_exp, {'E' - MCFLETOFFSET, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR}};
-const action ACT_PI = {KC_PI, &apply_const, {'P' - MCFLETOFFSET, 'I' - MCFLETOFFSET, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR}};
+const action ACT_PI = {KC_PI, &apply_const, {47, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR}};
 
 const action ACT_ADD = {KC_ADD, &apply_func_2to1, {39, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR}};
 const action ACT_SUBS = {KC_SUBS, &apply_func_2to1, {36, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR}};

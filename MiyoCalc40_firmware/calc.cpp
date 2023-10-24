@@ -45,7 +45,7 @@ show 6 stack registers on screen (3 high, reduce nbr of dec for 6), include mem 
 
 Display 6 max items from the stack and memory registers on screen (with 6 digits when displaying 6 items). When displaying only 3 stack items, show up to 9 digits.
 
-Show deg (little degree sign, circle) vs rad (little pi sign) mode indicatod in corner.
+Show deg (little degree sign, circle) vs rad (no sign) mode indicatod in corner.
 
 show shift indicator in corner of screen: f g h (small font)
 
