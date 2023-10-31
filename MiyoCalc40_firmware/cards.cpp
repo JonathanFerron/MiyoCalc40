@@ -90,21 +90,21 @@ const action ACT_ASIN = {KC_ASIN, &apply_func_1to1, {'S' - MCFLETOFFSET, 'I' - M
 const action ACT_ACOS = {KC_ACOS, &apply_func_1to1, {'S' - MCFLETOFFSET, 'I' - MCFLETOFFSET, 'N' - MCFLETOFFSET, MCFNULCHAR, MCFNULCHAR}};
 const action ACT_ATAN = {KC_ATAN, &apply_func_1to1, {'S' - MCFLETOFFSET, 'I' - MCFLETOFFSET, 'N' - MCFLETOFFSET, MCFNULCHAR, MCFNULCHAR}};
 
-//KC_BWAND
-//KC_BWOR
-//KC_BWXOR	
-//KC_BWNOT	  
+//const action ACT_BWAND = {KC_BWAND, &apply_func_2to1, {, , , ,}};
+//const action ACT_BWOR = {KC_BWOR, &apply_func_2to1, {, , , ,}};
+//const action ACT_BWXOR = {KC_BWXOR, &apply_func_2to1, {, , , ,}};	
+//const action ACT_BWNOT = {KC_BWNOT, &apply_func_1to1, {, , , ,}};	  
 
-//KC_MODEBIN	
-//KC_MODEOCT	
-//KC_MODEDEC	 
-//KC_MODEHEX	 
+//const action ACT_MODEBIN = {KC_MODEBIN, &change_nbr_rep_mode, {, , , ,}};
+//const action ACT_MODEOCT = {KC_MODEOCT, &change_nbr_rep_mode, {, , , ,}};
+//const action ACT_MODEDEC = {KC_MODEDEC, &change_nbr_rep_mode, {, , , ,}};	 
+//const action ACT_MODEHEX = {KC_MODEHEX, &change_nbr_rep_mode, {, , , ,}};	 
 
-//KC_MODERAD	
-//KC_MODEDEG	
+//const action ACT_MODERAD = {KC_MODERAD, &toggle_trig_mode, {, , , ,}};	
+//const action ACT_MODEDEG = {KC_MODEDEG, &toggle_trig_mode, {, , , ,}};	
 
-//KC_DATE	  
-//KC_DATEDIFF	
+//const action ACT_DATE = {KC_DATE, &apply_func_2to1, {, , , ,}};  
+//const action ACT_DATEDIFF = {KC_DATEDIFF, &apply_func_2to1, {, , , ,}};	
 
 const action ACT_NOP = {KC_NOP, &do_nothing, {'N' - MCFLETOFFSET, 'O' - MCFLETOFFSET, 'P' - MCFLETOFFSET, MCFNULCHAR, MCFNULCHAR}};
 
@@ -114,6 +114,10 @@ const action ACT_SHFT_G = {KC_NOP, &enter_shift_g, {'G' - MCFLETOFFSET, MCFNULCH
 const action ACT_SHFT_H = {KC_NOP, &enter_shift_h, {'H' - MCFLETOFFSET, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR}};
 
 const action ACT_PWR_DOWN = {KC_NOP, &power_down, {MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR}};
+
+const action ACT_CALC_MOD = {KC_NOP, &enter_calc_mode, {MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR}};
+const action ACT_CFG_MOD = {KC_NOP, &enter_config_mode, {MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR}};
+const action ACT_PROG_MOD = {KC_NOP, &enter_prog_mode, {MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR}};
 
 #define x____x &ACT_NOP
 
@@ -134,7 +138,7 @@ const action *calc_cards[4][NUM_ROW_PINS][NUM_COLUMN_PINS] =
     
   [fLayer] = 
     { {       x____x,        x____x,        x____x,   &ACT_ROLLUP,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
-      {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+      {       x____x,        x____x,        x____x,        x____x,  ACT_PROG_MOD,        x____x,        x____x,        x____x,        x____x,        x____x},
       {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x}, 
       {       x____x,        x____x,        x____x,     &ACT_ASIN, &ACT_PWR_DOWN,     &ACT_ACOS,     &ACT_ATAN,        x____x,        x____x,   &ACT_SHFT_G}
     },
@@ -147,7 +151,7 @@ const action *calc_cards[4][NUM_ROW_PINS][NUM_COLUMN_PINS] =
     },
     
   [hLayer] =
-    { {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+    { {       x____x,        x____x,        x____x,        x____x,   ACT_CFG_MOD,        x____x,        x____x,        x____x,        x____x,        x____x},
       {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
       {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x}, 
       {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,   &ACT_SHFT_B}
@@ -158,6 +162,13 @@ const action *calc_cards[4][NUM_ROW_PINS][NUM_COLUMN_PINS] =
 
 
 // config mode cards
+const action *config_cards[NUM_ROW_PINS][NUM_COLUMN_PINS] = 
+  {   
+      {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+      {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+      {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x}, 
+      {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x}
+  };
 
 
 // function definitions
@@ -192,8 +203,21 @@ action keytoaction()
   // calc vs prog vs config mode could be an enum, variable name could be 'activemode'
   return *calc_cards[shift][keypos_r][keypos_c]; // lookup action struct pointer in card and dereference it. will eventually add a first dimension for the active 'card', variable name could be 'activecard'
 
-  // need to implement another lookup when in prog mode here
-  
-  // and a final lookup when in config mode
+/**
+  switch (current_calc_prog_config_mode) 
+  {
+    case calc_mode:
+      return *calc_cards[shift][keypos_r][keypos_c];
+      break;
+    case prog_mode:
+      return *prog_cards[shift][keypos_r][keypos_c];
+      break;
+    case config_mode:
+      return *config_cards[keypos_r][keypos_c];
+      break;
+    default:
+      return *calc_cards[shift][keypos_r][keypos_c];
+  }
+**/  
   
 } // keytoaction()

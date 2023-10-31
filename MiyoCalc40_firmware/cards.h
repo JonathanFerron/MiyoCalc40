@@ -165,6 +165,13 @@ enum layers
   hLayer
 };
 
+enum calc_prog_config_modes
+{
+  calc_mode = 0,
+  prog_mode,
+  config_mode
+};
+
 // function prototypes
 action keytoaction();
 

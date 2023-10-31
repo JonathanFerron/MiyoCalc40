@@ -80,13 +80,14 @@ double variables[4][10] =
 int trigmode;     // Trigonometric mode: 0-DEG, 1-RAD
 int dispmode;     // Display mode: 0-NORM, 1-SCI, 2-ENG
 double trigconv;  // Trigonometric conversion constant, 1 for RAD, (pi/180.) for DEG
-int precision;         // Precision (number of significant digits)
+int precision;    // Precision (number of significant digits)
 
 bool mem_recall_mode;
 bool mem_store_mode;
 bool mem_clear_mode;
   
 int shift;
+int current_calc_prog_config_mode;
 
 // Table of maximal mantissa values for different precisions, look into changing this to an int64_t instead
 uint64_t max_mantissa[9] = {
@@ -145,6 +146,7 @@ void clear_input() {
 void calc_init() {
   trigmode = 1;  // use RAD mode by default
   dispmode = 0;  // normal display mode by default
+  current_calc_prog_config_mode = calc_mode;
   shift = baseLayer;  // base layer
   precision = 6; // should be 9 once we implement true double precision floating points
   
@@ -488,6 +490,21 @@ void enter_shift_g(__attribute__ ((unused)) uint8_t keycode) {
 void enter_shift_h(__attribute__ ((unused)) uint8_t keycode) {
 	shift = hLayer;
 	//draw_status();
+}
+
+void enter_calc_mode(__attribute__ ((unused)) uint8_t keycode)
+{
+  current_calc_prog_config_mode = calc_mode;
+}
+
+void enter_prog_mode(__attribute__ ((unused)) uint8_t keycode)
+{
+  current_calc_prog_config_mode = prog_mode;
+}
+
+void enter_config_mode(__attribute__ ((unused)) uint8_t keycode)
+{
+  current_calc_prog_config_mode = config_mode;
 }
 
 void enter_exp(__attribute__ ((unused)) uint8_t keycode) 
