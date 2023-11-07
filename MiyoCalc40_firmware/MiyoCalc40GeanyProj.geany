@@ -29,16 +29,18 @@ long_line_column=175
 
 [files]
 current_page=7
-FILE_NAME_0=251;Markdown;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5CTo%20Dos.md;0;2
-FILE_NAME_1=5885;C;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cresources%5Ccsnippets.c;0;2
+FILE_NAME_0=67;Markdown;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5CTo%20Dos.md;0;2
+FILE_NAME_1=5908;C;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cresources%5Ccsnippets.c;0;2
 FILE_NAME_2=6561;C++;0;EUTF-8;0;1;0;C%3A%5CUsers%5CJonathan%5CAppData%5CLocal%5CArduino15%5Cpackages%5CDxCore%5Ctools%5Cavr-gcc%5C7.3.0-atmel3.6.1-azduino6%5Cavr%5Cinclude%5Cavr%5Csleep.h;0;2
 FILE_NAME_3=302872;C++;0;EUTF-8;0;1;0;C%3A%5CUsers%5CJonathan%5CAppData%5CLocal%5CArduino15%5Cpackages%5CDxCore%5Ctools%5Cavr-gcc%5C7.3.0-atmel3.6.1-azduino6%5Cavr%5Cinclude%5Cavr%5Cioavr128da28.h;0;2
-FILE_NAME_4=4263;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Cmain.cpp;0;2
-FILE_NAME_5=924;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Ccalc.h;0;2
-FILE_NAME_6=12913;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Ccalc.cpp;0;2
-FILE_NAME_7=15026;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Ccards.cpp;0;2
-FILE_NAME_8=5293;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Ccards.h;0;2
-FILE_NAME_9=0;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Clcd.h;0;2
+FILE_NAME_4=9582;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Cmain.cpp;0;2
+FILE_NAME_5=1988;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Ccalc.h;0;2
+FILE_NAME_6=26019;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Ccalc.cpp;0;2
+FILE_NAME_7=8372;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Ccards.cpp;0;2
+FILE_NAME_8=5520;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Ccards.h;0;2
+FILE_NAME_9=4327;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Clcd.h;0;2
+FILE_NAME_10=10521;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Cfonts.h;0;2
+FILE_NAME_11=5178;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Clcd.cpp;0;2
 
 [prjorg]
 source_patterns=*.c;*.C;*.cpp;*.cxx;*.c++;*.cc;*.m;

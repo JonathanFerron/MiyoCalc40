@@ -70,6 +70,9 @@
   void apply_const(uint8_t keycode);
   void enter_lastx(uint8_t keycode);
   void enter_clear(uint8_t keycode);
+  void enter_calc_mode(uint8_t keycode);
+  void enter_config_mode(uint8_t keycode);
+  void enter_prog_mode(uint8_t keycode);
   
   void apply_memory_rcl(uint8_t r, uint8_t c);
   void apply_memory_sto(uint8_t r, uint8_t c);
@@ -83,6 +86,7 @@
   
   void LCDDrawStackAndMem();
   void LCDDrawInput();
+  void LCDDrawCalcStatus();
 
 #endif
 

@@ -242,8 +242,7 @@ void loop()
           keypos_c = 0xff; keypos_r = 0xff; // reset keypos to 'null' after action is obtained
           
           // reset mode to false after action has been processed
-          mem_recall_mode = false;
-        
+          mem_recall_mode = false;        
         }
         else if (mem_store_mode)
         {
@@ -263,7 +262,7 @@ void loop()
           // reset mode to false after action has been processed
           mem_clear_mode = false;
         }        
-        
+        LCDDrawCalcStatus();
       }
       else // not in mem store, recall, or clear mode
       {
@@ -288,7 +287,14 @@ void loop()
               (current_action.mnemonic[0] == ACT_SHFT_G.mnemonic[0] && current_action.mnemonic[1] == ACT_SHFT_G.mnemonic[1] && shift == gLayer) || 
               (current_action.mnemonic[0] == ACT_SHFT_H.mnemonic[0] && current_action.mnemonic[1] == ACT_SHFT_H.mnemonic[1] && shift == hLayer)))
         {
-          enter_shift_base(KC_NOP);
+          if (lcdon)
+          {
+            enter_shift_base(KC_NOP);
+          }
+          else
+          {
+            shift = baseLayer;
+          }
         }
       }     
       

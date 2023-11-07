@@ -158,8 +158,8 @@ void calc_init() {
 
   clear_input();
   clear_stack();
-  //draw_status(); // needs to be implemented
   LCDDrawStackAndMem();
+  LCDDrawCalcStatus();
 }
 
 
@@ -227,6 +227,7 @@ void enter_number(uint8_t keycode)
     input.exponent[0] = keycode;
   }
   LCDDrawInput();
+  LCDDrawCalcStatus();
 } // enter_number()
 
 double convert_input() 
@@ -266,6 +267,7 @@ void enter_enter(__attribute__ ((unused)) uint8_t keycode)
   input.enter_pressed = 1;
   stack_push(stack[0]);
   LCDDrawStackAndMem();
+  LCDDrawCalcStatus();
 } // enter_enter()
 
 void apply_func_1to1(uint8_t keycode)
@@ -307,6 +309,7 @@ void apply_func_1to1(uint8_t keycode)
   lastx = stack[0];  
   stack[0] = f;  
   LCDDrawStackAndMem();
+  LCDDrawCalcStatus();
 } // apply_func_1to1
 
 double factorial(double x)
@@ -351,6 +354,7 @@ void apply_func_2to1(uint8_t keycode)
   stack_drop();
   stack[0] = f;  
   LCDDrawStackAndMem();
+  LCDDrawCalcStatus();
 } // apply_func_2to1
 
 void enter_backspace_clrx(__attribute__ ((unused)) uint8_t keycode) 
@@ -394,6 +398,7 @@ void enter_backspace_clrx(__attribute__ ((unused)) uint8_t keycode)
     stack[0] = 0;  // clear x
     LCDDrawStackAndMem(); 
   }
+  LCDDrawCalcStatus();
 } // enter_backspace()
 
 void enter_decpoint(__attribute__ ((unused)) uint8_t keycode) 
@@ -415,6 +420,7 @@ void enter_decpoint(__attribute__ ((unused)) uint8_t keycode)
     input.point = input.mpos; 
   }
   LCDDrawInput(); 
+  LCDDrawCalcStatus();
 } // enter_decpoint()
 
 void enter_sign(__attribute__ ((unused)) uint8_t keycode) 
@@ -431,6 +437,7 @@ void enter_sign(__attribute__ ((unused)) uint8_t keycode)
     stack[0] = -stack[0];
     LCDDrawStackAndMem(); 
   }
+  LCDDrawCalcStatus();
 } // enter_sign()
 
 void enter_drop(__attribute__ ((unused)) uint8_t keycode) {
@@ -441,6 +448,7 @@ void enter_drop(__attribute__ ((unused)) uint8_t keycode) {
   input.enter_pressed = 0;
   stack_drop();
   LCDDrawStackAndMem();
+  LCDDrawCalcStatus();
 }
 
 void enter_swap_xy(__attribute__ ((unused)) uint8_t keycode) {
@@ -454,6 +462,7 @@ void enter_swap_xy(__attribute__ ((unused)) uint8_t keycode) {
   stack[0] = stack[1]; 
   stack[1] = tmp;
   LCDDrawStackAndMem(); 
+  LCDDrawCalcStatus();
 }
 
 void enter_rotate(uint8_t keycode) {
@@ -470,48 +479,51 @@ void enter_rotate(uint8_t keycode) {
     stack_rotate_up();
   }
   LCDDrawStackAndMem();
+  LCDDrawCalcStatus();
 } // enter_rotate()
 
 void enter_shift_base(__attribute__ ((unused)) uint8_t keycode) {
 	shift = baseLayer;
-	//draw_status();
+	LCDDrawCalcStatus();
 }
 
 void enter_shift_f(__attribute__ ((unused)) uint8_t keycode) {
 	shift = fLayer;
-	//draw_status();
+	LCDDrawCalcStatus();
 }
 
 void enter_shift_g(__attribute__ ((unused)) uint8_t keycode) {
 	shift = gLayer;
-	//draw_status();
+	LCDDrawCalcStatus();
 }
 
 void enter_shift_h(__attribute__ ((unused)) uint8_t keycode) {
 	shift = hLayer;
-	//draw_status();
+	LCDDrawCalcStatus();
 }
 
 void enter_calc_mode(__attribute__ ((unused)) uint8_t keycode)
 {
   current_calc_prog_config_mode = calc_mode;
+  LCDDrawCalcStatus();
 }
 
 void enter_prog_mode(__attribute__ ((unused)) uint8_t keycode)
 {
   current_calc_prog_config_mode = prog_mode;
+  LCDDrawCalcStatus();
 }
 
 void enter_config_mode(__attribute__ ((unused)) uint8_t keycode)
 {
   current_calc_prog_config_mode = config_mode;
+  LCDDrawCalcStatus();
 }
 
 void enter_exp(__attribute__ ((unused)) uint8_t keycode) 
 {
   if (!input.started) 
   {
-    //error_flag = 0;
     if (!input.enter_pressed && !error_flag) {
       stack_push(0);
       LCDDrawStackAndMem(); 
@@ -526,7 +538,8 @@ void enter_exp(__attribute__ ((unused)) uint8_t keycode)
     input.mpos = 1;
   }
   input.expentry = 1; 
-  LCDDrawInput(); 
+  LCDDrawInput();
+  LCDDrawCalcStatus();
 } // enter_exp()
 
 void apply_const(uint8_t keycode) {
@@ -548,6 +561,7 @@ void apply_const(uint8_t keycode) {
 	    stack[0] = f;
 	}
   LCDDrawStackAndMem();
+  LCDDrawCalcStatus();
 } // apply_const()
 
 void enter_lastx(__attribute__ ((unused)) uint8_t keycode) {
@@ -563,6 +577,7 @@ void enter_lastx(__attribute__ ((unused)) uint8_t keycode) {
     stack[0] = lastx;
   }
   LCDDrawStackAndMem(); 
+  LCDDrawCalcStatus();
 } // enter_lastx
 
 void enter_clear(__attribute__ ((unused)) uint8_t keycode) {
@@ -573,6 +588,7 @@ void enter_clear(__attribute__ ((unused)) uint8_t keycode) {
   input.enter_pressed = 0;
   clear_stack();
   LCDDrawStackAndMem();
+  LCDDrawCalcStatus();
 } // enter_clear
 
 // this will be called directly from loop() when calculator is already in mem rcl mode, and a key (variable name to recall) is provided
@@ -590,6 +606,7 @@ void apply_memory_rcl(uint8_t r, uint8_t c) {
     stack[0] = f;
 	}
   LCDDrawStackAndMem();
+  LCDDrawCalcStatus();
 }
 
 // this will be called directly from loop() when calculator is already in mem sto mode, and a key (variable name to store to) is provided
@@ -602,6 +619,7 @@ void apply_memory_sto(uint8_t r, uint8_t c) {
 	input.enter_pressed = 0;
 	variables[r][c] = stack[0];
   LCDDrawStackAndMem();
+  LCDDrawCalcStatus();
 }
 
 // this will be called directly from loop() when calculator is already in mem clr mode, and a key (variable name to store to) is provided
@@ -614,6 +632,7 @@ void apply_memory_clr(uint8_t r, uint8_t c) {
 	input.enter_pressed = 0;
 	variables[r][c] = 0;
   LCDDrawStackAndMem();
+  LCDDrawCalcStatus();
 }
 
 void toggle_mem_mode(uint8_t keycode)
@@ -931,4 +950,56 @@ void simulateInput()
   
 } // simulateInput()
 
+//void LCDDrawCalcStatus() {}
+
+void LCDDrawCalcStatus()
+{
+  // page 1, degree mode
+  switch (trigmode)
+  {
+    case 0:
+      mylcd.LCDBitmap(186, 0*8, 6, 8, MiyoCalcFont_Degree);  // degrees
+      break;
+    case 1:
+    default:
+      mylcd.LCDBitmap(186, 0*8, 6, 8, MiyoCalcFont_Blank);  // radian
+  } 
+  
+  // page 2, shift layer
+  switch (shift) 
+  {
+    case fLayer:
+      mylcd.LCDBitmap(186, 8*1, 6, 8, MiyoCalcFont_ShiftF); // f layer
+      break;
+    case gLayer:
+      mylcd.LCDBitmap(186, 8*1, 6, 8, MiyoCalcFont_ShiftG); // g layer
+      break;
+    case hLayer:
+      mylcd.LCDBitmap(186, 8*1, 6, 8, MiyoCalcFont_ShiftH); // h layer
+      break;
+    case baseLayer:
+    default:
+      mylcd.LCDBitmap(186, 8*1, 6, 8, MiyoCalcFont_Blank); // blank
+  }
+  
+  // page 3, register store, recall, clear mode
+  if (mem_store_mode)
+  {
+    mylcd.LCDBitmap(186, 8*2, 6, 8, MiyoCalcFont_RegSto); 
+  } 
+  else if (mem_recall_mode)
+  {
+    mylcd.LCDBitmap(186, 8*2, 6, 8, MiyoCalcFont_RegRcl); 
+  } 
+  else if (mem_clear_mode)
+  {
+    mylcd.LCDBitmap(186, 8*2, 6, 8, MiyoCalcFont_RegClr); 
+  } 
+  else
+  {
+    mylcd.LCDBitmap(186, 8*2, 6, 8, MiyoCalcFont_Blank); // blank
+  }
+
+  
+} // LCDDrawCalcStatus()
 

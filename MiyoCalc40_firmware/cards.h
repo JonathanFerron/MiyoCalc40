@@ -174,6 +174,9 @@ enum calc_prog_config_modes
 
 // function prototypes
 action keytoaction();
+//void enter_calc_mode(__attribute__ ((unused)) uint8_t keycode);
+//void enter_config_mode(__attribute__ ((unused)) uint8_t keycode);
+//void enter_prog_mode(__attribute__ ((unused)) uint8_t keycode);
 
 extern const action ACT_SHFT_F;
 extern const action ACT_SHFT_G;
