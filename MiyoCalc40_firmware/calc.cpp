@@ -1,55 +1,12 @@
 /*
  * Based in part on code from OpenRPNCalc by Anton Poluektov: https://github.com/apoluekt/OpenRPNCalc
  * 
-start by copying a lot of code from OpenRPNCalc, go through everything, simplify
-and modify as necessary in the context of the 'cards', actions', 'keycodes',
-and variable size (max 8) stack that grows and shrinks.
 
-openrpncalc pseudocode and structure (from calc.c):
-  setup_calc():
-    trigmode = DEG   we'll use an enum instead
-    dispmode = NORM   we'll use an enum instead. This is for the number display mode: NORM, SCI, ENG
-    shift = noshift      we have three possible shifts (four with 'no shift'), so use an enum instead
-    precision = 10
-    call set_trigconv
-    call clear_input
-    call clear_stack
-    call draw_status (we'll implement the 'draw' functions in lcd.cpp)
-    call draw stack
+Use variable depth stack (min 1, max 8, elements): first two still refered to as x and y, but really they are s0 and s1.
+When in variable depthe stack, initialize with only 1 variable in the stack (x), at 0.0
 
-  apply_op(): is called to trigger the execution of the actions
-    this calls the apply_enter, apply_stack, apply_const, apply_memory_rcl,
-    apply_memory_sto, convert_input, clear_input, apply_func_1to1,
-    apply_func_2to1, applyfunc2to2, draw_status and
-    draw_stack functions (anything that starts with 'draw' should probably go
-    in our lcd.cpp). code depends on the use of the 'op mode' portion of the
-    16 bit keycode: we could have a lookup table to provide this 'op mode'
-    based on our 8 bit keycode, if necessary, or more probably we could just
-    go and use the 'enter_number(KC_ENTER_1), enter_enter(KC_ENTER), apply_func_1to1(KC_SIN),
-    apply_func_2to1(KC_PLUS) etc. functions as our function pointers' that way the
-    functions from OpenRPNCalc can be used almost as-is (use 8 bit keycodes instead
-    of 16 bits, and use KC_SIN instead of OP_SIN). need to insert the uses of
-    the convert_input ad clear_input from the apply_op function inside the 
-    apply_func_atob() functions.
-
-  stack: array of double (use single to start with)
-  lastx: double (use single)
-  error_flag: boolean
-  variables: array of double (use single to start with), storage space for variables, perhaps change the name to memoryregisters
-
-
-use variable depth stack (min 1, max 8, elements): first two still refered to as x and y, but really they are s0 and s1
-initialize with only 1 variable in the stack (x), at 0.0
-
-show 6 stack registers on screen (3 high, reduce nbr of dec for 6), include mem (heap) reg up to a grand total of 6: X, Y, Z, T, S, R, (Q, P)
-
-Display 6 max items from the stack and memory registers on screen (with 6 digits when displaying 6 items). When displaying only 3 stack items, show up to 9 digits.
-
-Show deg (little degree sign, circle) vs rad (no sign) mode indicatod in corner.
-
-show shift indicator in corner of screen: f g h (small font)
-
-memory registers (heap): maximum of 36 registers from 0 to 9 and from A to Z. we can refer to them as R(0), R(1), etc. 
+Show up to 6 stack registers on screen (3 high, reduce nbr of digits to 6 for 6), include mem (heap) reg up to a grand total of 6: X, Y, Z, T, S, R, (Q, P).
+When displaying only 3 stack items, show up to 9 digits.
 
 */
 
@@ -148,7 +105,7 @@ void calc_init() {
   dispmode = 0;  // normal display mode by default
   current_calc_prog_config_mode = calc_mode;
   shift = baseLayer;  // base layer
-  precision = 6; // should be 9 once we implement true double precision floating points
+  precision = 9;
   
   mem_recall_mode = false;
   mem_store_mode = false;  
@@ -646,6 +603,16 @@ void toggle_mem_mode(uint8_t keycode)
 	}
 } // toggle_mem_mode
 
+void set_trig_mode(uint8_t keycode)
+{
+  switch (keycode)
+  {
+    case KC_MODERAD: trigmode = 1; break;
+    case KC_MODEDEG: trigmode = 0; break;
+  }
+  set_trigconv();
+} // set_trig_mode
+
 void do_nothing(__attribute__ ((unused)) uint8_t keycode)
 {}
 
@@ -952,54 +919,52 @@ void simulateInput()
 
 //void LCDDrawCalcStatus() {}
 
+// TO DO: increase the size of the symbols from 6x6 pixels to 12x12 pixels instead, with a max of 5 symbols
 void LCDDrawCalcStatus()
 {
-  // page 1, degree mode
+  // indicator area 1, degree mode
   switch (trigmode)
   {
     case 0:
-      mylcd.LCDBitmap(186, 0*8, 6, 8, MiyoCalcFont_Degree);  // degrees
+      mylcd.LCDBitmap(180, 13*0, 6, 8, MiyoCalcFont_Degree);  // degrees
       break;
     case 1:
     default:
-      mylcd.LCDBitmap(186, 0*8, 6, 8, MiyoCalcFont_Blank);  // radian
+      mylcd.LCDBitmap(180, 13*0, 6, 8, MiyoCalcFont_Blank);  // radian
   } 
   
-  // page 2, shift layer
+  // indicator area 2, shift layer
   switch (shift) 
   {
     case fLayer:
-      mylcd.LCDBitmap(186, 8*1, 6, 8, MiyoCalcFont_ShiftF); // f layer
+      mylcd.LCDBitmap(180, 13*1, 6, 8, MiyoCalcFont_ShiftF); // f layer
       break;
     case gLayer:
-      mylcd.LCDBitmap(186, 8*1, 6, 8, MiyoCalcFont_ShiftG); // g layer
+      mylcd.LCDBitmap(180, 13*1, 6, 8, MiyoCalcFont_ShiftG); // g layer
       break;
     case hLayer:
-      mylcd.LCDBitmap(186, 8*1, 6, 8, MiyoCalcFont_ShiftH); // h layer
+      mylcd.LCDBitmap(180, 13*1, 6, 8, MiyoCalcFont_ShiftH); // h layer
       break;
-    case baseLayer:
-    default:
-      mylcd.LCDBitmap(186, 8*1, 6, 8, MiyoCalcFont_Blank); // blank
   }
   
-  // page 3, register store, recall, clear mode
+  // indicator 2, register store, recall, clear mode
   if (mem_store_mode)
   {
-    mylcd.LCDBitmap(186, 8*2, 6, 8, MiyoCalcFont_RegSto); 
+    mylcd.LCDBitmap(180, 13*1, 6, 8, MiyoCalcFont_RegSto); 
   } 
   else if (mem_recall_mode)
   {
-    mylcd.LCDBitmap(186, 8*2, 6, 8, MiyoCalcFont_RegRcl); 
+    mylcd.LCDBitmap(180, 13*1, 6, 8, MiyoCalcFont_RegRcl); 
   } 
   else if (mem_clear_mode)
   {
-    mylcd.LCDBitmap(186, 8*2, 6, 8, MiyoCalcFont_RegClr); 
-  } 
-  else
+    mylcd.LCDBitmap(180, 13*1, 6, 8, MiyoCalcFont_RegClr); 
+  }  
+  
+  if (shift == baseLayer && !mem_store_mode && !mem_recall_mode && !mem_clear_mode)
   {
-    mylcd.LCDBitmap(186, 8*2, 6, 8, MiyoCalcFont_Blank); // blank
+     mylcd.LCDBitmap(180, 13*1, 6, 8, MiyoCalcFont_Blank); // blank
   }
-
   
 } // LCDDrawCalcStatus()
 

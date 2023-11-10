@@ -78,6 +78,7 @@
   void apply_memory_sto(uint8_t r, uint8_t c);
   void apply_memory_clr(uint8_t r, uint8_t c);
   void toggle_mem_mode(uint8_t keycode);
+  void set_trig_mode(uint8_t keycode);
   
   void testStillNumbers2();
   void testActionsWithoutKeyboard();

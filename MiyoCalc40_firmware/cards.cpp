@@ -100,8 +100,8 @@ const action ACT_ATAN = {KC_ATAN, &apply_func_1to1, {'S' - MCFLETOFFSET, 'I' - M
 //const action ACT_MODEDEC = {KC_MODEDEC, &change_nbr_rep_mode, {, , , ,}};	 
 //const action ACT_MODEHEX = {KC_MODEHEX, &change_nbr_rep_mode, {, , , ,}};	 
 
-//const action ACT_MODERAD = {KC_MODERAD, &set_trig_mode, {, , , ,}};	
-//const action ACT_MODEDEG = {KC_MODEDEG, &set_trig_mode, {, , , ,}};	
+const action ACT_MODERAD = {KC_MODERAD, &set_trig_mode, {'R' - MCFLETOFFSET, 'A' - MCFLETOFFSET, 'D' - MCFLETOFFSET, MCFNULCHAR, MCFNULCHAR}};	
+const action ACT_MODEDEG = {KC_MODEDEG, &set_trig_mode, {'D' - MCFLETOFFSET, 'E' - MCFLETOFFSET, 'G' - MCFLETOFFSET, MCFNULCHAR, MCFNULCHAR}};	
 
 //const action ACT_DATE = {KC_DATE, &apply_func_2to1, {, , , ,}};  
 //const action ACT_DATEDIFF = {KC_DATEDIFF, &apply_func_2to1, {, , , ,}};	
@@ -140,7 +140,7 @@ const action *calc_cards[4][NUM_ROW_PINS][NUM_COLUMN_PINS] =
     { {       x____x,        x____x,        x____x,   &ACT_ROLLUP,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
       {       x____x,        x____x,        x____x,        x____x, &ACT_PROG_MOD,        x____x,        x____x,        x____x,        x____x,        x____x},
       {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x}, 
-      {       x____x,        x____x,        x____x,     &ACT_ASIN, &ACT_PWR_DOWN,     &ACT_ACOS,     &ACT_ATAN,        x____x,        x____x,   &ACT_SHFT_G}
+      {       x____x,        x____x,        x____x,     &ACT_ASIN, &ACT_PWR_DOWN,     &ACT_ACOS,     &ACT_ATAN,  &ACT_MODERAD,  &ACT_MODEDEG,   &ACT_SHFT_G}
     },
     
   [gLayer] = 
