@@ -474,7 +474,8 @@ void enter_prog_mode(__attribute__ ((unused)) uint8_t keycode)
 void enter_config_mode(__attribute__ ((unused)) uint8_t keycode)
 {
   current_calc_prog_config_mode = config_mode;
-  LCDDrawCalcStatus();
+  // set current_config_screen variable = main_config_screen (enum)
+  LCDDrawCalcStatus(); // this should be a call to LCDDrawConfigScreen()
 }
 
 void enter_exp(__attribute__ ((unused)) uint8_t keycode) 

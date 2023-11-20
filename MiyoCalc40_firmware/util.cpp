@@ -3,7 +3,7 @@
 /* 
 helper function battery_voltage()
 
-LiFePO4 10440 (AAA) 280mAh to 300mAh battery
+LiFePO4 10440 (AAA) 280mAh battery. Used capacity when cycling from 3.25V to 3.00V is about 140mAh.
 
 Recharge battery to 90%: 3.25V
 When depleted at 10%: 3.00V
@@ -25,8 +25,16 @@ then cap charging voltage at 3.5V
 Stop charging when battery voltage reaches 3.25V, or when charging current drops to 15mA (0.05C), whichever comes first
 should take about 3 to 5 hours to charge battery from 10% SOC to 90% SOC (240mAh).
 
-Typical discharge when on will likely be around 0.3mA (mostly from LCD, really): or measure when using calc with a multimeter
+Typical discharge when on and idle, with backlight off, with battery at 3.2V, is 265uA (mostly from LCD)
 0.3mA / 300mAh = 0.001C
+
+Power consumption when on and very active (continually pressing buttons very fast), with backlight off, is 5.7mA.
+
+Power consumption in power down sleep mode is 7.3uA.
+
+Avg current when in active use = 320uA, therefore runtime of about 140mAh / 0.320mA = 428h = 18 days
+
+Avg runtime when in power down sleep mode = 140mAh / 0.0073uA = 19284h = 804 days = 26 months
 
 Voltage measurement code:
  

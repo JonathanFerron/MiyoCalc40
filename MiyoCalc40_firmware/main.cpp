@@ -72,10 +72,15 @@ void setup() {
     
   setupBacklight();
   
-  calc_init();  
+  calc_init();
  
 } // setup()
 
+/* TODO: Look into following ideas to save power:
+- Disable SPI, ADC, TCA, TCD, TCB, RTC, CCL when not needed
+- for ADC: ADC0.ctrla &= ~ADC_ENABLEbm or ADCpoweroption (adc_disable) or adcpoweroption(adc_standby_off)
+- for TCA0= TCA0.SPLIT.CTRLA = 0
+*/
 void setupMCU()
 {
   // look into turning off TCD0 to save power (call takeoverTCD0() perhaps )
