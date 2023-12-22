@@ -105,7 +105,8 @@ void calc_init() {
   dispmode = 0;  // normal display mode by default
   current_calc_prog_config_mode = calc_mode;
   shift = baseLayer;  // base layer
-  precision = 9;
+  //precision = 9;
+  precision = 6;
   
   mem_recall_mode = false;
   mem_store_mode = false;  

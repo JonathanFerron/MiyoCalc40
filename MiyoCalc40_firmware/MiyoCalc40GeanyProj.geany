@@ -28,14 +28,14 @@ long_line_behaviour=2
 long_line_column=175
 
 [files]
-current_page=0
+current_page=6
 FILE_NAME_0=63;Markdown;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5CTo%20Dos.md;0;2
 FILE_NAME_1=5908;C;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cresources%5Ccsnippets.c;0;2
 FILE_NAME_2=6561;C++;0;EUTF-8;0;1;0;C%3A%5CUsers%5CJonathan%5CAppData%5CLocal%5CArduino15%5Cpackages%5CDxCore%5Ctools%5Cavr-gcc%5C7.3.0-atmel3.6.1-azduino6%5Cavr%5Cinclude%5Cavr%5Csleep.h;0;2
 FILE_NAME_3=302872;C++;0;EUTF-8;0;1;0;C%3A%5CUsers%5CJonathan%5CAppData%5CLocal%5CArduino15%5Cpackages%5CDxCore%5Ctools%5Cavr-gcc%5C7.3.0-atmel3.6.1-azduino6%5Cavr%5Cinclude%5Cavr%5Cioavr128da28.h;0;2
 FILE_NAME_4=9582;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Cmain.cpp;0;2
 FILE_NAME_5=2677;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Ccalc.h;0;2
-FILE_NAME_6=23984;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Ccalc.cpp;0;2
+FILE_NAME_6=2747;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Ccalc.cpp;0;2
 FILE_NAME_7=12173;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Ccards.cpp;0;2
 FILE_NAME_8=5520;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Ccards.h;0;2
 FILE_NAME_9=4327;C++;0;EUTF-8;0;1;0;H%3A%5CMy%20Drive%5CMiyoCalc40%5Cgit%5CMiyoCalc40_firmware%5Clcd.h;0;2
