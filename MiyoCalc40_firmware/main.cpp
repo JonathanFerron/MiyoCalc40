@@ -667,9 +667,9 @@ void testSomeText() {
 void testSomeOtherText()
 {
   mylcd.LCDFillScreen(0x00, 0); // clear screen
-  mylcd.LCDString("NOAH", 0, 0);
-  mylcd.LCDString("AUDREY", 0, 3);
-  mylcd.LCDString("LIAM", 0, 6);
+  mylcd.LCDString("MIYO", 0, 0);
+  mylcd.LCDString("CALC", 0, 3);
+  mylcd.LCDString("40", 0, 6);
   uint8_t txt1[] = {35, 26, 33}; 
   mylcd.LCDCharSeq(txt1, sizeof(txt1)/sizeof(txt1[0]), 96, 0);
   delay(5000);
