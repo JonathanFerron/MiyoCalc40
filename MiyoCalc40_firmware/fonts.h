@@ -12,6 +12,8 @@
 
 #define MCFMINUS 36
 
+#define MCFLETTER_E ('E' - MCFLETOFFSET)  // used to render scientific notation, e.g. "1.5E9"
+
 #define MCFNULCHAR 0xFF  // this is considered a null character in the 'mnemonic' for an 'action' when less than 5 characters are needed
 
 

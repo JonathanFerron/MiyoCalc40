@@ -16,13 +16,14 @@
   #define XLCDPAGE 6
   
   // number_for_lcd struct typedef
-  // to do: add the 'exponent' component
   typedef struct {
     uint8_t digits[9];      // Mantissa digits array
     uint8_t sign;           // Sign: 0 for "+", 1 for "-"
     uint8_t dec_point_pos;  // Decimal point position, min 0, max 9 : number of digits to the left of the dec point
     uint8_t num_digits;     // Number of mantissa digits entered, max 9
     bool show_dec_point;
+    int16_t exponent;       // Exponent value (base 10), only meaningful if show_exponent
+    bool show_exponent;     // true when the number is rendered in scientific notation
   } number_for_lcd;
   
   extern bool mem_recall_mode;

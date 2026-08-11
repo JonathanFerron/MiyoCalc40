@@ -20,6 +20,32 @@ The firmware is an Arduino sketch, not built from the command line in this repo:
 - To build/flash: open `MiyoCalc40_firmware/MiyoCalc40_firmware.ino` in the Arduino IDE, select the AVR128DA28 board (DxCore), and flash via a UPDI programmer (not a bootloader/USB upload).
 - There is no unit test suite, linter, or CI for the firmware — verification is done on real hardware.
 
+### Compiler / `double` width
+
+DxCore's `platform.txt` has a deprecated `compiler.path` that Arduino IDE silently
+redirects to the **system** avr-gcc (`/usr/bin/avr-gcc`), not the bundled
+`DxCore/tools/avr-gcc/7.3.0-...`. Check which one actually ran in the verbose build log's
+`Warning: platform.txt from core 'DxCore' contains deprecated compiler.path=...` line.
+
+`double` is 32-bit (`== float`, avr-gcc's default `-mdouble=32`) on this toolchain, giving
+~7.2 honest decimal digits of precision. `precision` in `calc.cpp`'s `calc_init()` is set
+to `7` to match, deliberately staying inside that budget.
+
+**Do not force `-mdouble=64` via a DxCore `platform.local.txt`.** This was tried and
+reverted: the build compiles and links cleanly with no errors (`__adddf3`/`__muldf3`/
+`__divdf3` all resolve fine — those come from libgcc, not avr-libc), but avr-libc 2.2.1's
+`log10()`/`floor()`/`round()` for 64-bit doubles resolve to a software "libf7"
+extended-precision library (`__f7_log10`, `__f7_floor`, `__f7_round`) that produced
+garbage results on real AVR128DA28 hardware — e.g. `LCDNumber(3.0)` computed
+`_exponent` around `-22003` instead of `0`. This is invisible to linkage checks and to
+host-side testing (the host's own `double` math is correct; only the AVR target's is
+broken), so it can only be caught by running on real hardware. DxCore's own bundled
+compiler (7.3.0) doesn't even offer `-mdouble=64` as an option — this was only reachable
+because Arduino IDE's `compiler.path` redirect silently substitutes a much newer,
+untested system compiler. If 64-bit precision is revisited, verify `log10`/`pow`/`floor`/
+`round` numerically **on real hardware** (e.g. print results over UART) before trusting a
+clean build.
+
 ## Firmware architecture
 
 The module breakdown and dependency order is documented in the header comment of `MiyoCalc40_firmware.ino` and `main.h`:

@@ -46,18 +46,21 @@ bool mem_clear_mode;
 int shift;
 int current_calc_prog_config_mode;
 
-// Table of maximal mantissa values for different precisions, look into changing this to an int64_t instead
-uint64_t max_mantissa[9] = {
-		9LL,  // LL stands for long long (64 bit)
-		99LL,
-		999LL,
-		9999LL,
-		99999LL,
-		999999LL,
-		9999999LL,
-		99999999LL,
-		999999999LL
+// Exact powers of ten (all exactly representable in a 64-bit double up to 1e22;
+// 1e18 is more than enough headroom for scale10()'s chaining below).
+static const double p10[19] = {
+		1e0,  1e1,  1e2,  1e3,  1e4,  1e5,  1e6,  1e7,  1e8,  1e9,
+		1e10, 1e11, 1e12, 1e13, 1e14, 1e15, 1e16, 1e17, 1e18
 };
+
+// a * 10^k using only exact multiply/divide by table entries, avoiding pow()'s
+// exp(y*log(x)) approximation (which is what previously introduced display noise)
+static double scale10(double a, int k)
+{
+	while (k > 18)  { a *= p10[18]; k -= 18; }
+	while (k < -18) { a /= p10[18]; k += 18; }
+	return (k >= 0) ? a * p10[k] : a / p10[-k];
+} // scale10()
 
 
 t_input input; // Input structure
@@ -105,8 +108,13 @@ void calc_init() {
   dispmode = 0;  // normal display mode by default
   current_calc_prog_config_mode = calc_mode;
   shift = baseLayer;  // base layer
-  precision = 9;
-  //precision = 6;
+  // double is 32-bit (float, ~7.2 honest decimal digits) on this toolchain unless
+  // -mdouble=64 is forced via platform.local.txt -- do NOT re-enable that flag without
+  // re-verifying log10()/floor()/round() on real hardware first: avr-gcc 14.3.0 /
+  // avr-libc 2.2.1's libf7-based 64-bit math produced garbage exponents at runtime
+  // (e.g. LCDNumber(3.0) computed _exponent ~ -22003) despite linking without errors.
+  // See CLAUDE.md.
+  precision = 7;
   
   mem_recall_mode = false;
   mem_store_mode = false;  
@@ -203,8 +211,8 @@ double convert_input()
   if (input.expsign) exponent = -exponent; 
   if (input.point) exponent -= (input.mpos-input.point); 
 
-  number *= pow(10, exponent); 
-  if (input.sign) number = -number; 
+  number = scale10(number, exponent);
+  if (input.sign) number = -number;
 
   if (!isfinite(number)) 
   {
@@ -636,21 +644,54 @@ void LCDDrawNum(number_for_lcd *nfl, uint8_t page)
       mylcd.LCDDot(col, page);
       col += MCFDECPOINTWIDTH + MCFFONTSPACER;
     }
-    
+
     mylcd.LCDChar(nfl->digits[d], col, page);
     col += MCFFONTWIDTH + MCFFONTSPACER;
-    
-    int8_t thousandcheck = d + 1 - nfl->dec_point_pos;
-    
-    if ( (thousandcheck % 3 == 0) && (thousandcheck != 0) )
+
+    if (!nfl->show_exponent)  // thousands grouping only makes sense in fixed-point notation
     {
-      col += MCFTHOUSANDSPACER;
-    }     
+      int8_t thousandcheck = d + 1 - nfl->dec_point_pos;
+
+      if ( (thousandcheck % 3 == 0) && (thousandcheck != 0) )
+      {
+        col += MCFTHOUSANDSPACER;
+      }
+    }
   }
-  
+
   if (nfl->dec_point_pos == nfl->num_digits && nfl->show_dec_point)
   {
     mylcd.LCDDot(col, page);
+  }
+
+  if (nfl->show_exponent)
+  {
+    mylcd.LCDChar(MCFLETTER_E, col, page);
+    col += MCFFONTWIDTH + MCFFONTSPACER;
+
+    int16_t exp = nfl->exponent;
+    if (exp < 0)
+    {
+      mylcd.LCDChar(MCFMINUS, col, page);
+      col += MCFFONTWIDTH + MCFFONTSPACER;
+      exp = -exp;
+    }
+
+    // sized to int16_t's full digit range (up to 5 digits) rather than the ~3 digits
+    // a legitimate double exponent needs, so a miscomputed exponent can never overflow
+    // this buffer and corrupt the stack
+    uint8_t expdigits[5];
+    uint8_t nexp = 0;
+    do {
+      expdigits[nexp++] = exp % 10;
+      exp /= 10;
+    } while (exp != 0 && nexp < sizeof(expdigits));
+
+    while (nexp > 0)
+    {
+      mylcd.LCDChar(expdigits[--nexp], col, page);
+      col += MCFFONTWIDTH + MCFFONTSPACER;
+    }
   }
 } // LCDDrawNum
 
@@ -658,83 +699,113 @@ void LCDDrawNum(number_for_lcd *nfl, uint8_t page)
 // expect LCDNumber() to be called by LCDDrawStack()
 void LCDNumber(double num, uint8_t page)
 {
-  int _exponent; 
-  int64_t _mantissa;
-  int pointpos=1; 
+  // Scientific-notation mantissas use fewer significant digits than fixed-point
+  // ('precision', normally 7) to leave screen width for the "E<exponent>" suffix.
+  const int SCI_DIGITS = 5;
+
+  int _exponent;
+  int32_t _mantissa;
+  int pointpos=1;
+  int ndigits = precision;
+  bool show_exponent = false;
+
   if (num != 0) {
-    _exponent = (int)floor(log10(fabs(num)));
-    _mantissa = (int64_t)round(fabs(num)/pow(10, _exponent-precision+1));
-    if (_mantissa > max_mantissa[precision]) {
+    double a = fabs(num);
+    // log10() is only an estimate of the exponent: it can be off by one right at
+    // exact powers of ten, so both directions are corrected below by comparing
+    // the scaled mantissa against the [10^(precision-1), 10^precision) window.
+    _exponent = (int)floor(log10(a));
+    double scaled = scale10(a, precision-1-_exponent);
+    if (scaled >= p10[precision]) {
+      _exponent += 1;
+      scaled = scale10(a, precision-1-_exponent);
+    } else if (scaled < p10[precision-1]) {
+      _exponent -= 1;
+      scaled = scale10(a, precision-1-_exponent);
+    }
+    _mantissa = (int32_t)round(scaled);
+    if (_mantissa >= (int32_t)p10[precision]) {  // rounding pushed it to the next power of ten
       _mantissa /= 10;
-      _exponent += 1; 
+      _exponent += 1;
     }
-    if (_exponent < precision && _exponent > 0) {
-      pointpos = _exponent+1; 
-      _exponent = 0; 
+
+    if (_exponent > -4 && _exponent < precision) {
+      // fixed point: window covers 0.0001 <= |num| < 10^precision
+      if (_exponent > 0) {
+        // integer part spanning multiple digits
+        pointpos = _exponent+1;
+        _exponent = 0;
+      } else if (_exponent < 0) {
+        // small decimal (0.0001 <= |num| < 1)
+        _mantissa = (int32_t)round(scale10(a, precision-1));
+        pointpos = 1;
+        _exponent = 0;
+      }
+      // else _exponent == 0 (1 <= |num| < 10): pointpos already 1, _exponent already 0
+    } else {
+      // outside the fixed-point window: scientific notation, recomputed at SCI_DIGITS
+      // significant digits (same over/underflow correction as the block above)
+      double sci_scaled = scale10(a, SCI_DIGITS-1-_exponent);
+      if (sci_scaled >= p10[SCI_DIGITS]) {
+        _exponent += 1;
+        sci_scaled = scale10(a, SCI_DIGITS-1-_exponent);
+      } else if (sci_scaled < p10[SCI_DIGITS-1]) {
+        _exponent -= 1;
+        sci_scaled = scale10(a, SCI_DIGITS-1-_exponent);
+      }
+      _mantissa = (int32_t)round(sci_scaled);
+      if (_mantissa >= (int32_t)p10[SCI_DIGITS]) {
+        _mantissa /= 10;
+        _exponent += 1;
+      }
+      pointpos = 1;
+      ndigits = SCI_DIGITS;
+      show_exponent = true;
     }
-    if (_exponent < 0 && _exponent > -4) {
-      _mantissa = (int64_t)round(fabs(num)*pow(10, precision-1));
-      pointpos = 1; 
-      _exponent = 0;
-    }
-    for (int i=0; i<precision; i++) 
+
+    for (int i=0; i<ndigits; i++)
     {
-      if (_mantissa % 10 == 0 && pointpos < precision) {
-        _mantissa /= 10; 
-        pointpos++; 
+      if (_mantissa % 10 == 0 && pointpos < ndigits) {
+        _mantissa /= 10;
+        pointpos++;
       } else {
         break;
       }
     } // for
-    if (num<0) _mantissa = -_mantissa; 
+    if (num<0) _mantissa = -_mantissa;
   } else {
     _mantissa = 0;
     _exponent = 0;
-    pointpos = precision;
+    pointpos = ndigits;
   }
-  
-  int64_t mantissa = _mantissa;  // could probably re-merge the 2 by creating a 'isnegative' bool variable
-  int32_t exponent = _exponent;  // could probably re-merge the 2, need to clarify int vs int32_t
+
+  int32_t mantissa = _mantissa;  // could probably re-merge the 2 by creating a 'isnegative' bool variable
 
   if (_mantissa < 0) mantissa = -mantissa;
   number_for_lcd nfl;
   int j;
-  for (j=0; j<precision; j++) {
-    uint8_t ch = mantissa % 10; 
+  for (j=0; j<ndigits; j++) {
+    uint8_t ch = mantissa % 10;
     mantissa = mantissa/10;
-    
+
     nfl.digits[j] = ch;
-    
-    if (mantissa == 0 && pointpos + j >= precision) break;
+
+    if (mantissa == 0 && pointpos + j >= ndigits) break;
   }
-  
+
   if (_mantissa<0)
   {
     nfl.sign = 1;
-  } else 
+  } else
   {
     nfl.sign = 0;
   }
 
   nfl.num_digits = j+1;
-  nfl.dec_point_pos = nfl.num_digits - precision + pointpos;  
+  nfl.dec_point_pos = nfl.num_digits - ndigits + pointpos;
   nfl.show_dec_point = (nfl.dec_point_pos < nfl.num_digits);
-  
-  //mylcd.LCDChar(pointpos, 14*10, page);  // debugging print-out
-  //mylcd.LCDChar(nfl.num_digits, 14*12, page);  // debugging print-out
-
-  /** need to implement this for scientific notation presentation of numbers
-  if (exponent != 0) {
-    draw_char(0, pos, 0, 1);  // convert this to a write to the number_for_lcd variable
-    if (exponent<0) draw_char(1, pos, '-', 1);  // convert this to a write to the number_for_lcd variable
-    if (exponent<0) exponent = -exponent;
-    for (int i=0; i<3; i++) {
-      uint8_t ch = exponent % 10; 
-      exponent = exponent/10;
-      draw_char((4-i), pos, ch+'0', 1);  // convert this to a write to the number_for_lcd variable
-    }
-  }
-  **/
+  nfl.show_exponent = show_exponent;
+  nfl.exponent = (int16_t)_exponent;
 
   // reverse the 'digits' array so as to be ready for LCDDrawNum function
   int l=0;
@@ -748,10 +819,7 @@ void LCDNumber(double num, uint8_t page)
     l++;
     r--;
   }
-  
-  //mylcd.LCDChar(nfl.sign, 14*0, 0 * 3);
-  //mylcd.LCDChar(nfl.num_digits, 14*2, 0 * 3);
-  
+
   LCDDrawNum(&nfl, page);
 }  // LCDNumber()
 
@@ -783,10 +851,12 @@ void LCDDrawInput()
     nfl.digits[d] = input.mantissa[d];
   }
   
-  nfl.sign = input.sign;  
+  nfl.sign = input.sign;
   nfl.dec_point_pos = (input.point == 0) ? input.mpos : input.point;
   nfl.show_dec_point = (input.point > 0);
-  
+  nfl.show_exponent = false;
+  nfl.exponent = 0;
+
   // draw the input in the X page
   LCDDrawNum(&nfl, XLCDPAGE);
 } // LCDDrawInput()
