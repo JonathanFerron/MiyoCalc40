@@ -110,7 +110,7 @@ class ERM19264_UC1609_T {
 
     void LCDGotoXY(uint8_t column , uint8_t page);
     //void LCDChar(unsigned char character);
-    void LCDString(char *characters, uint8_t col, uint8_t page);
+    void LCDString(const char *characters, uint8_t col, uint8_t page);
     void LCDbegin(uint8_t VbiasPot = UC1609_DEFAULT_GN_PM );
     void LCDinit(void);
     void LCDPowerDown(void);

@@ -237,7 +237,7 @@ void ERM19264_UC1609_T::LCDDot(uint8_t col, uint8_t page)
 // careful with this: the function should only be called with upper case letters. No symbols, no numbers, no lower case.
 // Param1 : column 0-192
 // Param2  : page 0-7
-void ERM19264_UC1609_T::LCDString(char *characters, uint8_t col, uint8_t page)
+void ERM19264_UC1609_T::LCDString(const char *characters, uint8_t col, uint8_t page)
 {
   uint8_t i = 0;
   while (*characters)
