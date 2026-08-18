@@ -471,6 +471,11 @@ void enter_shift_h(__attribute__ ((unused)) uint8_t keycode) {
 void enter_calc_mode(__attribute__ ((unused)) uint8_t keycode)
 {
   current_calc_prog_config_mode = calc_mode;
+  LCDDrawStackAndMem();      // also clears the screen of whatever mode we're coming from
+  if (input.started)
+  {
+    LCDDrawInput();
+  }
   LCDDrawCalcStatus();
 }
 
@@ -478,13 +483,6 @@ void enter_prog_mode(__attribute__ ((unused)) uint8_t keycode)
 {
   current_calc_prog_config_mode = prog_mode;
   LCDDrawCalcStatus();
-}
-
-void enter_config_mode(__attribute__ ((unused)) uint8_t keycode)
-{
-  current_calc_prog_config_mode = config_mode;
-  // set current_config_screen variable = main_config_screen (enum)
-  LCDDrawCalcStatus(); // this should be a call to LCDDrawConfigScreen()
 }
 
 void enter_exp(__attribute__ ((unused)) uint8_t keycode) 

@@ -31,7 +31,8 @@
   extern bool mem_clear_mode;
   
   extern int shift;
-  
+  extern int current_calc_prog_config_mode;
+
   // Input structure typedef
   typedef struct {
     char mantissa[12];   // Mantissa digits array
@@ -72,7 +73,6 @@
   void enter_lastx(uint8_t keycode);
   void enter_clear(uint8_t keycode);
   void enter_calc_mode(uint8_t keycode);
-  void enter_config_mode(uint8_t keycode);
   void enter_prog_mode(uint8_t keycode);
   
   void apply_memory_rcl(uint8_t r, uint8_t c);
@@ -89,6 +89,7 @@
   void LCDDrawStackAndMem();
   void LCDDrawInput();
   void LCDDrawCalcStatus();
+  void LCDDrawNum(number_for_lcd *nfl, uint8_t page);
 
 #endif
 

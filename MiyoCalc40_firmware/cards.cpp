@@ -24,6 +24,7 @@ Using the calc_on_key function
 #include "fonts.h"
 #include "matrix.h"
 #include "calc.h"
+#include "config.h"
 
 // defines
 
@@ -119,6 +120,11 @@ const action ACT_CALC_MOD = {KC_NOP, &enter_calc_mode, {MCFNULCHAR, MCFNULCHAR, 
 const action ACT_CFG_MOD = {KC_NOP, &enter_config_mode, {MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR}};
 const action ACT_PROG_MOD = {KC_NOP, &enter_prog_mode, {MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR}};
 
+// config mode actions: none of these are programmable (all use KC_NOP as their keycode), since
+// none of the 'config mode' functions are expected to be recordable in a program.
+const action ACT_CFG_BATTVOLT = {KC_NOP, &config_show_battvolt, {'B' - MCFLETOFFSET, 'A' - MCFLETOFFSET, 'T' - MCFLETOFFSET, 'T' - MCFLETOFFSET, MCFNULCHAR}};
+const action ACT_CFG_EXIT = {KC_NOP, &config_cancel_exit, {'E' - MCFLETOFFSET, 'X' - MCFLETOFFSET, 'I' - MCFLETOFFSET, 'T' - MCFLETOFFSET, MCFNULCHAR}};
+
 #define x____x &ACT_NOP
 
 // define cards
@@ -162,12 +168,22 @@ const action *calc_cards[4][NUM_ROW_PINS][NUM_COLUMN_PINS] =
 
 
 // config mode cards
-const action *config_cards[NUM_ROW_PINS][NUM_COLUMN_PINS] = 
-  {   
+// layout per "ref card 40 x 6 plus notes - general scientific v2.svg" (bottom right, 'Config' section):
+//
+//   row  c0            c1              c2               c3            c4          c5           c6  c7  c8           c9
+//   0    max stk size  import pgm 1    import pgm all   -             down        up           -   7   8            9
+//   1    stk mode      export pgm 1    export pgm all   -             left        right        -   4   5            6
+//   2    lcd 1/2 col   time out        -                -             -           -            -   1   2            3
+//   3    de bounce     lcd contrast    back light       choose card   batt volt   soft reset    -   0   cancel/exit  confirm
+//
+// only 'batt volt' and 'cancel/exit' are wired up so far; the rest are placeholders (x____x) for
+// upcoming passes (backlight on/off + dimming is next).
+const action *config_cards[NUM_ROW_PINS][NUM_COLUMN_PINS] =
+  {
       {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
       {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
-      {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x}, 
-      {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x}
+      {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+      {       x____x,        x____x,        x____x,        x____x, &ACT_CFG_BATTVOLT,     x____x,        x____x,        x____x,   &ACT_CFG_EXIT,        x____x}
   };
 
 
@@ -199,25 +215,15 @@ keymap translation function: keytoaction(keypos)
 */
 action keytoaction()
 {
-  // if in calc mode (need to implement an 'if' or switch / case statement here)
-  // calc vs prog vs config mode could be an enum, variable name could be 'activemode'
-  return *calc_cards[shift][keypos_r][keypos_c]; // lookup action struct pointer in card and dereference it. will eventually add a first dimension for the active 'card', variable name could be 'activecard'
-
-/**
-  switch (current_calc_prog_config_mode) 
+  // prog_cards doesn't exist yet (programming mode is still design notes only, see
+  // programming.h), so prog_mode falls through to calc_cards for now -- this preserves today's
+  // behaviour, since ACT_PROG_MOD (f layer) is already reachable and prog_mode has no keymap of
+  // its own to switch to.
+  if (current_calc_prog_config_mode == config_mode)
   {
-    case calc_mode:
-      return *calc_cards[shift][keypos_r][keypos_c];
-      break;
-    case prog_mode:
-      return *prog_cards[shift][keypos_r][keypos_c];
-      break;
-    case config_mode:
-      return *config_cards[keypos_r][keypos_c];
-      break;
-    default:
-      return *calc_cards[shift][keypos_r][keypos_c];
+    return *config_cards[keypos_r][keypos_c];
   }
-**/  
-  
+  // lookup action struct pointer in card and dereference it. will eventually add a first
+  // dimension for the active 'card', variable name could be 'activecard'
+  return *calc_cards[shift][keypos_r][keypos_c];
 } // keytoaction()

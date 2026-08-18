@@ -12,7 +12,6 @@ void testStillNumbers();
 void testStillNumbers2();
 void testSomeText();
 void testSomeOtherText();
-void testBatteryVoltage();
 
 void setupMCU();
 void setupLCD();
