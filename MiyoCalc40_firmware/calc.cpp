@@ -109,7 +109,7 @@ void calc_init()
   current_calc_prog_config_mode = calc_mode;
   shift = baseLayer;  // base layer
   // double is 32-bit (float, ~7.2 honest decimal digits) on this toolchain unless
-  // -mdouble=64 is forced via platform.local.txt -- do NOT re-enable that flag without
+  // -mdouble=64 is forced via platform.local.txt -- do not enable that flag without
   // re-verifying log10()/floor()/round() on real hardware first: avr-gcc 14.3.0 /
   // avr-libc 2.2.1's libf7-based 64-bit math produced garbage exponents at runtime
   // (e.g. LCDNumber(3.0) computed _exponent ~ -22003) despite linking without errors.
@@ -192,11 +192,11 @@ void enter_number(uint8_t keycode)
 double convert_input()
 { int i;
   double number = 0.;
-  double shift = 1;
+  double place = 1;
 
   for(i=0; i<input.mpos; i++)
-  { number += input.mantissa[input.mpos-i-1]*shift;
-    shift *= 10;
+  { number += input.mantissa[input.mpos-i-1]*place;
+    place *= 10;
   }
   int exponent = 100*input.exponent[2] + 10*input.exponent[1] + input.exponent[0];
   if(input.expsign) exponent = -exponent;
@@ -858,7 +858,6 @@ void LCDDrawInput()
 
 //void LCDDrawCalcStatus() {}
 
-// TO DO: increase the size of the symbols from 6x6 pixels to 12x12 pixels instead, with a max of 5 symbols
 void LCDDrawCalcStatus()
 { // indicator area 1, degree mode
   switch(trigmode)

@@ -1,10 +1,12 @@
 # MiyoCalc40
+
 RPN calculator
 
 This is a project for a trough-hole only RPN calculator with a flexible configuration. The idea is for it to be minimalist, meant as a complement to other tools that the 
 user would typically have on hand (computer, formula cheat sheet, etc.) rather than as a replacement, and made with easy to solder through-hole components.
 
 I would like to give credit to the work of the following individuals which has served as inspiration for this project:
+
 - Alex Garza for work done on the Voyager form-factor RPN calculators: https://paxer.net/voyager/
 - Anton Poluektov for work done on the OpenRPNCalc calculator: https://github.com/apoluekt/OpenRPNCalc
 
@@ -18,7 +20,7 @@ The MiyoCalc40 **PCB work** is licensed under a
 [cc-by-nc-sa-shield]: https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg
 
 The MiyoCalc40 **Firmware** is licensed under the GNU General Public License version 3:
-Copyright (C) 2023 Jonathan Ferron
+Copyright (C) 2026 Jonathan Ferron
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

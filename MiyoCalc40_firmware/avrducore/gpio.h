@@ -5,10 +5,8 @@
 #include <stdint.h>
 
 /* Lightweight GPIO pin descriptor -- encodes a port + bitmask pair so
-   callers (lcd.h, matrix.cpp) can pass "a pin" around the way the Arduino
-   pin-number scheme they replace did, without an Arduino core underneath.
-   Mirrors KeyDU-Citrouille90/firmware/KeyDU.App/gpio.h, trimmed to only
-   what this project currently uses (no pullup/invert/ISC helpers yet --
+   callers (lcd.h, matrix.cpp) can pass "a pin" around.
+   Trimmed to only what this project currently uses (no pullup/invert/ISC helpers yet --
    matrix.cpp still configures those in bulk via direct PINCTRLSET writes). */
 typedef struct
 { uintptr_t port_addr;

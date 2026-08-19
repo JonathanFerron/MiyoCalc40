@@ -11,8 +11,7 @@ void spi_init(void)
                                                   is plain GPIO, not managed
                                                   by the SPI peripheral */
   SPI0.CTRLA = SPI_MASTER_bm | SPI_PRESC_DIV4_gc | SPI_ENABLE_bm;
-  /* master, CLK_PER/4 = 6MHz,
-     MSB-first (DORD left 0) */
+  /* master, CLK_PER/4 = 6MHz, MSB-first (DORD left 0) */
 } // spi_init
 
 void spi_disable(void)

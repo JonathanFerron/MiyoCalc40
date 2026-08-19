@@ -1,21 +1,6 @@
 /*
   cards.c
 
-  allow flexible config via cards
-
-  card = algebra, trig, fin, sci, eng, prob, computer science, woodworking, valuation, ...
-
-  for each card, can have a base layer, and multiple shift layers (f, g, h)
-
-*/
-
-/*
-  How this is done in OpenRPNCalc:
-  Using the calc_on_key function
-  switch case statement based on matrixkeypos code: this calls
-  the 'enter_key', change_trigmode (deg, rad), enter_shift (toggles f, g, h shift flags), change_dispmode (norm, sci, eng) or
-  change_precision (nbr of decimals to display) function to trigger the execution of the action
-
 */
 
 // includes
@@ -128,11 +113,10 @@ const action ACT_CFG_EXIT = {KC_NOP, &config_cancel_exit, {'E' - MCFLETOFFSET, '
 #define x____x &ACT_NOP
 
 // define cards
-// we should have 3 separate cards objects (calc_cards, prog_cards, config_cards)
+// we should have 3 separate cards objects (calc_cards, prog_cards, config_card)
 
 
 // calculator mode cards
-// to do: need to add one dimension to this table, as the first dimension, to allow for 'switching modes from algebra to trig to fin, etc'
 const action *calc_cards[4][NUM_ROW_PINS][NUM_COLUMN_PINS] =
 { [baseLayer] =
   { {    &ACT_SWAP, &ACT_ENTER, &ACT_DROPX, &ACT_ROLLDN, &ACT_FACT, &ACT_ABS, &ACT_ROOT, &ACT_7, &ACT_8, &ACT_9}, // 10 columns in row 0 (top)
@@ -164,20 +148,48 @@ const action *calc_cards[4][NUM_ROW_PINS][NUM_COLUMN_PINS] =
 };
 
 // programming mode cards
+const action *prog_cards[4][NUM_ROW_PINS][NUM_COLUMN_PINS] =
+{ [baseLayer] =
+  { {    x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+    {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+    {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+    {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x}
+  },
 
+  [fLayer] =
+  { {    x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+    {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+    {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+    {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x}
+  },
 
-// config mode cards
+  [gLayer] =
+  { {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+    {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+    {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+    {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x}
+  },
+
+  [hLayer] =
+  { {     x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+    {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+    {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+    {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x}
+  },
+};
+
+// config mode card
 // layout per "ref card 40 x 6 plus notes - general scientific v2.svg" (bottom right, 'Config' section):
 //
 //   row  c0            c1              c2               c3            c4          c5           c6  c7  c8           c9
-//   0    max stk size  import pgm 1    import pgm all   -             down        up           -   7   8            9
-//   1    stk mode      export pgm 1    export pgm all   -             left        right        -   4   5            6
+//   0    max stk size  import 1 pgm    import all pgm   -             down        up           -   7   8            9
+//   1    stk mode      export 1 pgm    export all pgm   -             left        right        -   4   5            6
 //   2    lcd 1/2 col   time out        -                -             -           -            -   1   2            3
-//   3    de bounce     lcd contrast    back light       choose card   batt volt   soft reset    -   0   cancel/exit  confirm
+//   3    debounce      lcd contrast    back light       -             batt volt   soft reset   -   0   cancel/exit  confirm
 //
 // only 'batt volt' and 'cancel/exit' are wired up so far; the rest are placeholders (x____x) for
-// upcoming passes (backlight on/off + dimming is next).
-const action *config_cards[NUM_ROW_PINS][NUM_COLUMN_PINS] =
+// upcoming passes (backlight on/off + dimming is next: backlight action to 'turn backlight config mode on', then use up and down keys to turn on / off and right / left keys to increase / decrease brightness (duty cycle)).
+const action *config_card[NUM_ROW_PINS][NUM_COLUMN_PINS] =
 { {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
   {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
   {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
@@ -194,14 +206,11 @@ const action *config_cards[NUM_ROW_PINS][NUM_COLUMN_PINS] =
 
   global variables used:
   mode: calc, prog, config
-    include ability to swap 'card' from config screen
-  configscreen: ... list out the various screens (only relevant in config mode)
-  f, g, h shift registers (true / false): for g, hit f twice; for h, hit h three times
 
   do this:
-  lookup from calccards, progcards, configcards matrices an 'action' structure:
+  lookup from calccards, progcards, configcard matrices an 'action' structure:
     each 'card' could each be n x 4 x 10 matrices (n being 4 for calc mode and prog mode for unshifted, then f, g,
-    and h, and n being the number of 'screens' that are presented in the config mode)
+    and h, and n being 1 in the config mode)
 
   action structure: contains a keycode (for programming mode, if it's an action that's programmable, otherwise NOP=0xFF),
     a function pointer to the implementation of the actual action (function to always take
@@ -213,11 +222,9 @@ const action *config_cards[NUM_ROW_PINS][NUM_COLUMN_PINS] =
 */
 action keytoaction()
 { // prog_cards doesn't exist yet (programming mode is still design notes only, see
-  // programming.h), so prog_mode falls through to calc_cards for now -- this preserves today's
-  // behaviour, since ACT_PROG_MOD (f layer) is already reachable and prog_mode has no keymap of
-  // its own to switch to.
+  // programming.h), so prog_mode falls through to calc_cards for now.
   if(current_calc_prog_config_mode == config_mode)
-    return *config_cards[keypos_r][keypos_c];
+    return *config_card[keypos_r][keypos_c];
   // lookup action struct pointer in card and dereference it. will eventually add a first
   // dimension for the active 'card', variable name could be 'activecard'
   return *calc_cards[shift][keypos_r][keypos_c];

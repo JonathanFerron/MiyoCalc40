@@ -10,11 +10,9 @@
    transaction in UC1609_CS_SetLow/High.
 
    Fixed configuration: MSB-first, SPI mode 0, CLK_PER/4. At F_CPU=24MHz
-   that's 6MHz -- matching what lcd.h previously requested from Arduino's
-   SPI library (SPI_FREQ 8MHz cap, fastest divider <= 8MHz available on a
-   24MHz clock). Write-only: the LCD is never read back, so spi_transfer()
+   that's 6MHz . Write-only: the LCD is never read back, so spi_transfer()
    is a synchronous full-duplex clock-out that the caller discards the
-   received byte from, same as the old `(void)SPI.transfer(byte)`. */
+   received byte from. */
 #ifdef __cplusplus
 extern "C"
 {

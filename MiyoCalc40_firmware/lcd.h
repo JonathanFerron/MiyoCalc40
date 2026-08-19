@@ -66,7 +66,7 @@
 // mS  datasheet FIG 11 wait >= 5mS  , Does not work on SW SPI blue
 #define UC1609_POWERON_DELAY3  0
 
- #define UC1609_INIT_DELAY 100 //  mS delay ,after init, 
+#define UC1609_INIT_DELAY 100 //  mS delay ,after init, 
 
 
 // No font
