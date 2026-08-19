@@ -1,5 +1,30 @@
+/*
+ * To build and flash the firmware: `make` then `make flash` from MiyoCalc40_firmware/ (see
+ * CLAUDE.md for the full make target list).
+ *
+ * main: main program loop
+ *
+ * matrix: matrix scanning code
+ *
+ * cards: contains mapping from matrix key positions to 'actions' for each 'mode' and 'card'
+ *
+ * calc: number crunching mode
+ *
+ * lcd: to control lcd
+ *   fonts: fonts bitmaps
+ *
+ * programming: programming mode
+ *
+ * config: configuration mode
+ *   backlight: to turn on/off backlight and set pwm duty cycle
+ *   util: to display battery voltage, etc
+ *
+ * avrducore: clock/CCP/fuses/GPIO/SPI0 -- replaces what the Arduino/DxCore core used to
+ *   provide silently (see CLAUDE.md)
+ */
+
  /* Other notes:
-  
+
   calc, config and programming mode: should be stored in a global status field that can be set and checked, could be an enum
   f, g, h shift modifiers: should each be a bool global variable that can be set and checked
   current config screen: should be stored in a global status fiels as well that can be set and checked, could be an enum (only relevant in 'config' mode)
