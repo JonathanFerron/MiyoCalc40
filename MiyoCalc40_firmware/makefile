@@ -1,15 +1,12 @@
 # ==============================================================================
 # MiyoCalc40 firmware — makefile
 #
-# Port off Arduino IDE + DxCore to a pure avr-gcc toolchain (see the plan file
-# for the full history). `make` builds a complete .hex with no Arduino/DxCore
-# dependency; `make flash`/`make flash_fuses` program it over UPDI.
+# Now using a pure avr-gcc toolchain
+# `make` builds a complete .hex
+# `make flash`/`make flash_fuses` program it over UPDI.
 # avrducore/ is a hand-rolled replacement for DxCore's init() and Arduino
-# core: clock_init() (CCP-protected clock setup), fuses.c (verified
-# byte-for-byte against the prior Arduino/DxCore build's fuse write), and
+# core: clock_init() (CCP-protected clock setup), fuses.c, and
 # spi.c/gpio.h (SPI0 + direct-register GPIO replacing <SPI.h>/digitalWrite).
-#
-# Conventions mirrored from /home/jonathan/projects/KeyDU-Citrouille90/firmware/makefile.
 # ==============================================================================
 
 MAKEFLAGS += -j$(shell nproc --ignore=2)
@@ -191,10 +188,7 @@ bear:
 
 FORMAT_SRC = $(wildcard *.cpp) $(wildcard *.h) $(wildcard avrducore/*.c) $(wildcard avrducore/*.h)
 
-# Uses .astylerc (run-in braces, 2-space indent — see KeyDU-Citrouille90 for
-# the convention this mirrors). NOTE: this project does not currently follow
-# that style, so a real `make format` run reformats nearly every file. Treat
-# that as a deliberate, isolated commit — don't run it incidentally.
+# Uses .astylerc (run-in braces, 2-space indent).
 format:
 	astyle --project --suffix=none $(FORMAT_SRC)
 

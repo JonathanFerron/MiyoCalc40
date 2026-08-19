@@ -16,7 +16,8 @@
    is a synchronous full-duplex clock-out that the caller discards the
    received byte from, same as the old `(void)SPI.transfer(byte)`. */
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 void spi_init(void);

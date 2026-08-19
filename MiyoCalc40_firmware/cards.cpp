@@ -2,18 +2,18 @@
   cards.c
 
   allow flexible config via cards
- 
+
   card = algebra, trig, fin, sci, eng, prob, computer science, woodworking, valuation, ...
 
   for each card, can have a base layer, and multiple shift layers (f, g, h)
 
 */
 
-/* 
-How this is done in OpenRPNCalc:
-Using the calc_on_key function
-  switch case statement based on matrixkeypos code: this calls 
-  the 'enter_key', change_trigmode (deg, rad), enter_shift (toggles f, g, h shift flags), change_dispmode (norm, sci, eng) or 
+/*
+  How this is done in OpenRPNCalc:
+  Using the calc_on_key function
+  switch case statement based on matrixkeypos code: this calls
+  the 'enter_key', change_trigmode (deg, rad), enter_shift (toggles f, g, h shift flags), change_dispmode (norm, sci, eng) or
   change_precision (nbr of decimals to display) function to trigger the execution of the action
 
 */
@@ -93,19 +93,19 @@ const action ACT_ATAN = {KC_ATAN, &apply_func_1to1, {'S' - MCFLETOFFSET, 'I' - M
 
 //const action ACT_BWAND = {KC_BWAND, &apply_func_2to1, {, , , ,}};
 //const action ACT_BWOR = {KC_BWOR, &apply_func_2to1, {, , , ,}};
-//const action ACT_BWXOR = {KC_BWXOR, &apply_func_2to1, {, , , ,}};	
-//const action ACT_BWNOT = {KC_BWNOT, &apply_func_1to1, {, , , ,}};	  
+//const action ACT_BWXOR = {KC_BWXOR, &apply_func_2to1, {, , , ,}};
+//const action ACT_BWNOT = {KC_BWNOT, &apply_func_1to1, {, , , ,}};
 
 //const action ACT_MODEBIN = {KC_MODEBIN, &change_nbr_rep_mode, {, , , ,}};
 //const action ACT_MODEOCT = {KC_MODEOCT, &change_nbr_rep_mode, {, , , ,}};
-//const action ACT_MODEDEC = {KC_MODEDEC, &change_nbr_rep_mode, {, , , ,}};	 
-//const action ACT_MODEHEX = {KC_MODEHEX, &change_nbr_rep_mode, {, , , ,}};	 
+//const action ACT_MODEDEC = {KC_MODEDEC, &change_nbr_rep_mode, {, , , ,}};
+//const action ACT_MODEHEX = {KC_MODEHEX, &change_nbr_rep_mode, {, , , ,}};
 
-const action ACT_MODERAD = {KC_MODERAD, &set_trig_mode, {'R' - MCFLETOFFSET, 'A' - MCFLETOFFSET, 'D' - MCFLETOFFSET, MCFNULCHAR, MCFNULCHAR}};	
-const action ACT_MODEDEG = {KC_MODEDEG, &set_trig_mode, {'D' - MCFLETOFFSET, 'E' - MCFLETOFFSET, 'G' - MCFLETOFFSET, MCFNULCHAR, MCFNULCHAR}};	
+const action ACT_MODERAD = {KC_MODERAD, &set_trig_mode, {'R' - MCFLETOFFSET, 'A' - MCFLETOFFSET, 'D' - MCFLETOFFSET, MCFNULCHAR, MCFNULCHAR}};
+const action ACT_MODEDEG = {KC_MODEDEG, &set_trig_mode, {'D' - MCFLETOFFSET, 'E' - MCFLETOFFSET, 'G' - MCFLETOFFSET, MCFNULCHAR, MCFNULCHAR}};
 
-//const action ACT_DATE = {KC_DATE, &apply_func_2to1, {, , , ,}};  
-//const action ACT_DATEDIFF = {KC_DATEDIFF, &apply_func_2to1, {, , , ,}};	
+//const action ACT_DATE = {KC_DATE, &apply_func_2to1, {, , , ,}};
+//const action ACT_DATEDIFF = {KC_DATEDIFF, &apply_func_2to1, {, , , ,}};
 
 const action ACT_NOP = {KC_NOP, &do_nothing, {'N' - MCFLETOFFSET, 'O' - MCFLETOFFSET, 'P' - MCFLETOFFSET, MCFNULCHAR, MCFNULCHAR}};
 
@@ -133,35 +133,34 @@ const action ACT_CFG_EXIT = {KC_NOP, &config_cancel_exit, {'E' - MCFLETOFFSET, '
 
 // calculator mode cards
 // to do: need to add one dimension to this table, as the first dimension, to allow for 'switching modes from algebra to trig to fin, etc'
-const action *calc_cards[4][NUM_ROW_PINS][NUM_COLUMN_PINS] = 
-{
-  [baseLayer] = 
-    { {    &ACT_SWAP,    &ACT_ENTER,    &ACT_DROPX,   &ACT_ROLLDN,     &ACT_FACT,      &ACT_ABS,     &ACT_ROOT,        &ACT_7,        &ACT_8,        &ACT_9}, // 10 columns in row 0 (top)
-      { &ACT_BKSCLRX,     &ACT_MULT,      &ACT_DIV,       &ACT_LN,  &ACT_CLRSTCK,   &ACT_CLRREG,      &ACT_POW,        &ACT_4,        &ACT_5,        &ACT_6}, // 10 columns in second row (row 1)
-      {  &ACT_SQUARE,      &ACT_ADD,     &ACT_SUBS,      &ACT_EXP,   &ACT_STOREG,   &ACT_RCLREG,   &ACT_CHGSGN,        &ACT_1,        &ACT_2,        &ACT_3}, 
-      {   &ACT_LASTX,  &ACT_MULTINV,     &ACT_SQRT,      &ACT_SIN,       &ACT_PI,      &ACT_COS,      &ACT_TAN,        &ACT_0,    &ACT_POINT,   &ACT_SHFT_F}
-    },
-    
-  [fLayer] = 
-    { {       x____x,        x____x,        x____x,   &ACT_ROLLUP,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
-      {       x____x,        x____x,        x____x,        x____x, &ACT_PROG_MOD,        x____x,        x____x,        x____x,        x____x,        x____x},
-      {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x}, 
-      {       x____x,        x____x,        x____x,     &ACT_ASIN, &ACT_PWR_DOWN,     &ACT_ACOS,     &ACT_ATAN,  &ACT_MODERAD,  &ACT_MODEDEG,   &ACT_SHFT_G}
-    },
-    
-  [gLayer] = 
-    { {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
-      {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
-      {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x}, 
-      {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,   &ACT_SHFT_H}
-    },
-    
+const action *calc_cards[4][NUM_ROW_PINS][NUM_COLUMN_PINS] =
+{ [baseLayer] =
+  { {    &ACT_SWAP, &ACT_ENTER, &ACT_DROPX, &ACT_ROLLDN, &ACT_FACT, &ACT_ABS, &ACT_ROOT, &ACT_7, &ACT_8, &ACT_9}, // 10 columns in row 0 (top)
+    { &ACT_BKSCLRX, &ACT_MULT, &ACT_DIV, &ACT_LN, &ACT_CLRSTCK, &ACT_CLRREG, &ACT_POW, &ACT_4, &ACT_5, &ACT_6}, // 10 columns in second row (row 1)
+    {  &ACT_SQUARE, &ACT_ADD, &ACT_SUBS, &ACT_EXP, &ACT_STOREG, &ACT_RCLREG, &ACT_CHGSGN, &ACT_1, &ACT_2, &ACT_3},
+    {   &ACT_LASTX, &ACT_MULTINV, &ACT_SQRT, &ACT_SIN, &ACT_PI, &ACT_COS, &ACT_TAN, &ACT_0, &ACT_POINT, &ACT_SHFT_F}
+  },
+
+  [fLayer] =
+  { {       x____x,        x____x,        x____x, &ACT_ROLLUP,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+    {       x____x,        x____x,        x____x,        x____x, &ACT_PROG_MOD,        x____x,        x____x,        x____x,        x____x,        x____x},
+    {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+    {       x____x,        x____x,        x____x, &ACT_ASIN, &ACT_PWR_DOWN, &ACT_ACOS, &ACT_ATAN, &ACT_MODERAD, &ACT_MODEDEG, &ACT_SHFT_G}
+  },
+
+  [gLayer] =
+  { {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+    {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+    {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+    {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x, &ACT_SHFT_H}
+  },
+
   [hLayer] =
-    { {       x____x,        x____x,        x____x,        x____x,  &ACT_CFG_MOD,        x____x,        x____x,        x____x,        x____x,        x____x},
-      {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
-      {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x}, 
-      {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,   &ACT_SHFT_B}
-    },
+  { {       x____x,        x____x,        x____x,        x____x, &ACT_CFG_MOD,        x____x,        x____x,        x____x,        x____x,        x____x},
+    {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+    {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+    {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x, &ACT_SHFT_B}
+  },
 };
 
 // programming mode cards
@@ -179,19 +178,18 @@ const action *calc_cards[4][NUM_ROW_PINS][NUM_COLUMN_PINS] =
 // only 'batt volt' and 'cancel/exit' are wired up so far; the rest are placeholders (x____x) for
 // upcoming passes (backlight on/off + dimming is next).
 const action *config_cards[NUM_ROW_PINS][NUM_COLUMN_PINS] =
-  {
-      {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
-      {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
-      {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
-      {       x____x,        x____x,        x____x,        x____x, &ACT_CFG_BATTVOLT,     x____x,        x____x,        x____x,   &ACT_CFG_EXIT,        x____x}
-  };
+{ {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+  {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+  {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+  {       x____x,        x____x,        x____x,        x____x, &ACT_CFG_BATTVOLT,     x____x,        x____x,        x____x, &ACT_CFG_EXIT,        x____x}
+};
 
 
 // function definitions
 
 // from keypos_r and keypos_c (global variables), return an action structure, via a lookup of the keypos from the currently active card
 /*
-keymap translation function: keytoaction(keypos)
+  keymap translation function: keytoaction(keypos)
   keypos: row and column number of key that was pressed, see matrix.c
 
   global variables used:
@@ -201,28 +199,25 @@ keymap translation function: keytoaction(keypos)
   f, g, h shift registers (true / false): for g, hit f twice; for h, hit h three times
 
   do this:
-  lookup from calccards, progcards, configcards matrices an 'action' structure: 
-    each 'card' could each be n x 4 x 10 matrices (n being 4 for calc mode and prog mode for unshifted, then f, g, 
+  lookup from calccards, progcards, configcards matrices an 'action' structure:
+    each 'card' could each be n x 4 x 10 matrices (n being 4 for calc mode and prog mode for unshifted, then f, g,
     and h, and n being the number of 'screens' that are presented in the config mode)
 
-  action structure: contains a keycode (for programming mode, if it's an action that's programmable, otherwise NOP=0xFF), 
+  action structure: contains a keycode (for programming mode, if it's an action that's programmable, otherwise NOP=0xFF),
     a function pointer to the implementation of the actual action (function to always take
-    one single argument, the keycode, though it may at time not be used, argument to be 
-    looked up and then 'provided' to the function called via the pointer), and a 'mnemonic' for the programming mode 
+    one single argument, the keycode, though it may at time not be used, argument to be
+    looked up and then 'provided' to the function called via the pointer), and a 'mnemonic' for the programming mode
     (uint8 matrix containing indexes of different characters from the 'font' table)
 
   return: the action structure
 */
 action keytoaction()
-{
-  // prog_cards doesn't exist yet (programming mode is still design notes only, see
+{ // prog_cards doesn't exist yet (programming mode is still design notes only, see
   // programming.h), so prog_mode falls through to calc_cards for now -- this preserves today's
   // behaviour, since ACT_PROG_MOD (f layer) is already reachable and prog_mode has no keymap of
   // its own to switch to.
-  if (current_calc_prog_config_mode == config_mode)
-  {
+  if(current_calc_prog_config_mode == config_mode)
     return *config_cards[keypos_r][keypos_c];
-  }
   // lookup action struct pointer in card and dereference it. will eventually add a first
   // dimension for the active 'card', variable name could be 'activecard'
   return *calc_cards[shift][keypos_r][keypos_c];

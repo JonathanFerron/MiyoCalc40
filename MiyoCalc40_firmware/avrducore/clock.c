@@ -18,7 +18,7 @@ void clock_init(void)
                   CLKCTRL_FRQSEL_24M_gc);
 
   /* Wait for OSCHF to lock before any peripheral init */
-  while (!(CLKCTRL.MCLKSTATUS & CLKCTRL_OSCHFS_bm))
+  while(!(CLKCTRL.MCLKSTATUS & CLKCTRL_OSCHFS_bm))
     ;
 
   /* CPUINT: default priority, no round-robin, no compact vectors */

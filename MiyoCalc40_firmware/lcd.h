@@ -1,9 +1,9 @@
 /*
- * Based in part on code from the ERM19264_UC1609 project by Gavin Lyons: https://github.com/gavinlyonsrepo/ERM19264_UC1609
- * 
- * 
- */
- 
+   Based in part on code from the ERM19264_UC1609 project by Gavin Lyons: https://github.com/gavinlyonsrepo/ERM19264_UC1609
+
+
+*/
+
 #ifndef LCD_H
 #define LCD_H
 
@@ -21,9 +21,9 @@
 #define UC1609_GET_STATUS 0xFE
 
 // UC1909 Write registers
-#define UC1609_SYSTEM_RESET 0xE2 
+#define UC1609_SYSTEM_RESET 0xE2
 
-#define UC1609_POWER_CONTROL 0x28 
+#define UC1609_POWER_CONTROL 0x28
 #define UC1609_PC_SET 0x06 // PC[2:0] 110 Internal V LCD (7x charge pump) + 10b: 1.4mA
 
 #define UC1609_ADDRESS_CONTROL 0x88 // set RAM address control
@@ -60,20 +60,20 @@
 // Delays
 // Delays
 // mS , datasheet FIG 11 wait <=  3mS
-#define UC1609_POWERON_DELAY1  3 
- // mS, datasheet FIG 11 wait >=  3uS
+#define UC1609_POWERON_DELAY1  3
+// mS, datasheet FIG 11 wait >=  3uS
 #define UC1609_POWERON_DELAY2  50
-// mS  datasheet FIG 11 wait >= 5mS  , Does not work on SW SPI blue 
-#define UC1609_POWERON_DELAY3  0 
+// mS  datasheet FIG 11 wait >= 5mS  , Does not work on SW SPI blue
+#define UC1609_POWERON_DELAY3  0
 
-#define UC1609_INIT_DELAY 100 //  mS delay ,after init, 
+ #define UC1609_INIT_DELAY 100 //  mS delay ,after init, 
 
 
 // No font
 #ifdef UC_FONT_MOD_ONE
-	#define UC1609_ASCII_OFFSET 0x00
+  #define UC1609_ASCII_OFFSET 0x00
 #else
-	#define UC1609_ASCII_OFFSET 0x20 //0x20, ASCII character for Space
+  #define UC1609_ASCII_OFFSET 0x20 //0x20, ASCII character for Space
 #endif
 
 #define UC1609_FONTPADDING  send_data(0x00)
@@ -93,49 +93,50 @@
 const uint8_t LCD_WIDTH = 192;
 const uint8_t LCD_HEIGHT = 64;
 
-//class 
-class ERM19264_UC1609_T {
-  public:
-     // Contructor 1 Software SPI with explicit SCLK and SDIN
-    ERM19264_UC1609_T(int8_t cd, int8_t rst, int8_t cs, int8_t sclk, int8_t din);
-    // Constructor 2 Hardware SPI
-    ERM19264_UC1609_T(gpio_pin_t cd, gpio_pin_t rst, gpio_pin_t cs);
+//class
+class ERM19264_UC1609_T
+{
+public:
+  // Contructor 1 Software SPI with explicit SCLK and SDIN
+  ERM19264_UC1609_T(int8_t cd, int8_t rst, int8_t cs, int8_t sclk, int8_t din);
+  // Constructor 2 Hardware SPI
+  ERM19264_UC1609_T(gpio_pin_t cd, gpio_pin_t rst, gpio_pin_t cs);
 
-    ~ERM19264_UC1609_T(){};
+  ~ERM19264_UC1609_T() {};
 
-    void LCDGotoXY(uint8_t column , uint8_t page);
-    //void LCDChar(unsigned char character);
-    void LCDString(const char *characters, uint8_t col, uint8_t page);
-    void LCDbegin(uint8_t VbiasPot = UC1609_DEFAULT_GN_PM );
-    void LCDinit(void);
-    void LCDPowerDown(void);
-    void FullLCDPowerDown(void);
-    void LCDEnable(uint8_t on);
-    void LCDFillScreen(uint8_t pixel, uint8_t mircodelay);
-    void LCDFillPage(uint8_t pixels);
-    //void LCDrotate(uint8_t rotatevalue);
-    //void LCDinvertDisplay(uint8_t on);
-    //void LCDAllpixelsOn(uint8_t bits);
-    //void LCDscroll(uint8_t bits);
-    void LCDBitmap(int16_t x, int16_t y, uint8_t w, uint8_t h, const uint8_t* data);
-    void LCDSetContrast(uint8_t cont);
-    void LCDChar(uint8_t index, uint8_t col, uint8_t page);
-    void LCDDot(uint8_t col, uint8_t page);
-    void LCDCharSeq(uint8_t indexes[], uint8_t size, uint8_t col, uint8_t page);
-           
-  private:
+  void LCDGotoXY(uint8_t column, uint8_t page);
+  //void LCDChar(unsigned char character);
+  void LCDString(const char* characters, uint8_t col, uint8_t page);
+  void LCDbegin(uint8_t VbiasPot = UC1609_DEFAULT_GN_PM);
+  void LCDinit(void);
+  void LCDPowerDown(void);
+  void FullLCDPowerDown(void);
+  void LCDEnable(uint8_t on);
+  void LCDFillScreen(uint8_t pixel, uint8_t mircodelay);
+  void LCDFillPage(uint8_t pixels);
+  //void LCDrotate(uint8_t rotatevalue);
+  //void LCDinvertDisplay(uint8_t on);
+  //void LCDAllpixelsOn(uint8_t bits);
+  //void LCDscroll(uint8_t bits);
+  void LCDBitmap(int16_t x, int16_t y, uint8_t w, uint8_t h, const uint8_t* data);
+  void LCDSetContrast(uint8_t cont);
+  void LCDChar(uint8_t index, uint8_t col, uint8_t page);
+  void LCDDot(uint8_t col, uint8_t page);
+  void LCDCharSeq(uint8_t indexes[], uint8_t size, uint8_t col, uint8_t page);
 
-    void send_data(uint8_t data);
-    void send_command(uint8_t command, uint8_t value);
-    //bool isHardwareSPI(void);
-    //void CustomshiftOut(uint8_t bitOrder, uint8_t val);
+private:
 
-    gpio_pin_t _LCD_CS;
-    gpio_pin_t _LCD_CD;
-    gpio_pin_t _LCD_RST;
-    //int8_t _LCD_SCLK; // Software SPI only
-    //int8_t _LCD_DIN;  // Software SPI only
-    uint8_t _VbiasPOT; // Contrast default 0x49 datasheet 00-FE
+  void send_data(uint8_t data);
+  void send_command(uint8_t command, uint8_t value);
+  //bool isHardwareSPI(void);
+  //void CustomshiftOut(uint8_t bitOrder, uint8_t val);
+
+  gpio_pin_t _LCD_CS;
+  gpio_pin_t _LCD_CD;
+  gpio_pin_t _LCD_RST;
+  //int8_t _LCD_SCLK; // Software SPI only
+  //int8_t _LCD_DIN;  // Software SPI only
+  uint8_t _VbiasPOT; // Contrast default 0x49 datasheet 00-FE
 };
 
 #endif

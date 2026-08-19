@@ -1,14 +1,15 @@
 // backlight.h
 #ifdef __cplusplus
-  extern "C" {
+extern "C"
+{
 #endif
 
 #ifndef BACKLIGHT_H
-  #define BACKLIGHT_H
+#define BACKLIGHT_H
 
 
 #endif
 
 #ifdef __cplusplus
-  }
+}
 #endif

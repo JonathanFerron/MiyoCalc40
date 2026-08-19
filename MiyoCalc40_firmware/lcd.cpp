@@ -1,9 +1,9 @@
-/* 
- * In part borrowed from the ERM19264_UC1609 project by Gavin Lyons: https://github.com/gavinlyonsrepo/ERM19264_UC1609
- * ERM19264 LCD driven by UC1609C controller
- * 
- * LCD draws about 270 to 290 uA at 3.2V (higher number is when more pixels are 'on')
- */
+/*
+   In part borrowed from the ERM19264_UC1609 project by Gavin Lyons: https://github.com/gavinlyonsrepo/ERM19264_UC1609
+   ERM19264 LCD driven by UC1609C controller
+
+   LCD draws about 270 to 290 uA at 3.2V (higher number is when more pixels are 'on')
+*/
 
 #include <util/delay.h>
 
@@ -15,18 +15,16 @@
 // Class Constructors
 // Hardware SPI
 ERM19264_UC1609_T  :: ERM19264_UC1609_T(gpio_pin_t cd, gpio_pin_t rst, gpio_pin_t cs)
-{
-  _LCD_CD = cd;
+{ _LCD_CD = cd;
   _LCD_RST= rst;
   _LCD_CS = cs;
 }
 
-// Desc: begin Method initialise LCD 
+// Desc: begin Method initialise LCD
 // Sets pinmodes and SPI setup
 // Param1: VBiasPOT default = 0x49 , range 0x00 to 0xFE
-void ERM19264_UC1609_T::LCDbegin(uint8_t VbiasPOT) 
-{
-  GPIO_SET_OUTPUT(_LCD_CD);
+void ERM19264_UC1609_T::LCDbegin(uint8_t VbiasPOT)
+{ GPIO_SET_OUTPUT(_LCD_CD);
   GPIO_SET_OUTPUT(_LCD_RST);
   GPIO_SET_OUTPUT(_LCD_CS);
   _VbiasPOT  = VbiasPOT;
@@ -36,10 +34,9 @@ void ERM19264_UC1609_T::LCDbegin(uint8_t VbiasPOT)
 
 // Desc: Called from LCDbegin carries out Power on sequence and register init
 void ERM19264_UC1609_T::LCDinit()
-{
-  UC1609_CD_SetHigh;
+{ UC1609_CD_SetHigh;
   UC1609_CS_SetHigh;
-  
+
   _delay_ms(UC1609_POWERON_DELAY1);
   UC1609_RST_SetLow;
   _delay_ms(UC1609_POWERON_DELAY2);
@@ -48,19 +45,19 @@ void ERM19264_UC1609_T::LCDinit()
 
   UC1609_CS_SetLow;
 
-  send_command(UC1609_TEMP_COMP_REG, UC1609_TEMP_COMP_SET); 
-  send_command(UC1609_ADDRESS_CONTROL, UC1609_ADDRESS_SET); 
+  send_command(UC1609_TEMP_COMP_REG, UC1609_TEMP_COMP_SET);
+  send_command(UC1609_ADDRESS_CONTROL, UC1609_ADDRESS_SET);
   send_command(UC1609_FRAMERATE_REG, UC1609_FRAMERATE_SET);
-  send_command(UC1609_BIAS_RATIO, UC1609_BIAS_RATIO_SET);  
+  send_command(UC1609_BIAS_RATIO, UC1609_BIAS_RATIO_SET);
   send_command(UC1609_POWER_CONTROL,  UC1609_PC_SET);
   _delay_ms(UC1609_INIT_DELAY);
-  
+
   send_command(UC1609_GN_PM, 0);
   send_command(UC1609_GN_PM, _VbiasPOT); //  changed by user
-  
+
   send_command(UC1609_DISPLAY_ON, 0x01); // turn on display
-  send_command(UC1609_LCD_CONTROL, UC1609_ROTATION_NORMAL); // rotate to normal 
-  
+  send_command(UC1609_LCD_CONTROL, UC1609_ROTATION_NORMAL); // rotate to normal
+
   UC1609_CS_SetHigh;
 }
 
@@ -68,9 +65,8 @@ void ERM19264_UC1609_T::LCDinit()
 // Desc: Sends a command to the display
 // Param1: the command
 // Param2: the values to change
-void ERM19264_UC1609_T::send_command(uint8_t command, uint8_t value) 
-{
-  UC1609_CD_SetLow; 
+void ERM19264_UC1609_T::send_command(uint8_t command, uint8_t value)
+{ UC1609_CD_SetLow;
   send_data(command | value);
   UC1609_CD_SetHigh;
 }
@@ -78,63 +74,53 @@ void ERM19264_UC1609_T::send_command(uint8_t command, uint8_t value)
 
 // Desc: turns in display
 // Param1: bits 1  on , 0 off
-void ERM19264_UC1609_T::LCDEnable(uint8_t bits) 
-{
- UC1609_CS_SetLow;
+void ERM19264_UC1609_T::LCDEnable(uint8_t bits)
+{ UC1609_CS_SetLow;
   send_command(UC1609_DISPLAY_ON, bits);
- UC1609_CS_SetHigh;
+  UC1609_CS_SetHigh;
 }
 
 
 // Desc: Powerdown procedure for LCD see datasheet P40
 void ERM19264_UC1609_T::LCDPowerDown(void)
-{
-  UC1609_RST_SetLow;
+{ UC1609_RST_SetLow;
   _delay_ms(1);  // datasheet FIG 14 says >= 3uS
   UC1609_RST_SetHigh;
   LCDEnable(0);
 }
 
 void ERM19264_UC1609_T::FullLCDPowerDown(void)
-{
-  LCDPowerDown();
+{ LCDPowerDown();
   UC1609_CS_SetLow;
   UC1609_RST_SetLow;
   UC1609_CD_SetLow;
   spi_disable();
 }
 
-// Desc: Fill the screen with a datapattern 
+// Desc: Fill the screen with a datapattern
 // Param1: datapattern can be set to zero to clear screen (not buffer) range 0x00 to 0ff
 // Param2: optional delay in microseconds can be set to zero normally.
-void ERM19264_UC1609_T::LCDFillScreen(uint8_t dataPattern=0, uint8_t delay=0) 
-{
- UC1609_CS_SetLow;
+void ERM19264_UC1609_T::LCDFillScreen(uint8_t dataPattern=0, uint8_t delay=0)
+{ UC1609_CS_SetLow;
   uint16_t numofbytes = LCD_WIDTH * (LCD_HEIGHT /8); // width * height
-  for (uint16_t i = 0; i < numofbytes; i++)
-  {
-    send_data(dataPattern);
+  for(uint16_t i = 0; i < numofbytes; i++)
+  { send_data(dataPattern);
     // _delay_us() needs a compile-time constant; 'delay' is a runtime
     // uint8_t (always 0 at every current call site), so step it out
     // one microsecond at a time instead.
-    for (uint8_t us = 0; us < delay; us++)
-    {
+    for(uint8_t us = 0; us < delay; us++)
       _delay_us(1);
-    }
   }
-UC1609_CS_SetHigh;
+  UC1609_CS_SetHigh;
 }
 
-// Desc: Fill the chosen page(1-8)  with a datapattern 
+// Desc: Fill the chosen page(1-8)  with a datapattern
 // Param1: datapattern can be set to 0 to FF (not buffer)
-void ERM19264_UC1609_T::LCDFillPage(uint8_t dataPattern=0) 
-{
-  UC1609_CS_SetLow;
+void ERM19264_UC1609_T::LCDFillPage(uint8_t dataPattern=0)
+{ UC1609_CS_SetLow;
   uint16_t numofbytes = ((LCD_WIDTH * (LCD_HEIGHT /8))/8); // (width * height/8)/8 = 192 bytes
-  for (uint16_t i = 0; i < numofbytes; i++) 
-  {
+  for(uint16_t i = 0; i < numofbytes; i++)
     send_data(dataPattern);
-  }
   UC1609_CS_SetHigh;
 }
 
@@ -145,26 +131,25 @@ void ERM19264_UC1609_T::LCDFillPage(uint8_t dataPattern=0)
 //Param3: width 0-192
 //Param4 height 0-64
 //Param5 the bitmap
-void ERM19264_UC1609_T::LCDBitmap(int16_t x, int16_t y, uint8_t w, uint8_t h, const uint8_t* data) 
-{
-  UC1609_CS_SetLow;
+void ERM19264_UC1609_T::LCDBitmap(int16_t x, int16_t y, uint8_t w, uint8_t h, const uint8_t* data)
+{ UC1609_CS_SetLow;
 
-  uint8_t tx, ty; 
-  uint16_t offset = 0; 
+  uint8_t tx, ty;
+  uint16_t offset = 0;
   uint8_t column = (x < 0) ? 0 : x;
   uint8_t page = (y < 0) ? 0 : y >>3;
 
-  for (ty = 0; ty < h; ty = ty + 8) 
-  {
-    if (y + ty < 0 || y + ty >= LCD_HEIGHT) {continue;}
-    send_command(UC1609_SET_COLADD_LSB, (column & 0x0F)); 
+  for(ty = 0; ty < h; ty = ty + 8)
+  { if(y + ty < 0 || y + ty >= LCD_HEIGHT)
+      continue;
+    send_command(UC1609_SET_COLADD_LSB, (column & 0x0F));
     send_command(UC1609_SET_COLADD_MSB, (column & 0xF0) >> 4);
-    send_command(UC1609_SET_PAGEADD, page++); 
+    send_command(UC1609_SET_PAGEADD, page++);
 
-    for (tx = 0; tx < w; tx++) 
-    {
-      if (x + tx < 0 || x + tx >= LCD_WIDTH) {continue;}
-      offset = (w * (ty >> 3)) + tx; 
+    for(tx = 0; tx < w; tx++)
+    { if(x + tx < 0 || x + tx >= LCD_WIDTH)
+        continue;
+      offset = (w * (ty >> 3)) + tx;
       send_data(pgm_read_byte(&data[offset]));
     }
   }
@@ -174,19 +159,17 @@ void ERM19264_UC1609_T::LCDBitmap(int16_t x, int16_t y, uint8_t w, uint8_t h, co
 //Desc: Send data byte with SPI to UC1609C
 //Param1: the data byte
 void ERM19264_UC1609_T::send_data(uint8_t byte)
-{
-  (void)spi_transfer(byte); // Hardware SPI
+{ (void)spi_transfer(byte); // Hardware SPI
 }
 
 // Desc: goes to XY position
 // Param1 : column 0-192
 // Param2  : page 0-7
-void ERM19264_UC1609_T::LCDGotoXY(uint8_t column , uint8_t page)
-{
-  UC1609_CS_SetLow;
-  send_command(UC1609_SET_COLADD_LSB, (column & 0x0F)); 
+void ERM19264_UC1609_T::LCDGotoXY(uint8_t column, uint8_t page)
+{ UC1609_CS_SetLow;
+  send_command(UC1609_SET_COLADD_LSB, (column & 0x0F));
   send_command(UC1609_SET_COLADD_MSB, (column & 0xF0) >> 4);
-  send_command(UC1609_SET_PAGEADD, page++); 
+  send_command(UC1609_SET_PAGEADD, page++);
   UC1609_CS_SetHigh;
 }
 
@@ -194,48 +177,38 @@ void ERM19264_UC1609_T::LCDGotoXY(uint8_t column , uint8_t page)
 // Param : column 0-192
 // Param  : page 0-7
 void ERM19264_UC1609_T::LCDChar(uint8_t index, uint8_t col, uint8_t page)
-{
-  if (index == MCFNULCHAR) return;
-  
+{ if(index == MCFNULCHAR) return;
+
   UC1609_CS_SetLow;
-  send_command(UC1609_SET_COLADD_LSB, (col & 0x0F)); 
+  send_command(UC1609_SET_COLADD_LSB, (col & 0x0F));
   send_command(UC1609_SET_COLADD_MSB, (col & 0xF0) >> 4);
-  send_command(UC1609_SET_PAGEADD, page++); 
-  for (uint8_t column = 0 ; column <  MCFFONTWIDTH ; column++)
-  {
+  send_command(UC1609_SET_PAGEADD, page++);
+  for(uint8_t column = 0 ; column <  MCFFONTWIDTH ; column++)
     send_data(pgm_read_byte(MiyoCalcFont + index * MCFFONTWIDTH * 2 + column));
-  }
-  
-  send_command(UC1609_SET_COLADD_LSB, (col & 0x0F)); 
+
+  send_command(UC1609_SET_COLADD_LSB, (col & 0x0F));
   send_command(UC1609_SET_COLADD_MSB, (col & 0xF0) >> 4);
-  send_command(UC1609_SET_PAGEADD, page++); 
-  for (uint8_t column = 0 ; column <  MCFFONTWIDTH ; column++)
-  {
+  send_command(UC1609_SET_PAGEADD, page++);
+  for(uint8_t column = 0 ; column <  MCFFONTWIDTH ; column++)
     send_data(pgm_read_byte(MiyoCalcFont + index * MCFFONTWIDTH * 2 + MCFFONTWIDTH + column));
-  }
   UC1609_CS_SetHigh;
 }
 
 // Param1 : column 0-192
 // Param2  : page 0-7
 void ERM19264_UC1609_T::LCDDot(uint8_t col, uint8_t page)
-{
-  UC1609_CS_SetLow;
-  send_command(UC1609_SET_COLADD_LSB, (col & 0x0F)); 
+{ UC1609_CS_SetLow;
+  send_command(UC1609_SET_COLADD_LSB, (col & 0x0F));
   send_command(UC1609_SET_COLADD_MSB, (col & 0xF0) >> 4);
-  send_command(UC1609_SET_PAGEADD, page++); 
-  for (uint8_t column = 0 ; column <  3 ; column++)
-  {
+  send_command(UC1609_SET_PAGEADD, page++);
+  for(uint8_t column = 0 ; column <  3 ; column++)
     send_data(pgm_read_byte(MiyoCalcFont_Dot + column));
-  }
-  
-  send_command(UC1609_SET_COLADD_LSB, (col & 0x0F)); 
+
+  send_command(UC1609_SET_COLADD_LSB, (col & 0x0F));
   send_command(UC1609_SET_COLADD_MSB, (col & 0xF0) >> 4);
-  send_command(UC1609_SET_PAGEADD, page++); 
-  for (uint8_t column = 0 ; column <  3 ; column++)
-  {
+  send_command(UC1609_SET_PAGEADD, page++);
+  for(uint8_t column = 0 ; column <  3 ; column++)
     send_data(pgm_read_byte(MiyoCalcFont_Dot + 3 + column));
-  }
   UC1609_CS_SetHigh;
 }
 
@@ -245,28 +218,22 @@ void ERM19264_UC1609_T::LCDDot(uint8_t col, uint8_t page)
 // careful with this: the function should only be called with upper case letters. No symbols, no numbers, no lower case.
 // Param1 : column 0-192
 // Param2  : page 0-7
-void ERM19264_UC1609_T::LCDString(const char *characters, uint8_t col, uint8_t page)
-{
-  uint8_t i = 0;
-  while (*characters)
-  {
-    LCDChar(*characters++ - MCFLETOFFSET, col + i * (MCFFONTWIDTH + MCFFONTSPACER), page);
+void ERM19264_UC1609_T::LCDString(const char* characters, uint8_t col, uint8_t page)
+{ uint8_t i = 0;
+  while(*characters)
+  { LCDChar(*characters++ - MCFLETOFFSET, col + i * (MCFFONTWIDTH + MCFFONTSPACER), page);
     i++;
   }
 }
 
 void ERM19264_UC1609_T::LCDCharSeq(uint8_t indexes[], uint8_t size, uint8_t col, uint8_t page)
-{
-  for (uint8_t i=0; i < size; i++)
-  {
+{ for(uint8_t i=0; i < size; i++)
     LCDChar(indexes[i], col + i * (MCFFONTWIDTH + MCFFONTSPACER), page);
-  }
 }
 
 // set contrast, values from 0x0A to 0x20 tend to work well
 void ERM19264_UC1609_T::LCDSetContrast(uint8_t cont)
-{
-  UC1609_CD_SetLow;
+{ UC1609_CD_SetLow;
   UC1609_CS_SetLow;
   (void)spi_transfer(UC1609_GN_PM | 0);
   UC1609_CS_SetHigh;

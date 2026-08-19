@@ -1,6 +1,6 @@
 /* 'config mode' stuff
- *
- */
+
+*/
 #ifndef CONFIG_H
 #define CONFIG_H
 
@@ -10,8 +10,7 @@
 // implemented so far -- backlight_cfg_screen, contrast_cfg_screen, etc. are the next ones to
 // land, per the config layer layout (see the comment above config_cards in cards.cpp).
 enum config_screens
-{
-  main_cfg_screen = 0,
+{ main_cfg_screen = 0,
   battvolt_cfg_screen
 };
 

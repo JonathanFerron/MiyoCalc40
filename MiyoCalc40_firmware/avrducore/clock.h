@@ -11,7 +11,8 @@
 #endif
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /* Initialise CLKCTRL and CPUINT. Blocks until OSCHF is stable. */
