@@ -14,15 +14,19 @@
 */
 
 #include <stdbool.h>
+#include <avr/io.h>
+#include <avr/interrupt.h>
 #include <avr/sleep.h>
+#include <util/delay.h>
 
 #include "matrix.h"
 #include "lcd.h"
-#include "fonts.h"
 #include "main.h"
 #include "cards.h"
 #include "calc.h"
 #include "util.h"
+#include "clock.h"
+#include "gpio.h"
 
 #define LCD_Default_Contrast 0x0C // Default LCD constrast: 0x0A to 0x20 tend to work well. Consider renaming this to something like LCD_DEF_Contrast.
 
@@ -37,10 +41,11 @@
 */
 
 // uncomment for avr-da
-#define LCD_CS PIN_PA7  // AVR pin connected to LCD CS pin
-#define LCD_CD PIN_PA2 // AVR pin connected to LCD CD pin
-#define LCD_RST PIN_PA3 // AVR pin connected to LCD Reset pin
+#define LCD_CS GPIO_PIN(PORTA, 7)  // AVR pin connected to LCD CS pin
+#define LCD_CD GPIO_PIN(PORTA, 2) // AVR pin connected to LCD CD pin
+#define LCD_RST GPIO_PIN(PORTA, 3) // AVR pin connected to LCD Reset pin
 
+const gpio_pin_t BACKLIGHT_PIN = GPIO_PIN(PORTA, 1); // LCD LED backlight pin
 
 // Global variables
 ERM19264_UC1609_T  mylcd(LCD_CD, LCD_RST, LCD_CS); // construct object using hardware SPI: CD, RST, CS
@@ -48,10 +53,7 @@ ERM19264_UC1609_T  mylcd(LCD_CD, LCD_RST, LCD_CS); // construct object using har
 int lcdon;  // to track if lcd is turned on or not, to do: change this to 'calcon'
 
 int main() {
-//  onBeforeInit(); // Empty callback called before init but after the .init stuff. First normal code executed
-  init(); // implemented in wiring.c
-  // by default, dxcore enables TCA0 timers at startup to use with pwm. see megaavr/extras/refcallbacks.md
-//  initVariant();
+  clock_init(); // avrducore/clock.c: 24MHz OSCHF, no prescaler, CPUINT defaults
 
   /* Insert here any code that needs to run before interrupts are
    * enabled but after all other core initialization. */
@@ -129,20 +131,28 @@ ISR(PORTF_PORT_vect)
 void setupLCD()
 {
   mylcd.LCDbegin(LCD_Default_Contrast); // initialize the LCD
-  mylcd.LCDFillScreen(0x00, 0); // clear screen  
-  delay(50);
+  mylcd.LCDFillScreen(0x00, 0); // clear screen
+  _delay_ms(50);
   lcdon = true;
 }
 
 // pwm set-up on pin A1
 void setupBacklight()  // this should be moved to the backlight file
 {
-  pinMode(PIN_PA1, OUTPUT); // set LCD LED Backlight pin to output mode
+  GPIO_SET_OUTPUT(BACKLIGHT_PIN); // set LCD LED Backlight pin to output mode
   PORTMUX.TCAROUTEA = PORTMUX_TCA0_PORTA_gc;  // route TCA to port A for PWM. Pin PA1 is on WO1 (waveform output 1)
   // see ref_timers.md in dxcore documentation
   // tca0 is configured by default as 8 bit timer with 6 output channels (we'll only need one): this allows for 256 different values for the duty cycle
   // we'll use the default prescaler which should give a frequency of 1471 Hz (this is with a prescale of 64). Could be changed to a prescaler of 256, but then 
   // frequency may be too low at 368 Hz? This would be done via TCA0.SPLIT.CTRLA = (TCA0.SPLIT.CTRLA & ~(0b00001110)) | TCA_SPLIT_CLKSEL_DIV256_gc
+  //
+  // NOTE: this used to rely on DxCore's init() (init_TCA0()) to actually put TCA0 into split
+  // 8-bit PWM mode (CTRLD=SPLITM, LPER/HPER=0xFE, CTRLA=DIV64|ENABLE) -- that's gone now that
+  // DxCore is gone. Nothing in the current codebase drives a duty cycle yet (backlight on/off
+  // and dimming are still unimplemented -- see config.cpp's design notes and the unwired
+  // "back light" slot in cards.cpp's config_cards table), so PA1 is left as a plain GPIO output
+  // (driven low) rather than adding unexercised PWM init. Add the TCA0 split-mode setup above
+  // when the real backlight control lands.
 }
 
 
@@ -203,7 +213,7 @@ void loop()
 			break;
 		}
 		//lp_delay_ms(2);
-    delay(2);  // to-do: chg this to PIT based delay to save power
+    _delay_ms(2);  // to-do: chg this to PIT based delay to save power
 	}  // end for loop for debouncing
   
   // if key press is valid, then move on to scan and process key press
@@ -322,284 +332,9 @@ void loop()
   
 } // loop()
 
-// old loop() code for testing
-void loopTests() {
-  //testContrast();
-  //testStillNumbers();
-  //testStillNumbers2();  // rename to testStack()
-  //testActionsWithoutKeyboard();
-  // simulateInput();
-  //testSomeText();
-  testSomeOtherText();
-
-  // test backlight
-  //digitalWrite(PIN_PA1, HIGH);
-  //delay(10000);
-  //digitalWrite(PIN_PA1, LOW);
-//  testBitmap();
-} // loopOld()
-
-
 // Battery voltage measurement (setupBattVoltMonitor() / read_batt_voltage_mv()) now lives in
 // util.cpp, wired up to the 'config' mode battery-voltage screen (config.cpp). See util.cpp for
 // the derivation of the VDD-in-millivolts calculation and the peripheral setup this depends on.
-
-void loopTestBacklightPWM()
-{
-  for (int i = 0; i <= 10; i++)
-  {
-    int dutycycle = min(26*i, 254);
-    analogWrite(PIN_PA1, dutycycle);
-    mylcd.LCDFillScreen(0x00, 0); // clear screen
-    mylcd.LCDChar(dutycycle / 100, 0, 0);
-    mylcd.LCDChar((dutycycle % 100)/ 10, MCFFONTWIDTH+MCFFONTSPACER, 0);
-    mylcd.LCDChar(dutycycle % 10, (MCFFONTWIDTH+MCFFONTSPACER) * 2, 0);
-    delay(5000);
-  }  
-}
-
-// shows how we would print numbers when displaying 3 elements of the stack (X at bottom, Y in middle, and Z on top)
-// use this as a template for the DrawNum() function in calc.cpp (which will print to the LCD on a given page from a given number_for_lcd struct)
-void testStillNumbers()
-{
-  mylcd.LCDFillScreen(0x00, 0); // clear screen
-  /*
-  mylcd.LCDChar(3, 14*0, 0 * 3); // col 0-11, page 0-1
-  mylcd.LCDDot(14*1, 0*3); // col 14-16
-  mylcd.LCDChar(1, 14*1 + 5, 0 * 3); // col 19-30
-  mylcd.LCDChar(4, 14*2 + 5, 0 * 3); // col 33-44
-  mylcd.LCDChar(1, 14*3 + 5, 0 * 3); 
-  mylcd.LCDChar(5, 14*4 + 5 + 3, 0 * 3); 
-  mylcd.LCDChar(9, 14*5 + 5 + 3, 0 * 3); 
-  mylcd.LCDChar(2, 14*6 + 5 + 3, 0 * 3); 
-  mylcd.LCDChar(6, 14*7 + 5 + 3*2, 0 * 3);
-  mylcd.LCDChar(5, 14*8 + 5 + 3*2, 0 * 3);   
-  */
-  
-  /*
-  mylcd.LCDChar(3, 14*0, 0 * 3); // col 0-11, page 0-1
-  mylcd.LCDDot(14*1, 0*3); // col 14-16
-  mylcd.LCDChar(1, 14*1 + 5, 0 * 3); // col 19-30
-  mylcd.LCDChar(4, 14*2 + 5, 0 * 3); // col 33-44
-  mylcd.LCDChar(1, 14*3 + 5, 0 * 3); 
-  mylcd.LCDChar(5, 14*4 + 5 + 4, 0 * 3); 
-  mylcd.LCDChar(9, 14*5 + 5 + 4, 0 * 3); 
-  mylcd.LCDChar(2, 14*6 + 5 + 4, 0 * 3); 
-  mylcd.LCDChar(6, 14*7 + 5 + 4*2, 0 * 3);
-  mylcd.LCDChar(5, 14*8 + 5 + 4*2, 0 * 3);
-  */
-  
-  number_for_lcd numforlcdZ;
-  
-  numforlcdZ.digits[0] = 3; numforlcdZ.digits[1] = 1; numforlcdZ.digits[2] = 4;
-  numforlcdZ.digits[3] = 1; numforlcdZ.digits[4] = 5; numforlcdZ.digits[5] = 9;
-  numforlcdZ.digits[6] = 2; numforlcdZ.digits[7] = 6; numforlcdZ.digits[8] = 5;  
-  numforlcdZ.sign = 0;  // positive
-  numforlcdZ.dec_point_pos = 1;
-  numforlcdZ.num_digits = 9;
-  numforlcdZ.show_dec_point = true;
-  
-  uint8_t col = 0;
-  
-  for (uint8_t d = 0; d < numforlcdZ.num_digits; d++)
-  {
-    if (d == numforlcdZ.dec_point_pos && numforlcdZ.show_dec_point)
-    {
-      mylcd.LCDDot(col, ZLCDPAGE);
-      col += MCFDECPOINTWIDTH + MCFFONTSPACER;
-    }
-    
-    mylcd.LCDChar(numforlcdZ.digits[d], col, ZLCDPAGE);
-    col += MCFFONTWIDTH + MCFFONTSPACER;
-    
-    int8_t thousandcheck = d + 1 - numforlcdZ.dec_point_pos;
-    
-    if ( (thousandcheck % 3 == 0) && (thousandcheck != 0) )
-    {
-      col += MCFTHOUSANDSPACER;
-    }     
-  }
-  
-  if (numforlcdZ.dec_point_pos == numforlcdZ.num_digits && numforlcdZ.show_dec_point)
-  {
-    mylcd.LCDDot(col, ZLCDPAGE);
-  }
-  
-  /*
-  mylcd.LCDChar(5, 14*0, 1 * 3); // col 0, page 3-4
-  mylcd.LCDChar(6, 14*1, 1 * 3); // 
-  mylcd.LCDChar(0, 14*2+3, 1 * 3); // 
-  mylcd.LCDChar(0, 14*3+3, 1 * 3); // 
-  mylcd.LCDChar(0, 14*4+3, 1 * 3); // 
-  mylcd.LCDChar(0, 14*5+3*2, 1 * 3); // 
-  mylcd.LCDChar(0, 14*6+3*2, 1 * 3); // 
-  mylcd.LCDChar(0, 14*7+3*2, 1 * 3); // 
-  
-  mylcd.LCDChar(2, 14*0, 2 * 3); // col 0, page 6-7
-  mylcd.LCDDot(14*1, 2*3); // col 14-16
-  mylcd.LCDChar(7, 14*1 + 5, 2 * 3); // col 19-30
-  mylcd.LCDChar(1, 14*2 + 5, 2 * 3); // col 33-44
-  mylcd.LCDChar(8, 14*3 + 5, 2 * 3); 
-  mylcd.LCDChar(2, 14*4 + 5 + 3, 2 * 3); 
-  mylcd.LCDChar(8, 14*5 + 5 + 3, 2 * 3); 
-  mylcd.LCDChar(1, 14*6 + 5 + 3, 2 * 3); 
-  mylcd.LCDChar(8, 14*7 + 5 + 3*2, 2 * 3);
-  mylcd.LCDChar(3, 14*8 + 5 + 3*2, 2 * 3);   
-  */
-  
-  
-  number_for_lcd numforlcdY;
-  
-  numforlcdY.digits[0] = 5; numforlcdY.digits[1] = 6; numforlcdY.digits[2] = 0;
-  numforlcdY.digits[3] = 0; numforlcdY.digits[4] = 0; numforlcdY.digits[5] = 0;
-  numforlcdY.digits[6] = 0; numforlcdY.digits[7] = 0;  
-  numforlcdY.sign = 0;  // positive
-  numforlcdY.dec_point_pos = 8;
-  numforlcdY.num_digits = 8;
-  numforlcdY.show_dec_point = false;
-  
-  col = 0;
-  
-  for (uint8_t d = 0; d < numforlcdY.num_digits; d++)
-  {
-    if (d == numforlcdY.dec_point_pos && numforlcdY.show_dec_point)
-    {
-      mylcd.LCDDot(col, YLCDPAGE);
-      col += MCFDECPOINTWIDTH + MCFFONTSPACER;
-    }
-    
-    mylcd.LCDChar(numforlcdY.digits[d], col, YLCDPAGE);
-    col += MCFFONTWIDTH + MCFFONTSPACER;
-    
-    int8_t thousandcheck = d + 1 - numforlcdY.dec_point_pos;
-    
-    if ( (thousandcheck % 3 == 0) && (thousandcheck != 0) )
-    {
-      col += MCFTHOUSANDSPACER;
-    }     
-  }
-  
-  if (numforlcdY.dec_point_pos == numforlcdY.num_digits && numforlcdY.show_dec_point)
-  {
-    mylcd.LCDDot(col, YLCDPAGE);
-  }
-  
-  number_for_lcd numforlcdX;
-  
-  numforlcdX.digits[0] = 2; numforlcdX.digits[1] = 7; numforlcdX.digits[2] = 1;
-  numforlcdX.digits[3] = 8; numforlcdX.digits[4] = 2; numforlcdX.digits[5] = 8;
-  numforlcdX.digits[6] = 1; numforlcdX.digits[7] = 8; numforlcdX.digits[8] = 3; 
-  numforlcdX.sign = 0;  // positive
-  numforlcdX.dec_point_pos = 0;
-  numforlcdX.num_digits = 9;
-  numforlcdX.show_dec_point = true;
-  
-  col = 0;
-  
-  for (uint8_t d = 0; d < numforlcdX.num_digits; d++)
-  {
-    if (d == numforlcdX.dec_point_pos && numforlcdX.show_dec_point)
-    {
-      mylcd.LCDDot(col, XLCDPAGE);
-      col += MCFDECPOINTWIDTH + MCFFONTSPACER;
-    }
-    
-    mylcd.LCDChar(numforlcdX.digits[d], col, XLCDPAGE);
-    col += MCFFONTWIDTH + MCFFONTSPACER;
-    
-    int8_t thousandcheck = d + 1 - numforlcdX.dec_point_pos;
-    
-    if ( (thousandcheck % 3 == 0) && (thousandcheck != 0) )
-    {
-      col += MCFTHOUSANDSPACER;
-    }     
-  }
-  
-  if (numforlcdX.dec_point_pos == numforlcdX.num_digits && numforlcdX.show_dec_point)
-  {
-    mylcd.LCDDot(col, XLCDPAGE);
-  }
-  
-  delay(20000);
-  
-  // how to show hex numbers
-  mylcd.LCDFillScreen(0x00, 0); // clear screen
-  mylcd.LCDChar(0xA, 14*0, 0 * 3); // col 0-14, page 0-1
-  mylcd.LCDChar(0xB, 14*1, 1 * 3); 
-  mylcd.LCDChar(0xC, 14*2, 2 * 3); 
-  mylcd.LCDChar(0xD, 14*3, 1 * 3); 
-  mylcd.LCDChar(0xE, 14*4, 0 * 3); 
-  mylcd.LCDChar(0xF, 14*5, 1 * 3); 
-   
-  delay(20000);
-} // testStillNumbers()
-
-// this shows how to change the contrast at run time to something other than the default
-void testContrast() {
-  for (byte c = 10; c <= 32; c++) {
-    char hexString[3];
-    char decString[4];    
-    sprintf(hexString, "0x%02X", c);
-    sprintf(decString, "%03d", c);    
-    mylcd.LCDSetContrast(c);  
-
-    //mylcd.LCDGotoXY(0, 0);
-    mylcd.LCDString(hexString, 0, 0);
-    //mylcd.LCDGotoXY(0, 1);
-    mylcd.LCDString(decString, 0, 3);
-   
-    //mylcd.LCDChar(c % 10);
-    //mylcd.LCDBitmap(0, 18, 14, 15, MiyoCalcFont_14x15[c]);
-    //mylcd.LCDBitmap(0, 48, 169, 16, testImage);
-    mylcd.LCDChar(c / 10, 0, 6);
-    mylcd.LCDChar(c % 10, 14, 6);
-
-    delay(1000);
-
-    //mylcd.LCDFillScreen(0x00, 0); // Clear the screen
-    //delay(50);    
-  }
-}
-
-
-// example of how to print logos, etc, on the LCD. may want to use for indicators such as degrees vs radiant, and 'shift' mode (f, g, h)
-void testBitmap() {
-  //mylcd.LCDBitmap(0, 24 , 16, 16, smallImage);
-  //mylcd.LCDBitmap(0,0,169,16,testImage);
-  //mylcd.LCDBitmap(0,24,169,16,testImage);
-  //mylcd.LCDBitmap(0,48,169,16,testImage);
-  
-  mylcd.LCDFillScreen(0x00, 0); // clear screen
-//  mylcd.LCDBitmap(0,0,176,16,MiyoCalcTemp1);
-//  mylcd.LCDBitmap(0,24,176,16,MiyoCalcTemp2);
-//  mylcd.LCDBitmap(0,48,176,16,MiyoCalcTemp3);
-  delay(5000);
-  
-  mylcd.LCDFillScreen(0x00, 0); // clear screen
-//  mylcd.LCDBitmap(0,0,62,16,MiyoCalcTemp4);
-  delay(5000);
-    
-}
-
-// example of how to print letters on the LCD. Also shows where the numbers would start when displaying 6 numbers on screen. (e.g. a full stack with X, Z, Z, T, U and V)
-void testSomeText() {
-  mylcd.LCDFillScreen(0x00, 0); // clear screen
-  mylcd.LCDChar(21, 0, 0); mylcd.LCDChar(21, 96, 0);  // TODO: make use of MCFLETOFFSET (replace hard-coded integer in first parameter by 'L' - MCFLETOFFSET, etc.)
-  mylcd.LCDChar(10, 0, 3); mylcd.LCDChar(19, 96, 3);
-  mylcd.LCDChar(23, 0, 6); mylcd.LCDChar(23, 96, 6);
-  delay(5000);
-}
-
-void testSomeOtherText()
-{
-  mylcd.LCDFillScreen(0x00, 0); // clear screen
-  mylcd.LCDString("MIYO", 0, 0);
-  mylcd.LCDString("CALC", 0, 3);
-  mylcd.LCDString("40", 0, 6);
-  uint8_t txt1[] = {35, 26, 33}; 
-  mylcd.LCDCharSeq(txt1, sizeof(txt1)/sizeof(txt1[0]), 96, 0);
-  delay(5000);
-}
 
 // if 'off' button (combination) was pressed (can tell based on action), power down lcd and configure 'sleep mode' to powerdown
 void power_down(__attribute__ ((unused)) uint8_t keycode)

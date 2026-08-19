@@ -1,0 +1,30 @@
+CompileFlags:
+  Remove:
+    - -mmcu=*
+    - -DF_CPU=*
+  Add:
+    - -I/usr/lib/avr/include
+    - -I/usr/lib/gcc/avr/14.3.0/include
+    - -D__AVR_AVR128DA28__
+    - -DF_CPU=24000000UL
+    - -D_SFR_ASM_COMPAT
+    - -D__AVR_ARCH__=104
+    - -D__AVR_DEVICE_NAME__=avr128da28
+    - -D__SFR_OFFSET=0x00
+    - -D__AVR__=1
+    - -D__AVR_2_BYTE_PC__=1
+    - -D__AVR_XMEGA__=1
+    - -D__AVR_MEGA__=1
+    - -D__AVR_ENHANCED__=1
+    - -D__AVR_HAVE_FLMAP__=1
+    - -D__AVR_HAVE_RAMPZ__=1
+    - -D__AVR_HAVE_SPH__=1
+    - -D__AVR_HAVE_16BIT_SP__=1
+    - -D__AVR_HAVE_ELPM__=1
+    - -D__AVR_HAVE_ELPMX__=1
+    - -D__AVR_HAVE_LPMX__=1
+    - -D__AVR_HAVE_ADIW__=1
+    - -D__AVR_SFR_OFFSET__=0x0
+    - -D__AVR_HAVE_JMP_CALL__=1
+    - -D__AVR_HAVE_MOVW__=1
+    - -D__AVR_HAVE_MUL__=1

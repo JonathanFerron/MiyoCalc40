@@ -47,8 +47,10 @@ Combine row and column into an int (e.g. 2 nibbles encoded in an uint8) or a set
 */
 
 // Includes
+#include <util/delay.h>
+
 #include "matrix.h"
-#include "Arduino.h"
+#include "gpio.h"
 
 // Defines
 //define number_of_columns and number_of_rows
@@ -56,14 +58,17 @@ Combine row and column into an int (e.g. 2 nibbles encoded in an uint8) or a set
 // Global variables
 //declare const for row pin and column pin arrays (contain pin numbers)
 // rows from top (keypos_r=0 for row 1) to bottom (keypos_r=3 for row 4)
-const uint8_t row_pin_array[NUM_ROW_PINS] = {
-		PIN_PD0, PIN_PD1, PIN_PD2, PIN_PD3};
+const gpio_pin_t row_pin_array[NUM_ROW_PINS] = {
+  GPIO_PIN(PORTD, 0), GPIO_PIN(PORTD, 1), GPIO_PIN(PORTD, 2), GPIO_PIN(PORTD, 3)};
 
 // columns from left (keypos_c=0 for col A) to right (keypos_c=9 for col J)
-const uint8_t column_pin_array[NUM_COLUMN_PINS] = {
-		PIN_PC0, PIN_PC1, PIN_PC2, PIN_PC3, PIN_PD4, PIN_PD5, PIN_PD6, PIN_PD7, PIN_PF1, PIN_PF0};
-    
-const uint8_t unused_pin_array[2] = {PIN_PA5, PIN_PA0};
+const gpio_pin_t column_pin_array[NUM_COLUMN_PINS] = {
+  GPIO_PIN(PORTC, 0), GPIO_PIN(PORTC, 1), GPIO_PIN(PORTC, 2), GPIO_PIN(PORTC, 3),
+  GPIO_PIN(PORTD, 4), GPIO_PIN(PORTD, 5), GPIO_PIN(PORTD, 6), GPIO_PIN(PORTD, 7),
+  GPIO_PIN(PORTF, 1), GPIO_PIN(PORTF, 0)};
+
+// PA0 and PA5 are unused pins; their digital input buffers are disabled
+// below (PORTA.PINCTRLSET = 0b00100001, i.e. bit0 | bit5).
 
 uint8_t keypos_r;
 uint8_t keypos_c;
@@ -124,11 +129,9 @@ Combine row and column into a keypos struct and return the result (global var ke
 void scanKB()
 {
   // read each column to find if one has been pulled low
-  // TODO: if necessary, look into optimizing this loop: could use digitalReadFast() if we were to unroll the loop to use constant pin numbers. 
-  // It does make the code harder to modify after, however.
-  for (uint8_t col = 0; col < NUM_COLUMN_PINS; col++)  
+  for (uint8_t col = 0; col < NUM_COLUMN_PINS; col++)
   {
-    if ( digitalRead(column_pin_array[col]) == LOW )  
+    if ( GPIO_READ(column_pin_array[col]) == 0 )
     {
       // we now know that 'c' is the column of the button pressed      
       
@@ -143,11 +146,24 @@ void scanKB()
       
       // set row pins as input
       PORTD.DIRTGL = PIN0_bm | PIN1_bm | PIN2_bm | PIN3_bm;
-      
+
+      // Let the row pins settle before reading them: they were just switched
+      // from driven-low output to input, and need time for the pull-up to
+      // charge the line back up to a valid high level (through whatever
+      // trace/diode capacitance sits on the row net) before a read is
+      // trustworthy. The Arduino/DxCore build had enough incidental overhead
+      // around this transition to mask the missing delay; this bare-metal
+      // build's leaner codegen does not -- without it, every row read landed
+      // on PD0 (row 0) regardless of which row was actually pressed, since
+      // that's the first row checked and the one most likely to still be
+      // mid-transition. 10us matches the design note this file already had
+      // for exactly this transition (see the "Open RPN Calc" notes above).
+      _delay_us(10);
+
       // Read each row to find which has been pulled low
       for (uint8_t row = 0; row < NUM_ROW_PINS; row++)
       {
-        if ( digitalRead(row_pin_array[row]) == LOW )
+        if ( GPIO_READ(row_pin_array[row]) == 0 )
         {
           // we now know that 'r' is the row of the button pressed
           // Combine row and column into a keypos struct and return the result (global var keypos)         

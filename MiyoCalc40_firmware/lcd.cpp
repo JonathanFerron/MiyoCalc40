@@ -5,13 +5,16 @@
  * LCD draws about 270 to 290 uA at 3.2V (higher number is when more pixels are 'on')
  */
 
+#include <util/delay.h>
+
 #include "lcd.h"
+#include "spi.h"
 
 #include "fonts.h"
 
 // Class Constructors
 // Hardware SPI
-ERM19264_UC1609_T  :: ERM19264_UC1609_T(int8_t cd, int8_t rst, int8_t cs) 
+ERM19264_UC1609_T  :: ERM19264_UC1609_T(gpio_pin_t cd, gpio_pin_t rst, gpio_pin_t cs)
 {
   _LCD_CD = cd;
   _LCD_RST= rst;
@@ -23,12 +26,11 @@ ERM19264_UC1609_T  :: ERM19264_UC1609_T(int8_t cd, int8_t rst, int8_t cs)
 // Param1: VBiasPOT default = 0x49 , range 0x00 to 0xFE
 void ERM19264_UC1609_T::LCDbegin(uint8_t VbiasPOT) 
 {
-  pinMode(_LCD_CD , OUTPUT);
-  pinMode(_LCD_RST, OUTPUT);
-  pinMode(_LCD_CS, OUTPUT);  
+  GPIO_SET_OUTPUT(_LCD_CD);
+  GPIO_SET_OUTPUT(_LCD_RST);
+  GPIO_SET_OUTPUT(_LCD_CS);
   _VbiasPOT  = VbiasPOT;
-  SPI.begin();
-  SPI.beginTransaction(SPISettings(SPI_FREQ, SPI_DIRECTION, SPI_UC1609_MODE));  
+  spi_init();
   LCDinit();
 }
 
@@ -38,11 +40,11 @@ void ERM19264_UC1609_T::LCDinit()
   UC1609_CD_SetHigh;
   UC1609_CS_SetHigh;
   
-  delay(UC1609_POWERON_DELAY1); 
+  _delay_ms(UC1609_POWERON_DELAY1);
   UC1609_RST_SetLow;
-  delay(UC1609_POWERON_DELAY2); 
+  _delay_ms(UC1609_POWERON_DELAY2);
   UC1609_RST_SetHigh;
-  delay(UC1609_POWERON_DELAY3);
+  _delay_ms(UC1609_POWERON_DELAY3);
 
   UC1609_CS_SetLow;
 
@@ -50,8 +52,8 @@ void ERM19264_UC1609_T::LCDinit()
   send_command(UC1609_ADDRESS_CONTROL, UC1609_ADDRESS_SET); 
   send_command(UC1609_FRAMERATE_REG, UC1609_FRAMERATE_SET);
   send_command(UC1609_BIAS_RATIO, UC1609_BIAS_RATIO_SET);  
-  send_command(UC1609_POWER_CONTROL,  UC1609_PC_SET); 
-  delay(UC1609_INIT_DELAY);
+  send_command(UC1609_POWER_CONTROL,  UC1609_PC_SET);
+  _delay_ms(UC1609_INIT_DELAY);
   
   send_command(UC1609_GN_PM, 0);
   send_command(UC1609_GN_PM, _VbiasPOT); //  changed by user
@@ -88,7 +90,7 @@ void ERM19264_UC1609_T::LCDEnable(uint8_t bits)
 void ERM19264_UC1609_T::LCDPowerDown(void)
 {
   UC1609_RST_SetLow;
-  delay(1);  // datasheet FIG 14 says >= 3uS
+  _delay_ms(1);  // datasheet FIG 14 says >= 3uS
   UC1609_RST_SetHigh;
   LCDEnable(0);
 }
@@ -99,7 +101,7 @@ void ERM19264_UC1609_T::FullLCDPowerDown(void)
   UC1609_CS_SetLow;
   UC1609_RST_SetLow;
   UC1609_CD_SetLow;
-  SPI.end();  
+  spi_disable();
 }
 
 // Desc: Fill the screen with a datapattern 
@@ -109,10 +111,16 @@ void ERM19264_UC1609_T::LCDFillScreen(uint8_t dataPattern=0, uint8_t delay=0)
 {
  UC1609_CS_SetLow;
   uint16_t numofbytes = LCD_WIDTH * (LCD_HEIGHT /8); // width * height
-  for (uint16_t i = 0; i < numofbytes; i++) 
+  for (uint16_t i = 0; i < numofbytes; i++)
   {
     send_data(dataPattern);
-    delayMicroseconds(delay);
+    // _delay_us() needs a compile-time constant; 'delay' is a runtime
+    // uint8_t (always 0 at every current call site), so step it out
+    // one microsecond at a time instead.
+    for (uint8_t us = 0; us < delay; us++)
+    {
+      _delay_us(1);
+    }
   }
 UC1609_CS_SetHigh;
 }
@@ -167,8 +175,8 @@ void ERM19264_UC1609_T::LCDBitmap(int16_t x, int16_t y, uint8_t w, uint8_t h, co
 //Param1: the data byte
 void ERM19264_UC1609_T::send_data(uint8_t byte)
 {
-  (void)SPI.transfer(byte); // Hardware SPI
-} 
+  (void)spi_transfer(byte); // Hardware SPI
+}
 
 // Desc: goes to XY position
 // Param1 : column 0-192
@@ -260,11 +268,11 @@ void ERM19264_UC1609_T::LCDSetContrast(uint8_t cont)
 {
   UC1609_CD_SetLow;
   UC1609_CS_SetLow;
-  (void)SPI.transfer(UC1609_GN_PM | 0);
+  (void)spi_transfer(UC1609_GN_PM | 0);
   UC1609_CS_SetHigh;
 
   UC1609_CD_SetLow;
   UC1609_CS_SetLow;
-  (void)SPI.transfer(UC1609_GN_PM | cont);
+  (void)spi_transfer(UC1609_GN_PM | cont);
   UC1609_CS_SetHigh;
 }

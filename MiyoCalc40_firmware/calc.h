@@ -81,9 +81,6 @@
   void toggle_mem_mode(uint8_t keycode);
   void set_trig_mode(uint8_t keycode);
   
-  void testStillNumbers2();
-  void testActionsWithoutKeyboard();
-  void simulateInput();
   double factorial(double x);
   
   void LCDDrawStackAndMem();

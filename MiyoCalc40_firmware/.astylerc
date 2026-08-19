@@ -1,0 +1,14 @@
+--style=run-in
+--indent=spaces=2
+--align-pointer=type
+--align-reference=name
+--remove-braces
+--remove-comment-prefix
+--indent-preproc-block
+--indent-preproc-define
+--indent-preproc-cond
+--min-conditional-indent=1
+--max-continuation-indent=120
+--unpad-paren
+--unpad-brackets
+--convert-tabs

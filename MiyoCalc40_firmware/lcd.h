@@ -7,8 +7,8 @@
 #ifndef LCD_H
 #define LCD_H
 
-#include "Arduino.h"
-#include <SPI.h>
+#include <stdint.h>
+#include "gpio.h"
 
 // Display Pixel colours   definition
 // black on white, FG = black BG = white
@@ -80,19 +80,14 @@
 #define UC1609_FONTWIDTH 5
 
 // GPIO
-#define UC1609_CS_SetHigh digitalWrite(_LCD_CS, HIGH)
-#define UC1609_CS_SetLow digitalWrite(_LCD_CS, LOW)
-#define UC1609_CD_SetHigh digitalWrite(_LCD_CD, HIGH)
-#define UC1609_CD_SetLow digitalWrite(_LCD_CD, LOW)
-#define UC1609_RST_SetHigh digitalWrite(_LCD_RST, HIGH)
-#define UC1609_RST_SetLow digitalWrite(_LCD_RST, LOW)
+#define UC1609_CS_SetHigh GPIO_HIGH(_LCD_CS)
+#define UC1609_CS_SetLow GPIO_LOW(_LCD_CS)
+#define UC1609_CD_SetHigh GPIO_HIGH(_LCD_CD)
+#define UC1609_CD_SetLow GPIO_LOW(_LCD_CD)
+#define UC1609_RST_SetHigh GPIO_HIGH(_LCD_RST)
+#define UC1609_RST_SetLow GPIO_LOW(_LCD_RST)
 
-// SPI
-#define SPI_FREQ 8000000 // Mhz (1000000 can be used on high freq MCU)
-#define SPI_DIRECTION  MSBFIRST 
-#define SPI_UC1609_MODE SPI_MODE0
-#define SPI_UC1609_CLOCK_DIV SPI_CLOCK_DIV8 //STM32 uses this 
-#define UC1609_HIGHFREQ_DELAY 0 // Can be used in software SPI for high freq MCU
+// SPI: frequency/mode are fixed in avrducore/spi.c (6MHz, MSB-first, mode 0)
 
 // Display  Size
 const uint8_t LCD_WIDTH = 192;
@@ -104,7 +99,7 @@ class ERM19264_UC1609_T {
      // Contructor 1 Software SPI with explicit SCLK and SDIN
     ERM19264_UC1609_T(int8_t cd, int8_t rst, int8_t cs, int8_t sclk, int8_t din);
     // Constructor 2 Hardware SPI
-    ERM19264_UC1609_T(int8_t cd, int8_t rst, int8_t cs);
+    ERM19264_UC1609_T(gpio_pin_t cd, gpio_pin_t rst, gpio_pin_t cs);
 
     ~ERM19264_UC1609_T(){};
 
@@ -135,9 +130,9 @@ class ERM19264_UC1609_T {
     //bool isHardwareSPI(void);
     //void CustomshiftOut(uint8_t bitOrder, uint8_t val);
 
-    int8_t _LCD_CS;
-    int8_t _LCD_CD;
-    int8_t _LCD_RST;
+    gpio_pin_t _LCD_CS;
+    gpio_pin_t _LCD_CD;
+    gpio_pin_t _LCD_RST;
     //int8_t _LCD_SCLK; // Software SPI only
     //int8_t _LCD_DIN;  // Software SPI only
     uint8_t _VbiasPOT; // Contrast default 0x49 datasheet 00-FE

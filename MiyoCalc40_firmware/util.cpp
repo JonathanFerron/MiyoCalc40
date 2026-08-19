@@ -1,4 +1,5 @@
-#include "Arduino.h"
+#include <avr/io.h>
+#include <util/delay.h>
 #include "util.h"
 
 /*
@@ -72,6 +73,25 @@ which is the case here), and Table 37-24 "ADC Conversion Timing Specifications" 
 not tested in production"), so a settle delay well above the typicals is used below, plus an
 extra conversion is thrown away before the one that's kept, as cheap additional insurance.
 
+Ported off Arduino/DxCore: DxCore's init() (wiring.c's init_ADC0(), called once at boot, before
+this project's own setup()) used to also set ADC0.SAMPCTRL = 14 (16 ADC-clock sample time) and
+ADC0.CTRLD = ADC_INITDLY_DLY64_gc (64 ADC-clock hardware-automatic delay, re-applied by the ADC
+itself on every disabled->enabled transition -- not just at boot). Neither was ever touched by
+this file, so both were silently in effect for the accuracy this code has already been hardware-
+verified against (3.208V here vs 3.218V DMM, on a LiFePO4 pack) -- removing DxCore means they
+must be set explicitly below, or that verified accuracy no longer applies as-is.
+
+DxCore's init_ADC0() additionally ran a DA-series errata workaround once at boot (MUXPOS=0x40,
+COMMAND=ADC_STCONV_bm, COMMAND=ADC_SPCONV_bm -- a start-then-abort dummy conversion), which is
+deliberately NOT ported here: it runs on MUXPOS 0x40 (an internal reference channel), not 0x49
+(DACREF0, what this file actually measures), it only ever ran once at power-up rather than before
+every reading, and DxCore's own comment flags it as tentative ("may become defined when DA-series
+silicon is available with the fix"). This file already discards one full conversion on the actual
+DACREF0 channel before every kept reading (below), which is the closer analogue for how this code
+is actually used -- so there is no clear mechanism by which the boot-time, wrong-channel dummy
+read would matter here. If a future measurement disagrees with a DMM by more than the ~10mV
+already observed, revisit this.
+
 */
 
 // See setupMCU() in main.cpp for the rest of the ADC/AC/VREF peripheral map -- this only
@@ -83,6 +103,8 @@ void setupBattVoltMonitor()
   AC0.DACREF = 128;                        // DACREF0 = (128/256) * VDD = VDD / 2
   ADC0.MUXPOS = ADC_MUXPOS_DACREF0_gc;     // Measure DACREF0
   ADC0.CTRLC = ADC_PRESC_DIV64_gc;         // 375kHz clock (24,000,000 / 64)
+  ADC0.SAMPCTRL = 14;                      // 16 ADC-clock sample time (see comment block above)
+  ADC0.CTRLD = ADC_INITDLY_DLY64_gc;       // 64 ADC-clock settle delay, auto-applied on enable
   // ADC0.CTRLA (ADC_ENABLE_bm) is deliberately left off here: the ADC is enabled only for the
   // duration of a reading, in read_batt_voltage_mv(), to avoid drawing its idle current
   // continuously.
@@ -93,7 +115,7 @@ void setupBattVoltMonitor()
 uint16_t read_batt_voltage_mv()
 {
   ADC0.CTRLA = ADC_ENABLE_bm;              // Single, 12-bit
-  delayMicroseconds(100);                  // let VREF/ADC settle, see comment block above
+  _delay_us(100);                          // let VREF/ADC settle, see comment block above
 
   // throw away one conversion as extra settling insurance before trusting a result
   ADC0.COMMAND = ADC_STCONV_bm;
