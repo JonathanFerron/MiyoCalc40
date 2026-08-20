@@ -64,7 +64,7 @@
 // mS  datasheet FIG 11 wait >= 5mS  , Does not work on SW SPI blue
 #define UC1609_POWERON_DELAY3  0
 
-#define UC1609_INIT_DELAY 100 //  mS delay ,after init, 
+#define UC1609_INIT_DELAY 100 //  mS delay ,after init,
 
 
 // No font
@@ -125,7 +125,7 @@ private:
   gpio_pin_t _LCD_CS;
   gpio_pin_t _LCD_CD;
   gpio_pin_t _LCD_RST;
-   uint8_t _VbiasPOT; // Contrast default 0x49 datasheet 00-FE
+  uint8_t _VbiasPOT; // Contrast default 0x49 datasheet 00-FE
 };
 
 #endif
