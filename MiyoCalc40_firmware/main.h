@@ -5,11 +5,9 @@
 
 extern ERM19264_UC1609_T mylcd;
 
-void setup();
 void loop();
 
 void setupMCU();
 void setupLCD();
-void setupBacklight();
 
 #endif

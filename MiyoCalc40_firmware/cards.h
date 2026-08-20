@@ -1,9 +1,5 @@
 // function prototypes for cards.c
-/*
-  #ifdef __cplusplus
-  extern "C" {
-  #endif
-*/
+
 #ifndef CARDS_H
 #define CARDS_H
 
@@ -143,6 +139,14 @@
 // special keycodes: 0xF0 to 0xFF
 #define KC_NOP         0xFF  // no operation
 
+// config-mode-only navigation keycodes: not part of the programmable keycode space above (config
+// mode is never recorded into a program), reused here purely as config_adjust()'s argument so it
+// can tell which of the four arrow actions was pressed.
+#define KCC_UP         0xF0
+#define KCC_DOWN       0xF1
+#define KCC_LEFT       0xF2
+#define KCC_RIGHT      0xF3
+
 // end of keycode definitions
 
 #define ONOFFKEYPOS_R 0x03
@@ -171,18 +175,9 @@ enum calc_prog_config_modes
 
 // function prototypes
 action keytoaction();
-//void enter_calc_mode(__attribute__ ((unused)) uint8_t keycode);
-//void enter_config_mode(__attribute__ ((unused)) uint8_t keycode);
-//void enter_prog_mode(__attribute__ ((unused)) uint8_t keycode);
 
 extern const action ACT_SHFT_F;
 extern const action ACT_SHFT_G;
 extern const action ACT_SHFT_H;
 
 #endif
-
-/*
-  #ifdef __cplusplus
-  }
-  #endif
-*/

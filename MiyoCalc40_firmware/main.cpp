@@ -1,38 +1,30 @@
 /*
    To build and flash the firmware: `make` then `make flash` from MiyoCalc40_firmware/ (see
-   CLAUDE.md for the full make target list).
+   CLAUDE.md and makefile for the full make target list).
 
    main: main program loop
 
    matrix: matrix scanning code
 
-   cards: contains mapping from matrix key positions to 'actions' for each 'mode' and 'card'
+   cards: contains mapping from matrix key positions to 'actions' for each 'mode'
 
    calc: number crunching mode
 
    lcd: to control lcd
-     fonts: fonts bitmaps
+
+   fonts: fonts bitmaps
 
    programming: programming mode
 
    config: configuration mode
-     backlight: to turn on/off backlight and set pwm duty cycle
      util: to display battery voltage, etc
 
-   avrducore: clock/CCP/fuses/GPIO/SPI0 -- replaces what the Arduino/DxCore core used to
-     provide silently (see CLAUDE.md)
+   backlight: to turn on/off backlight and set pwm duty cycle
+
+   avrducore: clock/CCP/fuses/GPIO/SPI0
 */
 
 /* Other notes:
-
-  calc, config and programming mode: should be stored in a global status field that can be set and checked, could be an enum
-  f, g, h shift modifiers: should each be a bool global variable that can be set and checked
-  current config screen: should be stored in a global status fiels as well that can be set and checked, could be an enum (only relevant in 'config' mode)
-
-  see repocalc, openrpncalc, dcalc (main.c) for examples
-       H:\My Drive\MiyoCalc40\resources\openrpncalc
-       H:\My Drive\MiyoCalc40\resources\repocalc
-       H:\My Drive\MiyoCalc40\resources\dcalc-2.12
 
   MCU draws about 6.0mA at 3.2V when actively running at 24 MHz
 
@@ -52,25 +44,15 @@
 #include "util.h"
 #include "clock.h"
 #include "gpio.h"
+#include "backlight.h"
 
-#define LCD_Default_Contrast 0x0C // Default LCD constrast: 0x0A to 0x20 tend to work well. Consider renaming this to something like LCD_DEF_Contrast.
+#define LCD_Default_Contrast 0x0C // Default LCD constrast: 0x0A to 0x20 tend to work well.
 
 // GPIO 5-wire SPI interface
 
-/* //uncomment for arduino uno
-  #define CS 10  // GPIO pin number pick any you want
-  #define CD  9 // GPIO pin number pick any you want
-  #define RST 8 // GPIO pin number pick any you want
-  // GPIO pin number SDA(UNO 11) , HW SPI , MOSI
-  // GPIO pin number SCK(UNO 13) , HW SPI , SCK
-*/
-
-// uncomment for avr-da
 #define LCD_CS GPIO_PIN(PORTA, 7)  // AVR pin connected to LCD CS pin
 #define LCD_CD GPIO_PIN(PORTA, 2) // AVR pin connected to LCD CD pin
 #define LCD_RST GPIO_PIN(PORTA, 3) // AVR pin connected to LCD Reset pin
-
-const gpio_pin_t BACKLIGHT_PIN = GPIO_PIN(PORTA, 1); // LCD LED backlight pin
 
 // Global variables
 ERM19264_UC1609_T  mylcd(LCD_CD, LCD_RST, LCD_CS); // construct object using hardware SPI: CD, RST, CS
@@ -80,42 +62,26 @@ int lcdon;  // to track if lcd is turned on or not, to do: change this to 'calco
 int main()
 { clock_init(); // avrducore/clock.c: 24MHz OSCHF, no prescaler, CPUINT defaults
 
-  /* Insert here any code that needs to run before interrupts are
-     enabled but after all other core initialization. */
-  sei();  // enable interrupts (could consider turning on interupts only after the setup() function, if it matters at all).
-
-  setup();
-
-  for(;;)
-    loop();
-}
-
-void setup()
-{
+  /* Insert here any code that needs to run before interrupts are enabled but after all other core initialization. */
+  sei();  // enable interrupts (could consider turning on interupts only after the setup code below, if it matters at all).
 
   setupMCU();
   setupMatrix();
 
   setupLCD();
 
-  setupBacklight();
+  backlight_init();
   setupBattVoltMonitor();
 
   calc_init();
 
-} // setup()
+  for(;;)
+    loop();
+}
 
-/* TODO: Look into following ideas to save power:
-  - Disable SPI, TCA, TCD, TCB, RTC, CCL when not needed
-  (ADC is handled: see setupBattVoltMonitor() / read_batt_voltage_mv() in util.cpp -- the ADC is
-  only enabled for the duration of a battery-voltage reading, not continuously)
-  - for TCA0= TCA0.SPLIT.CTRLA = 0
-*/
 void setupMCU()
-{ // look into turning off TCD0 to save power (call takeoverTCD0() perhaps )
-
-  // ADC/AC/VREF setup for battery voltage monitoring lives in setupBattVoltMonitor() (util.cpp),
-  // called from setup(). The ADC itself is left disabled there; it's only enabled for the
+{ // ADC/AC/VREF setup for battery voltage monitoring lives in setupBattVoltMonitor() (util.cpp),
+  // called from main(). The ADC itself is left disabled there; it's only enabled for the
   // duration of a reading, by read_batt_voltage_mv().
 
   set_sleep_mode(SLEEP_MODE_STANDBY);
@@ -155,25 +121,6 @@ void setupLCD()
   _delay_ms(50);
   lcdon = true;
 }
-
-// pwm set-up on pin A1
-void setupBacklight()  // this should be moved to the backlight file
-{ GPIO_SET_OUTPUT(BACKLIGHT_PIN); // set LCD LED Backlight pin to output mode
-  PORTMUX.TCAROUTEA = PORTMUX_TCA0_PORTA_gc;  // route TCA to port A for PWM. Pin PA1 is on WO1 (waveform output 1)
-  // see ref_timers.md in dxcore documentation
-  // tca0 is configured by default as 8 bit timer with 6 output channels (we'll only need one): this allows for 256 different values for the duty cycle
-  // we'll use the default prescaler which should give a frequency of 1471 Hz (this is with a prescale of 64). Could be changed to a prescaler of 256, but then
-  // frequency may be too low at 368 Hz? This would be done via TCA0.SPLIT.CTRLA = (TCA0.SPLIT.CTRLA & ~(0b00001110)) | TCA_SPLIT_CLKSEL_DIV256_gc
-  //
-  // NOTE: this used to rely on DxCore's init() (init_TCA0()) to actually put TCA0 into split
-  // 8-bit PWM mode (CTRLD=SPLITM, LPER/HPER=0xFE, CTRLA=DIV64|ENABLE) -- that's gone now that
-  // DxCore is gone. Nothing in the current codebase drives a duty cycle yet (backlight on/off
-  // and dimming are still unimplemented -- see config.cpp's design notes and the unwired
-  // "back light" slot in cards.cpp's config_cards table), so PA1 is left as a plain GPIO output
-  // (driven low) rather than adding unexercised PWM init. Add the TCA0 split-mode setup above
-  // when the real backlight control lands.
-}
-
 
 /*
   go in sleep mode (enable sleep, enable bothedges interrups for all column pins) : see dxcore/megaavr/extras/powersave.md
@@ -241,6 +188,7 @@ void loop()
     // if lcd is off, power it up if 'on' button was pressed
     if(keypos_r == ONOFFKEYPOS_R && keypos_c == ONOFFKEYPOS_C && !lcdon)
     { setupLCD();
+      backlight_resume();
       lcdon = true;
       if(input.started)
         LCDDrawInput();
@@ -342,6 +290,7 @@ void loop()
 // if 'off' button (combination) was pressed (can tell based on action), power down lcd and configure 'sleep mode' to powerdown
 void power_down(__attribute__((unused)) uint8_t keycode)
 { mylcd.FullLCDPowerDown();
+  backlight_suspend(); // see backlight.h: TCA0 must not be left running into Power-Down sleep
   lcdon = false;
   //LCDDrawStackAndMem();
 

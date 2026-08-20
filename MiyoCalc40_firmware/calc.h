@@ -4,10 +4,6 @@
 
 #include <stdint.h>
 
-/*#ifdef __cplusplus
-  extern "C" {
-  #endif
-*/
 #ifndef CALC_H
 #define CALC_H
 
@@ -89,9 +85,3 @@ void LCDDrawCalcStatus();
 void LCDDrawNum(number_for_lcd *nfl, uint8_t page);
 
 #endif
-
-/*
-  #ifdef __cplusplus
-  }
-  #endif
-*/

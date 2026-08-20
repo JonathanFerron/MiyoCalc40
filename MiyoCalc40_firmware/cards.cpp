@@ -108,7 +108,15 @@ const action ACT_PROG_MOD = {KC_NOP, &enter_prog_mode, {MCFNULCHAR, MCFNULCHAR, 
 // config mode actions: none of these are programmable (all use KC_NOP as their keycode), since
 // none of the 'config mode' functions are expected to be recordable in a program.
 const action ACT_CFG_BATTVOLT = {KC_NOP, &config_show_battvolt, {'B' - MCFLETOFFSET, 'A' - MCFLETOFFSET, 'T' - MCFLETOFFSET, 'T' - MCFLETOFFSET, MCFNULCHAR}};
+const action ACT_CFG_BACKLIGHT = {KC_NOP, &config_show_backlight, {'B' - MCFLETOFFSET, 'K' - MCFLETOFFSET, 'L' - MCFLETOFFSET, 'T' - MCFLETOFFSET, MCFNULCHAR}};
 const action ACT_CFG_EXIT = {KC_NOP, &config_cancel_exit, {'E' - MCFLETOFFSET, 'X' - MCFLETOFFSET, 'I' - MCFLETOFFSET, 'T' - MCFLETOFFSET, MCFNULCHAR}};
+
+// config-mode arrow keys: keycode carries the KCC_ direction (see cards.h) as config_adjust()'s
+// argument rather than anything programmable -- config mode is never recorded into a program.
+const action ACT_CFG_UP = {KCC_UP, &config_adjust, {MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR}};
+const action ACT_CFG_DOWN = {KCC_DOWN, &config_adjust, {MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR}};
+const action ACT_CFG_LEFT = {KCC_LEFT, &config_adjust, {MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR}};
+const action ACT_CFG_RIGHT = {KCC_RIGHT, &config_adjust, {MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR, MCFNULCHAR}};
 
 #define x____x &ACT_NOP
 
@@ -187,13 +195,13 @@ const action *prog_cards[4][NUM_ROW_PINS][NUM_COLUMN_PINS] =
 //   2    lcd 1/2 col   time out        -                -             -           -            -   1   2            3
 //   3    debounce      lcd contrast    back light       -             batt volt   soft reset   -   0   cancel/exit  confirm
 //
-// only 'batt volt' and 'cancel/exit' are wired up so far; the rest are placeholders (x____x) for
-// upcoming passes (backlight on/off + dimming is next: backlight action to 'turn backlight config mode on', then use up and down keys to turn on / off and right / left keys to increase / decrease brightness (duty cycle)).
+// 'batt volt', 'cancel/exit', and 'back light' (with its up/down/left/right adjustment) are
+// wired up; the rest are placeholders (x____x) for upcoming passes.
 const action *config_card[NUM_ROW_PINS][NUM_COLUMN_PINS] =
-{ {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
+{ {       x____x,        x____x,        x____x,        x____x, &ACT_CFG_DOWN, &ACT_CFG_UP,        x____x,        x____x,        x____x,        x____x},
+  {       x____x,        x____x,        x____x,        x____x, &ACT_CFG_LEFT, &ACT_CFG_RIGHT,     x____x,        x____x,        x____x,        x____x},
   {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
-  {       x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x,        x____x},
-  {       x____x,        x____x,        x____x,        x____x, &ACT_CFG_BATTVOLT,     x____x,        x____x,        x____x, &ACT_CFG_EXIT,        x____x}
+  {       x____x,        x____x, &ACT_CFG_BACKLIGHT,    x____x, &ACT_CFG_BATTVOLT,     x____x,        x____x,        x____x, &ACT_CFG_EXIT,        x____x}
 };
 
 
@@ -221,8 +229,9 @@ const action *config_card[NUM_ROW_PINS][NUM_COLUMN_PINS] =
   return: the action structure
 */
 action keytoaction()
-{ // prog_cards doesn't exist yet (programming mode is still design notes only, see
-  // programming.h), so prog_mode falls through to calc_cards for now.
+{ // prog_cards exists but is currently just an all-NOP placeholder, unwired here
+  // (programming mode is still design notes only, see programming.h), so prog_mode
+  // falls through to calc_cards for now.
   if(current_calc_prog_config_mode == config_mode)
     return *config_card[keypos_r][keypos_c];
   // lookup action struct pointer in card and dereference it. will eventually add a first

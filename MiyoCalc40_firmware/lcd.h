@@ -1,7 +1,5 @@
 /*
    Based in part on code from the ERM19264_UC1609 project by Gavin Lyons: https://github.com/gavinlyonsrepo/ERM19264_UC1609
-
-
 */
 
 #ifndef LCD_H
@@ -105,7 +103,6 @@ public:
   ~ERM19264_UC1609_T() {};
 
   void LCDGotoXY(uint8_t column, uint8_t page);
-  //void LCDChar(unsigned char character);
   void LCDString(const char* characters, uint8_t col, uint8_t page);
   void LCDbegin(uint8_t VbiasPot = UC1609_DEFAULT_GN_PM);
   void LCDinit(void);
@@ -114,10 +111,6 @@ public:
   void LCDEnable(uint8_t on);
   void LCDFillScreen(uint8_t pixel, uint8_t mircodelay);
   void LCDFillPage(uint8_t pixels);
-  //void LCDrotate(uint8_t rotatevalue);
-  //void LCDinvertDisplay(uint8_t on);
-  //void LCDAllpixelsOn(uint8_t bits);
-  //void LCDscroll(uint8_t bits);
   void LCDBitmap(int16_t x, int16_t y, uint8_t w, uint8_t h, const uint8_t* data);
   void LCDSetContrast(uint8_t cont);
   void LCDChar(uint8_t index, uint8_t col, uint8_t page);
@@ -128,15 +121,11 @@ private:
 
   void send_data(uint8_t data);
   void send_command(uint8_t command, uint8_t value);
-  //bool isHardwareSPI(void);
-  //void CustomshiftOut(uint8_t bitOrder, uint8_t val);
 
   gpio_pin_t _LCD_CS;
   gpio_pin_t _LCD_CD;
   gpio_pin_t _LCD_RST;
-  //int8_t _LCD_SCLK; // Software SPI only
-  //int8_t _LCD_DIN;  // Software SPI only
-  uint8_t _VbiasPOT; // Contrast default 0x49 datasheet 00-FE
+   uint8_t _VbiasPOT; // Contrast default 0x49 datasheet 00-FE
 };
 
 #endif

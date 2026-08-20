@@ -81,7 +81,7 @@ numerically **on real hardware** (e.g. print results over UART) before trusting 
 
 The module breakdown and dependency order is documented in the header comment of `main.cpp` and in `main.h`:
 
-- **main.cpp/h** — `main()`, `setup()`/`loop()`, MCU/sleep setup, port ISRs. `loop()` is the core state machine: sleep the CPU, wake on a column-pin interrupt, debounce (10×2ms), scan the matrix, then dispatch the pressed key.
+- **main.cpp/h** — `main()` (init + `loop()` dispatch), `loop()`, MCU/sleep setup, port ISRs. `loop()` is the core state machine: sleep the CPU, wake on a column-pin interrupt, debounce (10×2ms), scan the matrix, then dispatch the pressed key.
 - **matrix.cpp/h** — keyboard matrix scanning (`scanKB()`), exposes the currently-pressed `keypos_r`/`keypos_c`.
 - **cards.cpp/h** — maps matrix key positions to `action` structs (keycode + function pointer + display mnemonic). A "card" is a swappable keymap (e.g. algebra, trig, finance) with a base layer plus `f`/`g`/`h` shift layers (see `enum layers`). `keytoaction()` is the lookup entry point called from `main.cpp`'s loop.
 - **calc.cpp/h** — the RPN number-crunching engine: stack entry/manipulation (`enter_number`, `enter_enter`, `enter_swap_xy`, `enter_rotate`, ...), 1-arg/2-arg function application (`apply_func_1to1`, `apply_func_2to1`), memory registers (`apply_memory_rcl/sto/clr`), shift-layer state, and LCD stack/input rendering (`LCDDrawStackAndMem`, `LCDDrawInput`, `LCDDrawCalcStatus`).

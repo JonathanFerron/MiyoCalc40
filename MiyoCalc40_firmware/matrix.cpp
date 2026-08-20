@@ -1,51 +1,3 @@
-/* Matrix scanning examples:
-
-  1. Open RPN Calc: slower but more robust
-  define number_of_columns and number_of_rows
-  declare const for row pin and column pin arrays (contain pin numbers)
-
-  helper function (scan keyboard), returns an uint16_t, takes no argument
-  pressed_row = 0
-  pressed_column = -1
-  set all output column pins to high
-  scan columns: for each column
-    set one column pin output low
-    small 10 microsecond delay for transitional processes to finish
-    read row pins: for each row
-      read row pin status
-      if row pin is low:
-        pressed_row = current row
-        pressed_column = current column
-    end loop over all rows
-
-    set column pin back to high
-
-  end loop over all columns
-
-  reset all output column pins to low
-
-  return pressed_column + pressed_row * number_of_columns + 1
-
-  2. an3407: faster but less robust
-  define number_of_columns and number_of_rows
-  declare const for row pin and column pin arrays (contain pin numbers)
-
-  set column as input pull-up (already done in main loop)
-  Rows as output low (already done in main loop)
-  Read each column to find which has been pulled low
-  This will tell us which column was pressed
-
-  set row pins as input pull-up
-  Set entire column axis as output low
-  Read voltage on each rows to find which has been pulled low
-  This will tell us which row was pressed
-
-  reset columns pins to input pull-up and row pins as output low
-
-  Combine row and column into an int (e.g. 2 nibbles encoded in an uint8) or a set of 2 ints (one for each value, could be in a bitfield) and return the result
-
-*/
-
 // Includes
 #include <util/delay.h>
 
@@ -53,7 +5,6 @@
 #include "gpio.h"
 
 // Defines
-//define number_of_columns and number_of_rows
 
 // Global variables
 //declare const for row pin and column pin arrays (contain pin numbers)
@@ -74,13 +25,7 @@ const gpio_pin_t column_pin_array[NUM_COLUMN_PINS] =
 
 uint8_t keypos_r;
 uint8_t keypos_c;
-/*
-  struct keyposS
-  {
-  unsigned int r : 4;
-  unsigned int c : 4;
-  } keypos;
-*/
+
 
 // helper matrix scanning functions code
 
@@ -92,16 +37,11 @@ void setupMatrix()
   PORTF.PINCTRLSET = 0b00000011;
 
   // set-up column pins as input
-  //PORTC.DIR &= ~(PIN0_bm | PIN1_bm | PIN2_bm | PIN3_bm);
-  //PORTD.DIR &= ~(PIN4_bm | PIN5_bm | PIN6_bm | PIN7_bm);
-  //PORTF.DIR &= ~(PIN0_bm, PIN1_bm);
   PORTC.DIRCLR = PIN0_bm | PIN1_bm | PIN2_bm | PIN3_bm;
   PORTD.DIRCLR = PIN4_bm | PIN5_bm | PIN6_bm | PIN7_bm;
   PORTF.DIRCLR = PIN0_bm | PIN1_bm;
 
   // set row pins as output low
-  //PORTD.DIR |= PIN0_bm | PIN1_bm | PIN2_bm | PIN3_bm; // output
-  //PORTD.OUT &= ~(PIN0_bm | PIN1_bm | PIN2_bm | PIN3_bm); // low
   PORTD.DIRSET = PIN0_bm | PIN1_bm | PIN2_bm | PIN3_bm;
   PORTD.OUTCLR = PIN0_bm | PIN1_bm | PIN2_bm | PIN3_bm;
 

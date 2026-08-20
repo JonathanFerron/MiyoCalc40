@@ -894,5 +894,11 @@ void LCDDrawCalcStatus()
   { mylcd.LCDBitmap(180, 13*1, 6, 8, MiyoCalcFont_Blank); // blank
   }
 
+  // indicator area 3, config mode (programming mode has no functional indicator yet)
+  if(current_calc_prog_config_mode == config_mode)
+    mylcd.LCDBitmap(180, 13*2, 6, 8, MiyoCalcFont_ConfigMode);
+  else
+    mylcd.LCDBitmap(180, 13*2, 6, 8, MiyoCalcFont_Blank);
+
 } // LCDDrawCalcStatus()
 
