@@ -10,6 +10,26 @@ I would like to give credit to the work of the following individuals which has s
 - Alex Garza for work done on the Voyager form-factor RPN calculators: https://paxer.net/voyager/
 - Anton Poluektov for work done on the OpenRPNCalc calculator: https://github.com/apoluekt/OpenRPNCalc
 
+## Building and flashing the firmware
+
+Toolchain: `avr-gcc` + avr-libc (AVR128DA28 support built in) and avrdude 8.x. No Arduino IDE needed.
+Programmer: a CH340E USB-serial adapter used as a SerialUPDI programmer (avrdude's `serialupdi`).
+
+From `MiyoCalc40_firmware/`:
+
+| Command | Action |
+|---|---|
+| `make` | Build `build/MiyoCalc40_firmware.hex` |
+| `make flash` | Flash the firmware over UPDI |
+| `make flash_fuses` | Write the fuse row (first-time setup, or after changing `avrducore/fuses.c`) |
+| `make help` | List all targets |
+
+The default port is `/dev/ttyUSB0`. To use a different one, pass `PROG_PORT`, e.g. `make flash PROG_PORT=/dev/ttyUSB1`.
+
+Equivalent raw avrdude command:
+
+    avrdude -c serialupdi -p avr128da28 -P /dev/ttyUSB0 -U flash:w:build/MiyoCalc40_firmware.hex:i
+
 The MiyoCalc40 **PCB work** is licensed under a
 [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License][cc-by-nc-sa].
 

@@ -18,130 +18,12 @@
       "-fno-threadsafe-statics",
       "-c",
       "-o",
-      "build/config.o",
-      "config.cpp"
+      "build/cards.o",
+      "cards.cpp"
     ],
     "directory": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware",
-    "file": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/config.cpp",
-    "output": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/build/config.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/avr-gcc",
-      "-mmcu=avr128da28",
-      "-DF_CPU=24000000UL",
-      "-Os",
-      "-Wall",
-      "-Wextra",
-      "-Wshadow",
-      "-Wundef",
-      "-ffunction-sections",
-      "-fdata-sections",
-      "-Iavrducore",
-      "-std=gnu11",
-      "-Wstrict-prototypes",
-      "-c",
-      "-o",
-      "build/avrducore/fuses.o",
-      "avrducore/fuses.c"
-    ],
-    "directory": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware",
-    "file": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/avrducore/fuses.c",
-    "output": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/build/avrducore/fuses.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/avr-g++",
-      "-mmcu=avr128da28",
-      "-DF_CPU=24000000UL",
-      "-Os",
-      "-Wall",
-      "-Wextra",
-      "-Wshadow",
-      "-Wundef",
-      "-ffunction-sections",
-      "-fdata-sections",
-      "-Iavrducore",
-      "-std=gnu++17",
-      "-fno-exceptions",
-      "-fno-rtti",
-      "-fno-threadsafe-statics",
-      "-c",
-      "-o",
-      "build/main.o",
-      "main.cpp"
-    ],
-    "directory": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware",
-    "file": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/main.cpp",
-    "output": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/build/main.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/avr-gcc",
-      "-mmcu=avr128da28",
-      "-DF_CPU=24000000UL",
-      "-x",
-      "assembler-with-cpp",
-      "-c",
-      "-o",
-      "build/avrducore/ccp.o",
-      "avrducore/ccp.S"
-    ],
-    "directory": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware",
-    "file": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/avrducore/ccp.S",
-    "output": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/build/avrducore/ccp.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/avr-g++",
-      "-mmcu=avr128da28",
-      "-DF_CPU=24000000UL",
-      "-Os",
-      "-Wall",
-      "-Wextra",
-      "-Wshadow",
-      "-Wundef",
-      "-ffunction-sections",
-      "-fdata-sections",
-      "-Iavrducore",
-      "-std=gnu++17",
-      "-fno-exceptions",
-      "-fno-rtti",
-      "-fno-threadsafe-statics",
-      "-c",
-      "-o",
-      "build/backlight.o",
-      "backlight.cpp"
-    ],
-    "directory": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware",
-    "file": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/backlight.cpp",
-    "output": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/build/backlight.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/avr-g++",
-      "-mmcu=avr128da28",
-      "-DF_CPU=24000000UL",
-      "-Os",
-      "-Wall",
-      "-Wextra",
-      "-Wshadow",
-      "-Wundef",
-      "-ffunction-sections",
-      "-fdata-sections",
-      "-Iavrducore",
-      "-std=gnu++17",
-      "-fno-exceptions",
-      "-fno-rtti",
-      "-fno-threadsafe-statics",
-      "-c",
-      "-o",
-      "build/lcd.o",
-      "lcd.cpp"
-    ],
-    "directory": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware",
-    "file": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/lcd.cpp",
-    "output": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/build/lcd.o"
+    "file": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/cards.cpp",
+    "output": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/build/cards.o"
   },
   {
     "arguments": [
@@ -188,12 +70,12 @@
       "-fno-threadsafe-statics",
       "-c",
       "-o",
-      "build/util.o",
-      "util.cpp"
+      "build/lcd.o",
+      "lcd.cpp"
     ],
     "directory": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware",
-    "file": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/util.cpp",
-    "output": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/build/util.o"
+    "file": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/lcd.cpp",
+    "output": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/build/lcd.o"
   },
   {
     "arguments": [
@@ -214,12 +96,36 @@
       "-fno-threadsafe-statics",
       "-c",
       "-o",
-      "build/cards.o",
-      "cards.cpp"
+      "build/config.o",
+      "config.cpp"
     ],
     "directory": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware",
-    "file": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/cards.cpp",
-    "output": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/build/cards.o"
+    "file": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/config.cpp",
+    "output": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/build/config.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/avr-gcc",
+      "-mmcu=avr128da28",
+      "-DF_CPU=24000000UL",
+      "-Os",
+      "-Wall",
+      "-Wextra",
+      "-Wshadow",
+      "-Wundef",
+      "-ffunction-sections",
+      "-fdata-sections",
+      "-Iavrducore",
+      "-std=gnu11",
+      "-Wstrict-prototypes",
+      "-c",
+      "-o",
+      "build/avrducore/clock.o",
+      "avrducore/clock.c"
+    ],
+    "directory": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware",
+    "file": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/avrducore/clock.c",
+    "output": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/build/avrducore/clock.o"
   },
   {
     "arguments": [
@@ -264,12 +170,12 @@
       "-fno-threadsafe-statics",
       "-c",
       "-o",
-      "build/calc.o",
-      "calc.cpp"
+      "build/util.o",
+      "util.cpp"
     ],
     "directory": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware",
-    "file": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/calc.cpp",
-    "output": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/build/calc.o"
+    "file": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/util.cpp",
+    "output": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/build/util.o"
   },
   {
     "arguments": [
@@ -288,12 +194,64 @@
       "-Wstrict-prototypes",
       "-c",
       "-o",
-      "build/avrducore/clock.o",
-      "avrducore/clock.c"
+      "build/avrducore/fuses.o",
+      "avrducore/fuses.c"
     ],
     "directory": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware",
-    "file": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/avrducore/clock.c",
-    "output": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/build/avrducore/clock.o"
+    "file": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/avrducore/fuses.c",
+    "output": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/build/avrducore/fuses.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/avr-g++",
+      "-mmcu=avr128da28",
+      "-DF_CPU=24000000UL",
+      "-Os",
+      "-Wall",
+      "-Wextra",
+      "-Wshadow",
+      "-Wundef",
+      "-ffunction-sections",
+      "-fdata-sections",
+      "-Iavrducore",
+      "-std=gnu++17",
+      "-fno-exceptions",
+      "-fno-rtti",
+      "-fno-threadsafe-statics",
+      "-c",
+      "-o",
+      "build/backlight.o",
+      "backlight.cpp"
+    ],
+    "directory": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware",
+    "file": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/backlight.cpp",
+    "output": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/build/backlight.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/avr-g++",
+      "-mmcu=avr128da28",
+      "-DF_CPU=24000000UL",
+      "-Os",
+      "-Wall",
+      "-Wextra",
+      "-Wshadow",
+      "-Wundef",
+      "-ffunction-sections",
+      "-fdata-sections",
+      "-Iavrducore",
+      "-std=gnu++17",
+      "-fno-exceptions",
+      "-fno-rtti",
+      "-fno-threadsafe-statics",
+      "-c",
+      "-o",
+      "build/main.o",
+      "main.cpp"
+    ],
+    "directory": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware",
+    "file": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/main.cpp",
+    "output": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/build/main.o"
   },
   {
     "arguments": [
@@ -320,5 +278,47 @@
     "directory": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware",
     "file": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/matrix.cpp",
     "output": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/build/matrix.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/avr-gcc",
+      "-mmcu=avr128da28",
+      "-DF_CPU=24000000UL",
+      "-x",
+      "assembler-with-cpp",
+      "-c",
+      "-o",
+      "build/avrducore/ccp.o",
+      "avrducore/ccp.S"
+    ],
+    "directory": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware",
+    "file": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/avrducore/ccp.S",
+    "output": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/build/avrducore/ccp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/avr-g++",
+      "-mmcu=avr128da28",
+      "-DF_CPU=24000000UL",
+      "-Os",
+      "-Wall",
+      "-Wextra",
+      "-Wshadow",
+      "-Wundef",
+      "-ffunction-sections",
+      "-fdata-sections",
+      "-Iavrducore",
+      "-std=gnu++17",
+      "-fno-exceptions",
+      "-fno-rtti",
+      "-fno-threadsafe-statics",
+      "-c",
+      "-o",
+      "build/calc.o",
+      "calc.cpp"
+    ],
+    "directory": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware",
+    "file": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/calc.cpp",
+    "output": "/home/jonathan/projects/MiyoCalc40/MiyoCalc40_firmware/build/calc.o"
   }
 ]
